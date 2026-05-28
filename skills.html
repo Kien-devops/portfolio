@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html class="light" lang="en" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+    <link rel="apple-touch-icon" href="apple-touch-icon.svg"/>
+    <title>Skills | Kien Nguyen</title>
+    <meta name="description" content="DevOps, cloud, security, and observability skills by Kien Nguyen."/>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              background: "#fbf9f9",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-low": "#f5f3f3",
+              "surface-container": "#efeded",
+              "surface-container-high": "#e9e8e7",
+              primary: "#000000",
+              "primary-container": "#1c1b1b",
+              "on-primary": "#ffffff",
+              "on-background": "#1b1c1c",
+              "on-surface": "#1b1c1c",
+              "on-surface-variant": "#444748",
+              "outline-variant": "#c4c7c7",
+              secondary: "#735c00"
+            },
+            borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+            spacing: { "margin-mobile": "20px", "base-unit": "8px", gutter: "24px", "margin-desktop": "64px", "section-gap": "120px", "container-max": "1200px" },
+            fontFamily: {
+              "headline-md": ["Playfair Display"],
+              "headline-xl": ["Playfair Display"],
+              "headline-xl-mobile": ["Playfair Display"],
+              "headline-lg": ["Playfair Display"],
+              "body-md": ["Inter"],
+              "body-lg": ["Inter"],
+              "label-md": ["Inter"],
+              "label-sm": ["Inter"],
+              mono: ["Fira Code", "monospace"]
+            },
+            fontSize: {
+              "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+              "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "600"}],
+              "headline-xl": ["48px", {"lineHeight": "1.1", "fontWeight": "700"}],
+              "headline-xl-mobile": ["36px", {"lineHeight": "1.2", "fontWeight": "700"}],
+              "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+              "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+              "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+              "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "500"}]
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+        body { min-height: 100vh; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; display: inline-block; vertical-align: middle; }
+        .signature-divider { height: 1px; background-color: #735c00; width: 100%; }
+        .reveal-up { opacity: 0; transform: translateY(40px); transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal-up.active { opacity: 1; transform: translateY(0); }
+        .tech-badge { font-family: 'Fira Code', monospace; font-size: 11px; letter-spacing: -0.02em; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased overflow-x-hidden">
+    <header class="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-md flex justify-between items-center px-margin-mobile h-16 border-b border-outline-variant/20 transition-all duration-300 md:hidden">
+        <div class="flex items-center gap-4">
+            <button class="text-primary hover:text-secondary transition-colors duration-300" id="menu-toggle"><span class="material-symbols-outlined">menu</span></button>
+            <a href="index.html" class="font-headline-md text-headline-md font-bold tracking-tighter text-primary">KN.DEVOPS</a>
+        </div>
+    </header>
+    <div class="fixed inset-0 bg-black/20 z-[60] hidden transition-opacity duration-300 opacity-0 md:hidden" id="drawer-overlay"></div>
+    <aside class="fixed top-0 left-0 h-full w-[280px] z-[70] bg-surface-container-low md:bg-background shadow-xl md:shadow-none -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out border-r border-outline-variant/30 flex flex-col justify-between" id="nav-drawer">
+        <div class="p-8 flex flex-col items-center">
+            <div class="w-24 h-24 rounded-full bg-primary-container flex items-center justify-center shadow-lg border-2 border-surface-container-lowest overflow-hidden mb-4"><span class="font-headline-md text-secondary text-3xl tracking-tighter">KN</span></div>
+            <h2 class="font-headline-md text-headline-md text-primary font-bold">Kien Nguyen</h2>
+            <p class="font-label-sm text-on-surface-variant text-center mt-2 italic">DevOps &amp; DevSecOps Engineer</p>
+        </div>
+        <nav class="flex flex-col px-4 gap-2 flex-1">
+            <a class="flex items-center gap-4 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors duration-300 font-semibold" href="index.html"><span class="material-symbols-outlined text-[20px] w-5 shrink-0 text-center">home</span><span class="font-label-md text-label-md tracking-wider uppercase">Home</span></a>
+            <a class="relative flex items-center gap-4 px-4 py-3 rounded-lg bg-surface-container-high text-primary transition-colors duration-300 font-semibold before:absolute before:left-0 before:top-2 before:bottom-2 before:w-1 before:rounded-full before:bg-secondary" href="skills.html"><span class="material-symbols-outlined text-[20px] w-5 shrink-0 text-center">category</span><span class="font-label-md text-label-md tracking-wider uppercase">Skills</span></a>
+            <a class="flex items-center gap-4 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors duration-300 font-semibold" href="pipeline.html"><span class="material-symbols-outlined text-[20px] w-5 shrink-0 text-center">route</span><span class="font-label-md text-label-md tracking-wider uppercase">Pipeline</span></a>
+            <a class="flex items-center gap-4 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors duration-300 font-semibold" href="projects.html"><span class="material-symbols-outlined text-[20px] w-5 shrink-0 text-center">folder</span><span class="font-label-md text-label-md tracking-wider uppercase">Projects</span></a>
+            <a class="flex items-center gap-4 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors duration-300 font-semibold" href="blogs.html"><span class="material-symbols-outlined text-[20px] w-5 shrink-0 text-center">book</span><span class="font-label-md text-label-md tracking-wider uppercase">Blogs</span></a>
+            <a class="flex items-center gap-4 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors duration-300 font-semibold" href="contact.html"><span class="material-symbols-outlined text-[20px] w-5 shrink-0 text-center">info</span><span class="font-label-md text-label-md tracking-wider uppercase">Contact</span></a>
+        </nav>
+        <div class="p-6 border-t border-outline-variant/20 flex justify-center gap-4">
+            <a href="https://github.com/kiennguly24" target="_blank" class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors group"><i class="fa-brands fa-github text-[18px] group-hover:scale-110 transition-transform"></i></a>
+            <a href="https://www.linkedin.com/in/kien-vpc-peering/" target="_blank" class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors group"><i class="fa-brands fa-linkedin-in text-[18px] group-hover:scale-110 transition-transform"></i></a>
+            <a href="mailto:kiennguly24@gmail.com" class="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors group"><i class="fa-solid fa-envelope text-[18px] group-hover:scale-110 transition-transform"></i></a>
+        </div>
+    </aside>
+
+    <main class="mt-16 md:mt-0 md:ml-[280px] min-h-screen">
+        <section class="py-12 md:py-16 bg-surface-container-low">
+            <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop reveal-up">
+                <div class="flex flex-col gap-4 mb-16">
+                    <div class="signature-divider max-w-[100px]"></div>
+                    <span class="font-label-md text-label-md uppercase tracking-widest text-secondary">Expertise</span>
+                    <h1 class="font-headline-xl-mobile md:font-headline-xl text-headline-xl-mobile md:text-headline-xl text-primary">Skills &amp; Orchestration</h1>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 border border-outline-variant/30 flex flex-col justify-between">
+                        <div><span class="fa-brands fa-aws text-secondary mb-6 block text-4xl"></span><h3 class="font-headline-md text-headline-md text-primary mb-4">Cloud Platforms</h3><p class="text-on-surface-variant font-body-md mb-8">Designing enterprise cloud setups, multi-AZ networking, secure IAM topologies, and Managed Kubernetes clusters.</p></div>
+                        <div class="flex flex-wrap gap-2"><span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">AWS</span><span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">EKS</span><span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">ECR</span><span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">VPC</span></div>
+                    </div>
+                    <div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 border border-outline-variant/30 flex flex-col justify-between">
+                        <div><span class="fa-brands fa-docker text-secondary mb-6 block text-4xl"></span><h3 class="font-headline-md text-headline-md text-primary mb-4">Containers</h3><p class="text-on-surface-variant font-body-md mb-8">Building slim application container images, writing declarations, and configuring complex ingress policies.</p></div>
+                        <div class="flex flex-wrap gap-2"><span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Docker</span><span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Kubernetes</span><span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Kustomize</span></div>
+                    </div>
+                    <div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 border border-outline-variant/30 flex flex-col justify-between">
+                        <div><span class="fa-solid fa-code-merge text-secondary mb-6 block text-4xl"></span><h3 class="font-headline-md text-headline-md text-primary mb-4">GitOps &amp; CI/CD</h3><p class="text-on-surface-variant font-body-md mb-8">Automating application releases using declarative deployments and version-controlled infrastructure sync.</p></div>
+                        <div class="flex flex-wrap gap-2"><span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Argo CD</span><span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">GitHub Actions</span><span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Terraform</span></div>
+                    </div>
+                    <div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 border border-outline-variant/30 flex flex-col justify-between">
+                        <div><span class="fa-solid fa-shield-halved text-secondary mb-6 block text-4xl"></span><h3 class="font-headline-md text-headline-md text-primary mb-4">DevSecOps</h3><p class="text-on-surface-variant font-body-md mb-8">Shifting security left by enforcing static analysis, container audits, admission controllers, and threat detection.</p></div>
+                        <div class="flex flex-wrap gap-2"><span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Trivy</span><span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">SonarQube</span><span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Kyverno</span><span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Falco</span></div>
+                    </div>
+                    <div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 border border-outline-variant/30 flex flex-col justify-between md:col-span-2">
+                        <div><span class="fa-solid fa-chart-line text-secondary mb-6 block text-4xl"></span><h3 class="font-headline-md text-headline-md text-primary mb-4">Observability &amp; Guardrails</h3><p class="text-on-surface-variant font-body-md mb-8">Establishing metrics baselines, alerting rule matrices, centralized system logs, and building automated triggers for scaling activities.</p></div>
+                        <div class="flex flex-wrap gap-2"><span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Prometheus</span><span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Grafana</span><span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Loki</span><span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Alertmanager</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="bg-surface-container text-on-surface border-t border-outline-variant w-full md:pl-[280px]"><div class="flex flex-col items-center gap-base-unit py-12 px-margin-mobile text-center"><span class="font-headline-md text-headline-md text-primary font-bold tracking-tighter mb-4">KN.DEVOPS</span><p class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant opacity-60">&copy; 2026 Kien Nguyen. All rights reserved.</p></div></footer>
+    <script src="script.js?v=9"></script>
+</body>
+</html>
