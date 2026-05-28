@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html class="light" lang="en" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Kien Nguyen | DevOps & DevSecOps Engineer</title>
+    <meta name="description" content="Portfolio of Kien Nguyen, DevOps Engineer specializing in AWS EKS, GitOps, and CI/CD."/>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- FontAwesome for Tech Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+              "inverse-primary": "#c8c6c5",
+              "inverse-surface": "#303031",
+              "on-tertiary-container": "#838484",
+              "background": "#fbf9f9",
+              "error-container": "#ffdad6",
+              "surface-bright": "#fbf9f9",
+              "tertiary-container": "#1a1c1c",
+              "tertiary": "#000000",
+              "surface-container-high": "#e9e8e7",
+              "primary-fixed-dim": "#c8c6c5",
+              "on-surface": "#1b1c1c",
+              "surface-container-highest": "#e3e2e2",
+              "on-tertiary-fixed-variant": "#454747",
+              "primary": "#000000",
+              "on-primary-fixed-variant": "#474746",
+              "surface-dim": "#dbdad9",
+              "on-primary-fixed": "#1c1b1b",
+              "on-secondary": "#ffffff",
+              "on-secondary-container": "#745c00",
+              "tertiary-fixed": "#e2e2e2",
+              "on-error": "#ffffff",
+              "inverse-on-surface": "#f2f0f0",
+              "secondary-fixed": "#ffe088",
+              "surface-container": "#efeded",
+              "on-secondary-fixed": "#241a00",
+              "surface-container-lowest": "#ffffff",
+              "on-primary-container": "#858383",
+              "on-surface-variant": "#444748",
+              "on-secondary-fixed-variant": "#574500",
+              "tertiary-fixed-dim": "#c6c6c7",
+              "on-tertiary": "#ffffff",
+              "secondary-fixed-dim": "#e9c349",
+              "secondary": "#735c00",
+              "error": "#ba1a1a",
+              "surface-tint": "#5f5e5e",
+              "primary-container": "#1c1b1b",
+              "on-primary": "#ffffff",
+              "primary-fixed": "#e5e2e1",
+              "on-tertiary-fixed": "#1a1c1c",
+              "on-background": "#1b1c1c",
+              "outline": "#747878",
+              "surface-container-low": "#f5f3f3",
+              "surface": "#fbf9f9",
+              "outline-variant": "#c4c7c7",
+              "secondary-container": "#fed65b",
+              "on-error-container": "#93000a",
+              "surface-variant": "#e3e2e2"
+            },
+            "borderRadius": {
+              "DEFAULT": "0.25rem",
+              "lg": "0.5rem",
+              "xl": "0.75rem",
+              "full": "9999px"
+            },
+            "spacing": {
+              "margin-mobile": "20px",
+              "base-unit": "8px",
+              "gutter": "24px",
+              "margin-desktop": "64px",
+              "section-gap": "120px",
+              "container-max": "1200px"
+            },
+            "fontFamily": {
+              "headline-md": ["Playfair Display"],
+              "label-md": ["Inter"],
+              "headline-xl": ["Playfair Display"],
+              "headline-lg": ["Playfair Display"],
+              "body-lg": ["Inter"],
+              "body-md": ["Inter"],
+              "label-sm": ["Inter"],
+              "headline-xl-mobile": ["Playfair Display"],
+              "mono": ["Fira Code", "monospace"]
+            },
+            "fontSize": {
+              "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+              "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+              "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+              "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "600"}],
+              "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+              "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+              "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+              "headline-xl-mobile": ["36px", {"lineHeight": "1.2", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .signature-divider {
+            height: 1px;
+            background-color: #735c00;
+            width: 100%;
+        }
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-up.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .tech-badge {
+            font-family: 'Fira Code', monospace;
+            font-size: 11px;
+            letter-spacing: -0.02em;
+        }
+        body {
+            min-height: 100vh;
+        }
+        /* Custom scrollbar to match quiet luxury */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fbf9f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c4c7c7;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #735c00;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased overflow-x-hidden">
+
+    <!-- TopAppBar -->
+    <header class="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-md flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 border-b border-outline-variant/20 transition-all duration-300">
+        <div class="flex items-center gap-4">
+            <button class="md:hidden text-primary hover:text-secondary transition-colors duration-300" id="menu-toggle">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+            <span class="font-headline-md text-headline-md font-bold tracking-tighter text-primary">KN.DEVOPS</span>
+        </div>
+        <nav class="hidden md:flex gap-8">
+            <a class="text-on-surface-variant font-label-md uppercase tracking-widest hover:text-secondary transition-colors duration-300" href="#about">Profile</a>
+            <a class="text-on-surface-variant font-label-md uppercase tracking-widest hover:text-secondary transition-colors duration-300" href="#skills">Skills</a>
+            <a class="text-on-surface-variant font-label-md uppercase tracking-widest hover:text-secondary transition-colors duration-300" href="#pipeline">Pipeline</a>
+            <a class="text-on-surface-variant font-label-md uppercase tracking-widest hover:text-secondary transition-colors duration-300" href="#projects">Projects</a>
+            <a class="text-on-surface-variant font-label-md uppercase tracking-widest hover:text-secondary transition-colors duration-300" href="#blogs">Blogs</a>
+            <a class="text-on-surface-variant font-label-md uppercase tracking-widest hover:text-secondary transition-colors duration-300" href="#contact">Contact</a>
+        </nav>
+        <div class="w-8"></div> <!-- Spacer for symmetry -->
+    </header>
+
+    <!-- Mobile Drawer Overlay -->
+    <div class="fixed inset-0 bg-black/20 z-[60] hidden transition-opacity duration-300 opacity-0" id="drawer-overlay"></div>
+    <aside class="fixed top-0 left-0 h-full w-80 z-[70] bg-surface-container-lowest shadow-xl -translate-x-full transition-transform duration-300 ease-in-out border-r border-outline-variant/30" id="nav-drawer">
+        <div class="flex flex-col p-8 gap-6">
+            <div class="flex justify-between items-center mb-8">
+                <span class="font-label-md text-label-md uppercase tracking-widest text-on-tertiary-container">NAVIGATION</span>
+                <button id="close-drawer">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <a class="flex items-center gap-4 text-on-surface-variant hover:translate-x-2 transition-transform duration-300" href="#about" onclick="toggleNav()">
+                <span class="material-symbols-outlined">person</span>
+                <span class="font-label-md text-label-md uppercase tracking-widest">Profile</span>
+            </a>
+            <a class="flex items-center gap-4 text-on-surface-variant hover:translate-x-2 transition-transform duration-300" href="#skills" onclick="toggleNav()">
+                <span class="material-symbols-outlined">construction</span>
+                <span class="font-label-md text-label-md uppercase tracking-widest">Skills</span>
+            </a>
+            <a class="flex items-center gap-4 text-on-surface-variant hover:translate-x-2 transition-transform duration-300" href="#pipeline" onclick="toggleNav()">
+                <span class="material-symbols-outlined">route</span>
+                <span class="font-label-md text-label-md uppercase tracking-widest">Pipeline</span>
+            </a>
+            <a class="flex items-center gap-4 text-on-surface-variant hover:translate-x-2 transition-transform duration-300" href="#projects" onclick="toggleNav()">
+                <span class="material-symbols-outlined">folder</span>
+                <span class="font-label-md text-label-md uppercase tracking-widest">Projects</span>
+            </a>
+            <a class="flex items-center gap-4 text-on-surface-variant hover:translate-x-2 transition-transform duration-300" href="#blogs" onclick="toggleNav()">
+                <span class="material-symbols-outlined">book</span>
+                <span class="font-label-md text-label-md uppercase tracking-widest">Blogs</span>
+            </a>
+            <a class="flex items-center gap-4 text-on-surface-variant hover:translate-x-2 transition-transform duration-300" href="#contact" onclick="toggleNav()">
+                <span class="material-symbols-outlined">mail</span>
+                <span class="font-label-md text-label-md uppercase tracking-widest">Contact</span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="mt-16">
+        <!-- Hero Section -->
+        <header id="about" class="relative w-full h-auto py-24 md:py-36 flex flex-col justify-center items-center px-margin-mobile md:px-margin-desktop bg-surface-container-low overflow-hidden">
+            <div class="absolute inset-0 opacity-5 pointer-events-none">
+                <div class="absolute inset-0 bg-[radial-gradient(#735c00_1px,transparent_1px)] [background-size:40px_40px]"></div>
+            </div>
+            <div class="relative z-10 flex flex-col md:flex-row items-center gap-12 max-w-container-max mx-auto w-full reveal-up">
+                <!-- Avatar Graphic -->
+                <div class="relative group">
+                    <div class="absolute -inset-4 bg-secondary/5 rounded-full scale-0 group-hover:scale-100 transition-transform duration-700 ease-out"></div>
+                    <div class="w-48 h-48 md:w-64 md:h-64 rounded-full bg-primary-container flex items-center justify-center shadow-2xl border-4 border-surface-container-lowest transition-all duration-500 overflow-hidden">
+                        <div class="flex flex-col items-center">
+                            <span class="font-headline-xl text-secondary text-5xl md:text-7xl tracking-tighter">KN</span>
+                            <span class="font-mono text-[10px] text-on-primary-container tracking-widest uppercase mt-2">DevOps</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center md:text-left flex-1">
+                    <span class="font-label-md text-label-md uppercase tracking-widest text-secondary mb-4 block">Cloud &amp; Platform Engineer</span>
+                    <h1 class="font-headline-xl-mobile md:font-headline-xl text-headline-xl-mobile md:text-headline-xl text-primary mb-6">
+                        Kien Nguyen
+                    </h1>
+                    <p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl mb-8">
+                        Building secure, high-availability, and automated cloud platforms. Specializing in AWS EKS cluster design, automated DevSecOps pipelines, and declarative GitOps deployments.
+                    </p>
+                    <div class="flex flex-wrap justify-center md:justify-start gap-4">
+                        <a href="#projects" class="bg-primary text-on-primary px-6 py-3 rounded-lg font-label-md text-label-md hover:bg-secondary transition-colors duration-300 uppercase tracking-widest text-center">
+                            Explore Works
+                        </a>
+                        <a href="#contact" class="border border-secondary text-secondary px-6 py-3 rounded-lg font-label-md text-label-md hover:bg-secondary/5 transition-colors uppercase tracking-widest text-center">
+                            Get In Touch
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Certifications Section -->
+        <section class="py-20 bg-background border-b border-outline-variant/20">
+            <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop reveal-up">
+                <div class="flex flex-col gap-2 mb-10 text-center md:text-left">
+                    <div class="signature-divider max-w-[80px] mx-auto md:mx-0"></div>
+                    <span class="font-label-md text-label-md uppercase tracking-widest text-secondary">Verified Expertise</span>
+                    <h2 class="font-headline-lg text-headline-lg text-primary">Industry Certifications</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
+                    <a href="https://www.credly.com/badges/fb64362a-24b4-4006-bc6d-d7fd1428a9e1/public_url" target="_blank" class="flex items-center gap-6 p-6 bg-surface-container-low hover:bg-surface-container transition-all duration-500 rounded-xl border border-outline-variant/30 group w-full">
+                        <i class="fa-brands fa-aws text-4xl text-[#FF9900]"></i>
+                        <div>
+                            <h3 class="font-headline-md text-[18px] text-primary group-hover:text-secondary transition-colors">AWS Solutions Architect</h3>
+                            <p class="font-label-sm text-[12px] text-on-surface-variant uppercase tracking-wider mt-1">Associate • Verified Credly Link</p>
+                        </div>
+                    </a>
+                    <a href="https://www.credly.com/badges/d38c4a62-2af2-4593-9e90-5b0bd42517e2/public_url" target="_blank" class="flex items-center gap-6 p-6 bg-surface-container-low hover:bg-surface-container transition-all duration-500 rounded-xl border border-outline-variant/30 group w-full">
+                        <i class="fa-brands fa-aws text-4xl text-[#FF9900]"></i>
+                        <div>
+                            <h3 class="font-headline-md text-[18px] text-primary group-hover:text-secondary transition-colors">AWS Cloud Practitioner</h3>
+                            <p class="font-label-sm text-[12px] text-on-surface-variant uppercase tracking-wider mt-1">Foundational • Verified Credly Link</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bio & Philosophy -->
+        <section class="py-section-gap bg-background">
+            <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop grid md:grid-cols-12 gap-gutter reveal-up">
+                <div class="md:col-span-4 flex flex-col gap-4">
+                    <div class="signature-divider"></div>
+                    <span class="font-label-md text-label-md uppercase tracking-widest text-secondary">The Philosophy</span>
+                </div>
+                <div class="md:col-span-8 flex flex-col gap-8">
+                    <h2 class="font-headline-lg text-headline-lg text-primary">
+                        Quiet Operations, Decisive Delivery
+                    </h2>
+                    <div class="flex flex-col gap-6 text-on-surface-variant font-body-lg leading-relaxed">
+                        <p>
+                            I design infrastructure under the principle of minimal noise and maximum stability. In modern systems architecture, reliability is not loud; it is quiet, predictable, and fully codified.
+                        </p>
+                        <p>
+                            From automating multi-stage pipelines to hardening Kubernetes orchestrators, my focus is always on engineering scalable solutions that respect the principle of least privilege. By leveraging Terraform, GitOps with Argo CD, and strict container security policies, I eliminate drift and ensure reproducible environments at scale.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core DevOps Skills (Bento Grid Style) -->
+        <section id="skills" class="py-section-gap bg-surface-container-low">
+            <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop reveal-up">
+                <div class="flex flex-col gap-4 mb-16">
+                    <div class="signature-divider max-w-[100px]"></div>
+                    <span class="font-label-md text-label-md uppercase tracking-widest text-secondary">Expertise</span>
+                    <h2 class="font-headline-lg text-headline-lg text-primary">Skills &amp; Orchestration</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Cloud -->
+                    <div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 border border-outline-variant/30 flex flex-col justify-between">
+                        <div>
+                            <span class="fa-brands fa-aws text-secondary mb-6 block text-4xl"></span>
+                            <h3 class="font-headline-md text-headline-md text-primary mb-4">Cloud Platforms</h3>
+                            <p class="text-on-surface-variant font-body-md mb-8">Designing enterprise cloud setups, multi-AZ networking, secure IAM topologies, and Managed Kubernetes clusters.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">AWS</span>
+                            <span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">EKS</span>
+                            <span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">ECR</span>
+                            <span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">VPC</span>
+                        </div>
+                    </div>
+
+                    <!-- Containers -->
+                    <div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 border border-outline-variant/30 flex flex-col justify-between">
+                        <div>
+                            <span class="fa-brands fa-docker text-secondary mb-6 block text-4xl"></span>
+                            <h3 class="font-headline-md text-headline-md text-primary mb-4">Containers</h3>
+                            <p class="text-on-surface-variant font-body-md mb-8">Building slim application container images, writing declarations, and configuring complex ingress policies.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Docker</span>
+                            <span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Kubernetes</span>
+                            <span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Kustomize</span>
+                        </div>
+                    </div>
+
+                    <!-- CI/CD & GitOps -->
+                    <div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 border border-outline-variant/30 flex flex-col justify-between">
+                        <div>
+                            <span class="fa-solid fa-code-merge text-secondary mb-6 block text-4xl"></span>
+                            <h3 class="font-headline-md text-headline-md text-primary mb-4">GitOps &amp; CI/CD</h3>
+                            <p class="text-on-surface-variant font-body-md mb-8">Automating application releases using declarative deployments and version-controlled infrastructure sync.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Argo CD</span>
+                            <span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">GitHub Actions</span>
+                            <span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Terraform</span>
+                        </div>
+                    </div>
+
+                    <!-- Security -->
+                    <div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 border border-outline-variant/30 flex flex-col justify-between">
+                        <div>
+                            <span class="fa-solid fa-shield-halved text-secondary mb-6 block text-4xl"></span>
+                            <h3 class="font-headline-md text-headline-md text-primary mb-4">DevSecOps</h3>
+                            <p class="text-on-surface-variant font-body-md mb-8">Shifting security left by enforcing static analysis, container audits, admission controllers, and threat detection.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Trivy</span>
+                            <span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">SonarQube</span>
+                            <span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Kyverno</span>
+                            <span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Falco</span>
+                        </div>
+                    </div>
+
+                    <!-- Observability -->
+                    <div class="bg-surface-container-lowest p-8 rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 border border-outline-variant/30 flex flex-col justify-between md:col-span-2">
+                        <div>
+                            <span class="fa-solid fa-chart-line text-secondary mb-6 block text-4xl"></span>
+                            <h3 class="font-headline-md text-headline-md text-primary mb-4">Observability &amp; Guardrails</h3>
+                            <p class="text-on-surface-variant font-body-md mb-8">Establishing metrics baselines, alerting rule matrices, centralized system logs, and building automated triggers for scaling activities.</p>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Prometheus</span>
+                            <span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Grafana</span>
+                            <span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Loki</span>
+                            <span class="px-3 py-1 bg-surface-container text-label-sm font-mono uppercase text-on-surface rounded-full tech-badge">Alertmanager</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience / Pipeline Timeline -->
+        <section id="pipeline" class="py-section-gap bg-background">
+            <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop reveal-up">
+                <div class="flex flex-col gap-4 mb-20">
+                    <div class="signature-divider max-w-[100px]"></div>
+                    <span class="font-label-md text-label-md uppercase tracking-widest text-secondary">The Flow</span>
+                    <h2 class="font-headline-lg text-headline-lg text-primary">Automated DevSecOps Pipeline</h2>
+                </div>
+                <div class="space-y-12">
+                    <!-- Step 1 -->
+                    <div class="grid md:grid-cols-12 gap-8 items-start group">
+                        <div class="md:col-span-3">
+                            <span class="font-headline-md text-headline-md text-primary-container font-mono">STAGE 01</span>
+                        </div>
+                        <div class="md:col-span-9 border-l border-outline-variant pl-8 relative group-hover:border-secondary transition-colors duration-500">
+                            <div class="absolute -left-1.5 top-2 w-3 h-3 bg-secondary rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <h3 class="font-headline-md text-headline-md text-primary mb-2 flex items-center gap-3">
+                                <i class="fa-brands fa-github text-secondary text-2xl"></i> Code Commit &amp; CI
+                            </h3>
+                            <p class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-4">GitHub Actions Workflows</p>
+                            <p class="text-on-surface-variant font-body-md max-w-2xl">
+                                Code changes trigger verification. Code reviews, branch protections, and basic testing validate inputs before pipeline progression.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="grid md:grid-cols-12 gap-8 items-start group">
+                        <div class="md:col-span-3">
+                            <span class="font-headline-md text-headline-md text-primary-container font-mono">STAGE 02</span>
+                        </div>
+                        <div class="md:col-span-9 border-l border-outline-variant pl-8 relative group-hover:border-secondary transition-colors duration-500">
+                            <div class="absolute -left-1.5 top-2 w-3 h-3 bg-secondary rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <h3 class="font-headline-md text-headline-md text-primary mb-2 flex items-center gap-3">
+                                <i class="fa-solid fa-shield-halved text-secondary text-2xl"></i> Code Quality &amp; Security Scan
+                            </h3>
+                            <p class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-4">SonarQube &amp; Trivy Scan</p>
+                            <p class="text-on-surface-variant font-body-md max-w-2xl">
+                                Integrated security scanning. Static Application Security Testing (SAST) checks via SonarQube, and container file systems / IaC templates are audited with Trivy.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="grid md:grid-cols-12 gap-8 items-start group">
+                        <div class="md:col-span-3">
+                            <span class="font-headline-md text-headline-md text-primary-container font-mono">STAGE 03</span>
+                        </div>
+                        <div class="md:col-span-9 border-l border-outline-variant pl-8 relative group-hover:border-secondary transition-colors duration-500">
+                            <div class="absolute -left-1.5 top-2 w-3 h-3 bg-secondary rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <h3 class="font-headline-md text-headline-md text-primary mb-2 flex items-center gap-3">
+                                <i class="fa-solid fa-box text-secondary text-2xl"></i> Build &amp; Artifact Storage
+                            </h3>
+                            <p class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-4">Nexus Repository &amp; Amazon ECR</p>
+                            <p class="text-on-surface-variant font-body-md max-w-2xl">
+                                Stable packages are proxied and cached in Sonatype Nexus. Secure Docker images are built and pushed to Amazon Elastic Container Registry (ECR) with immutable Git SHA tags.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="grid md:grid-cols-12 gap-8 items-start group">
+                        <div class="md:col-span-3">
+                            <span class="font-headline-md text-headline-md text-primary-container font-mono">STAGE 04</span>
+                        </div>
+                        <div class="md:col-span-9 border-l border-outline-variant pl-8 relative group-hover:border-secondary transition-colors duration-500">
+                            <div class="absolute -left-1.5 top-2 w-3 h-3 bg-secondary rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <h3 class="font-headline-md text-headline-md text-primary mb-2 flex items-center gap-3">
+                                <i class="fa-solid fa-anchor text-secondary text-2xl"></i> GitOps Synchronization
+                            </h3>
+                            <p class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-4">Argo CD &amp; Kustomize</p>
+                            <p class="text-on-surface-variant font-body-md max-w-2xl">
+                                Declarative GitOps engine. Argo CD tracks configuration repos, automatically matching Kubernetes live state to Kustomize overlays. Self-healing acts instantly on configuration drifts.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="grid md:grid-cols-12 gap-8 items-start group">
+                        <div class="md:col-span-3">
+                            <span class="font-headline-md text-headline-md text-primary-container font-mono">STAGE 05</span>
+                        </div>
+                        <div class="md:col-span-9 border-l border-outline-variant pl-8 relative group-hover:border-secondary transition-colors duration-500">
+                            <div class="absolute -left-1.5 top-2 w-3 h-3 bg-secondary rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <h3 class="font-headline-md text-headline-md text-primary mb-2 flex items-center gap-3">
+                                <i class="fa-solid fa-chart-line text-secondary text-2xl"></i> Deployment &amp; Observability
+                            </h3>
+                            <p class="font-label-md text-label-md text-secondary uppercase tracking-widest mb-4">Amazon EKS, Prometheus &amp; Grafana</p>
+                            <p class="text-on-surface-variant font-body-md max-w-2xl">
+                                Deploy workloads on highly available EKS node pools. Monitor health stats with kube-prometheus-stack, collect runtime audit logs with Loki/Promtail, and configure auto-scaling thresholds.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Selected Projects (Case Studies) -->
+        <section id="projects" class="py-section-gap bg-surface-container-low border-t border-b border-outline-variant/30">
+            <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop reveal-up">
+                <!-- Header -->
+                <div class="mb-16 md:mb-24 text-center md:text-left">
+                    <div class="mb-4">
+                        <div class="signature-divider mb-4 max-w-[100px] mx-auto md:mx-0"></div>
+                        <span class="font-label-md text-label-md text-secondary uppercase tracking-widest">Case Studies</span>
+                    </div>
+                    <h1 class="font-headline-xl-mobile md:font-headline-xl text-headline-xl-mobile md:text-headline-xl text-primary mb-6">Selected Works</h1>
+                    <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Detailed architectures of production-grade infrastructures and secure deployment systems designed with high-fidelity automation frameworks.</p>
+                </div>
+
+                <!-- Projects Grid (Dynamically loaded via JS) -->
+                <div id="projects-container" class="grid grid-cols-1 gap-16">
+                    <!-- Loading Skeleton / Placeholder -->
+                    <div class="col-span-full text-center py-12">
+                        <span class="material-symbols-outlined animate-spin text-4xl text-secondary">sync</span>
+                        <p class="mt-4 font-body-md text-on-surface-variant">Connecting to projects database...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Blogs Section -->
+        <section id="blogs" class="py-section-gap bg-surface-container-low border-b border-outline-variant/30">
+            <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop reveal-up">
+                <div class="mb-16 text-center md:text-left">
+                    <div class="mb-4">
+                        <div class="signature-divider mb-4 max-w-[100px] mx-auto md:mx-0"></div>
+                        <span class="font-label-md text-label-md text-secondary uppercase tracking-widest">Personal Blogs</span>
+                    </div>
+                    <h1 class="font-headline-xl-mobile md:font-headline-xl text-headline-xl-mobile md:text-headline-xl text-primary mb-6">Musings &amp; Insights</h1>
+                    <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Reflections on cloud engineering, security practices, and continuous automation architectures.</p>
+                </div>
+
+                <!-- Blogs Container (Dynamically loaded via JS) -->
+                <div id="blogs-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Loading Skeleton / Placeholder -->
+                    <div class="col-span-full text-center py-12">
+                        <span class="material-symbols-outlined animate-spin text-4xl text-secondary">sync</span>
+                        <p class="mt-4 font-body-md text-on-surface-variant">Connecting to blogs database...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Blog Modal -->
+        <div id="blog-modal" class="fixed inset-0 bg-black/40 z-[100] hidden items-center justify-center p-4 backdrop-blur-md transition-all duration-500 opacity-0">
+            <div class="bg-background max-w-3xl w-full rounded-2xl shadow-2xl border border-outline-variant/30 p-8 md:p-12 relative max-h-[90vh] overflow-y-auto flex flex-col gap-8 transition-all duration-500 scale-95" id="blog-modal-card">
+                <!-- Floating Close Button -->
+                <button id="close-blog-modal" class="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full bg-surface-container hover:bg-secondary hover:text-on-secondary transition-all duration-300 shadow-sm">
+                    <span class="material-symbols-outlined text-[20px]">close</span>
+                </button>
+                
+                <!-- Header Metadata -->
+                <div class="flex flex-col gap-4">
+                    <div class="flex items-center gap-3">
+                        <span id="modal-blog-icon" class="text-secondary text-3xl"></span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-outline-variant/50"></span>
+                        <span id="modal-blog-date" class="font-label-sm text-secondary uppercase tracking-widest text-[11px]"></span>
+                    </div>
+                    <h3 id="modal-blog-title" class="font-headline-xl-mobile md:font-headline-xl text-headline-xl-mobile md:text-headline-xl text-primary leading-tight"></h3>
+                </div>
+
+                <!-- Author Profile Info -->
+                <div class="flex items-center gap-4 py-4 border-y border-outline-variant/20">
+                    <div class="w-10 h-10 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-bold tracking-tighter text-sm">KN</div>
+                    <div>
+                        <p class="font-label-md text-primary font-semibold">Kien Nguyen</p>
+                        <p class="font-label-sm text-on-surface-variant/80 text-[12px]">DevOps &amp; DevSecOps Architect</p>
+                    </div>
+                </div>
+
+                <!-- Blog Article Body -->
+                <div id="modal-blog-content" class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed space-y-4">
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-section-gap bg-background">
+            <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop reveal-up">
+                <!-- Contact Header -->
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-gutter mb-20">
+                    <div class="md:w-2/3">
+                        <div class="signature-divider w-12 mb-4"></div>
+                        <span class="font-label-md text-label-md uppercase tracking-widest text-secondary mb-4 block">GET IN TOUCH</span>
+                        <h1 class="font-headline-xl-mobile md:font-headline-xl text-headline-xl-mobile md:text-headline-xl text-primary max-w-2xl">
+                            Let's Build Something Resilient
+                        </h1>
+                    </div>
+                    <div class="md:w-1/3 md:text-right">
+                        <p class="font-body-lg text-body-lg text-on-surface-variant italic">
+                            Open for Cloud &amp; DevOps opportunities.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Contact Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
+                    <!-- Contact Form -->
+                    <div class="md:col-span-7">
+                        <form class="space-y-8" action="mailto:kiennguly24@gmail.com" method="post" enctype="text/plain">
+                            <div class="relative group">
+                                <label class="block font-label-md text-label-md text-on-surface-variant mb-2 transition-colors group-focus-within:text-secondary">Full Name</label>
+                                <input class="w-full bg-transparent border-0 border-b border-outline-variant py-4 px-0 font-body-lg text-body-lg focus:ring-0 focus:border-secondary transition-all placeholder:text-outline-variant/50" placeholder="John Doe" type="text" name="name" required/>
+                            </div>
+                            <div class="relative group">
+                                <label class="block font-label-md text-label-md text-on-surface-variant mb-2 transition-colors group-focus-within:text-secondary">Email Address</label>
+                                <input class="w-full bg-transparent border-0 border-b border-outline-variant py-4 px-0 font-body-lg text-body-lg focus:ring-0 focus:border-secondary transition-all placeholder:text-outline-variant/50" placeholder="john@example.com" type="email" name="email" required/>
+                            </div>
+                            <div class="relative group">
+                                <label class="block font-label-md text-label-md text-on-surface-variant mb-2 transition-colors group-focus-within:text-secondary">Message</label>
+                                <textarea class="w-full bg-transparent border-0 border-b border-outline-variant py-4 px-0 font-body-lg text-body-lg focus:ring-0 focus:border-secondary transition-all resize-none placeholder:text-outline-variant/50" placeholder="Describe the scale or scope of your project..." rows="4" name="message" required></textarea>
+                            </div>
+                            <div class="pt-6">
+                                <button class="group flex items-center justify-between bg-primary text-on-primary px-8 py-5 rounded-lg w-full md:w-auto min-w-[200px] transition-all duration-300 hover:bg-secondary active:opacity-70" type="submit">
+                                    <span class="font-label-md text-label-md uppercase tracking-widest">Send Message</span>
+                                    <span class="material-symbols-outlined ml-4 group-hover:translate-x-2 transition-transform">arrow_forward</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Direct Contacts -->
+                    <div class="md:col-span-5 space-y-16">
+                        <div class="space-y-6">
+                            <div class="signature-divider w-8"></div>
+                            <h3 class="font-label-md text-label-md uppercase tracking-widest text-primary">Direct Info</h3>
+                            <div class="space-y-4">
+                                <a class="block font-headline-md text-headline-md text-on-surface hover:text-secondary transition-colors duration-300 break-all" href="mailto:kiennguly24@gmail.com">
+                                    kiennguly24@gmail.com
+                                </a>
+                                <p class="block font-body-lg text-body-lg text-on-surface-variant">
+                                    Located in Vietnam
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Social Channels -->
+                        <div class="space-y-6">
+                            <div class="signature-divider w-8"></div>
+                            <h3 class="font-label-md text-label-md uppercase tracking-widest text-primary">Social Channels</h3>
+                            <div class="grid grid-cols-1 gap-4">
+                                <a class="flex items-center justify-between p-6 bg-surface-container-low hover:bg-surface-container-high transition-all duration-300 rounded-lg group" href="https://www.linkedin.com/in/kien-vpc-peering/" target="_blank">
+                                    <div class="flex items-center gap-4">
+                                        <i class="fa-brands fa-linkedin text-secondary text-xl"></i>
+                                        <span class="font-label-md text-label-md uppercase tracking-widest">LinkedIn</span>
+                                    </div>
+                                    <span class="material-symbols-outlined opacity-0 group-hover:opacity-100 transition-opacity">north_east</span>
+                                </a>
+                                <a class="flex items-center justify-between p-6 bg-surface-container-low hover:bg-surface-container-high transition-all duration-300 rounded-lg group" href="https://github.com/kiennguly24" target="_blank">
+                                    <div class="flex items-center gap-4">
+                                        <i class="fa-brands fa-github text-secondary text-xl"></i>
+                                        <span class="font-label-md text-label-md uppercase tracking-widest">GitHub</span>
+                                    </div>
+                                    <span class="material-symbols-outlined opacity-0 group-hover:opacity-100 transition-opacity">north_east</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-surface-container text-on-surface border-t border-outline-variant w-full">
+        <div class="flex flex-col items-center gap-base-unit py-12 px-margin-mobile text-center">
+            <span class="font-headline-md text-headline-md text-primary font-bold tracking-tighter mb-4">KN.DEVOPS</span>
+            <p class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant opacity-60">
+                &copy; 2026 Kien Nguyen. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
+    <script src="script.js?v=4"></script>
+</body>
+</html>
