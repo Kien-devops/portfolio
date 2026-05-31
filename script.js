@@ -178,6 +178,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!content || !content.trim()) {
             return `<div class="rounded-xl border border-outline-variant/30 bg-surface-container-low p-6 text-on-surface-variant font-body-md">Article content is being prepared.</div>`;
         }
+
+        const looksLikeHtml = /<\/?[a-z][\s\S]*>/i.test(content.trim());
+        if (looksLikeHtml) {
+            return `
+                <div class="blog-rich-content">
+                    ${content}
+                </div>
+            `;
+        }
+
         // Split by double newline to detect blocks (paragraphs or lists)
         const blocks = content.split(/\n\s*\n/);
         return blocks.map(block => {
