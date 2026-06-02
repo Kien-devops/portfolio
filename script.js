@@ -16,6 +16,60 @@ document.addEventListener('DOMContentLoaded', () => {
         return /^https?:\/\//i.test(String(value || '').trim());
     }
 
+    const portfolioApiBaseUrl = String(window.PORTFOLIO_API_BASE_URL || '').replace(/\/$/, '');
+    const blogsEndpoint = portfolioApiBaseUrl ? `${portfolioApiBaseUrl}/blogs` : '';
+    const projectsEndpoint = portfolioApiBaseUrl ? `${portfolioApiBaseUrl}/projects` : '';
+
+    function assertApiConfigured() {
+        if (!portfolioApiBaseUrl) {
+            throw new Error('Portfolio API URL is not configured in config.js');
+        }
+    }
+
+    function formatDate(value) {
+        if (!value) return '';
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return String(value);
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' });
+    }
+
+    function getItems(result) {
+        if (Array.isArray(result.items)) return result.items;
+        if (Array.isArray(result.data)) return result.data;
+        return [];
+    }
+
+    function normalizeBlog(blog) {
+        return {
+            ...blog,
+            title: blog.title || 'Untitled Blog',
+            summary: blog.summary || '',
+            content: blog.content || '',
+            image_url: blog.image_url || blog.coverImage || blog.imageUrl || '',
+            date: blog.date || formatDate(blog.createdAt || blog.updatedAt),
+        };
+    }
+
+    function normalizeProject(project, index) {
+        const techStack = project.tech_stack || project.techStack || [];
+        const details = Array.isArray(project.details) ? project.details : [];
+        const description = project.description || '';
+
+        return {
+            ...project,
+            project_number: project.project_number || project.projectNumber || `PROJECT ${String(index + 1).padStart(2, '0')}`,
+            title: project.title || project.name || 'Untitled Project',
+            summary: project.summary || description,
+            github_url: project.github_url || project.githubUrl || '',
+            tech_stack: Array.isArray(techStack) ? techStack : String(techStack || '').split(',').map(tech => tech.trim()).filter(Boolean),
+            details: details.length ? details : (description ? [{
+                icon: 'fa-solid fa-diagram-project',
+                detail_title: 'Overview',
+                detail_description: description
+            }] : []),
+        };
+    }
+
     function renderBlogCardVisual(blog) {
         if (isUrl(blog.image_url)) {
             return `<img src="${escapeHtml(blog.image_url)}" alt="${escapeHtml(blog.title)}" class="w-12 h-12 rounded-lg object-cover border border-outline-variant/30"/>`;
@@ -123,25 +177,25 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!container) return;
 
         try {
-            const response = await fetch('blogs.php');
+            assertApiConfigured();
+            const response = await fetch(blogsEndpoint);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
             const result = await response.json();
             
-            if (result.status === 'success') {
-                container.innerHTML = '';
-                const blogs = result.data;
+            container.innerHTML = '';
+            const blogs = getItems(result).map(normalizeBlog);
                 
-                if (blogs.length === 0) {
-                    container.innerHTML = `<div class="col-span-full text-center text-on-surface-variant font-body-md">No blogs found.</div>`;
-                    return;
-                }
+            if (blogs.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center text-on-surface-variant font-body-md">No blogs found.</div>`;
+                return;
+            }
 
-                blogs.forEach(blog => {
-                    const card = document.createElement('article');
-                    card.className = "bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 border border-outline-variant/30 flex flex-col overflow-hidden group";
-                    const hasImage = isUrl(blog.image_url);
+            blogs.forEach(blog => {
+                const card = document.createElement('article');
+                card.className = "bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 border border-outline-variant/30 flex flex-col overflow-hidden group";
+                const hasImage = isUrl(blog.image_url);
                     
                     card.innerHTML = `
                         ${renderBlogCardCover(blog)}
@@ -159,13 +213,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     `;
 
-                    container.appendChild(card);
-                });
-            } else {
-                container.innerHTML = `<div class="col-span-full text-center text-error font-body-md">Error loading blogs: ${result.message}</div>`;
-            }
+                container.appendChild(card);
+            });
         } catch (error) {
-            container.innerHTML = `<div class="col-span-full text-center text-error font-body-md">Error connecting to blogs API.</div>`;
+            container.innerHTML = `<div class="col-span-full text-center text-error font-body-md">Error connecting to blogs API: ${escapeHtml(error.message)}</div>`;
         }
     }
 
@@ -300,37 +351,35 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!container) return;
 
         try {
-            const response = await fetch('projects.php');
+            assertApiConfigured();
+            const response = await fetch(projectsEndpoint);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
             const result = await response.json();
             
-            if (result.status === 'success') {
-                container.innerHTML = '';
-                const projects = Array.isArray(result.data) ? result.data : [];
+            container.innerHTML = '';
+            const projects = getItems(result).map(normalizeProject);
                 
-                if (projects.length === 0) {
-                    container.innerHTML = `<div class="col-span-full text-center text-on-surface-variant font-body-md">No projects found.</div>`;
-                    return;
-                }
+            if (projects.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center text-on-surface-variant font-body-md">No projects found.</div>`;
+                return;
+            }
 
-                projects.forEach(project => {
-                    const article = document.createElement('article');
-                    article.className = "group";
-                    const techStack = Array.isArray(project.tech_stack)
-                        ? project.tech_stack
-                        : String(project.tech_stack || '').split(',').map(tech => tech.trim()).filter(Boolean);
-                    const details = Array.isArray(project.details) ? project.details : [];
+            projects.forEach(project => {
+                const article = document.createElement('article');
+                article.className = "group";
+                const techStack = project.tech_stack;
+                const details = Array.isArray(project.details) ? project.details : [];
                     
                     // Create tech badges HTML
                     const techBadgesHtml = techStack.map(tech => 
-                        `<span class="px-3 py-1 bg-surface-container text-label-sm font-mono text-on-surface rounded">${tech}</span>`
+                        `<span class="px-3 py-1 bg-surface-container text-label-sm font-mono text-on-surface rounded">${escapeHtml(tech)}</span>`
                     ).join('');
 
                     // Create project details list HTML
                     const detailsListHtml = details.map(detail => 
-                        `<li class="flex gap-3"><i class="${detail.icon} text-secondary mt-1"></i> <div><strong>${detail.detail_title}:</strong> ${detail.detail_description}</div></li>`
+                        `<li class="flex gap-3"><i class="${escapeHtml(detail.icon || 'fa-solid fa-circle-check')} text-secondary mt-1"></i> <div><strong>${escapeHtml(detail.detail_title || 'Detail')}:</strong> ${escapeHtml(detail.detail_description || '')}</div></li>`
                     ).join('');
 
                     article.innerHTML = `
@@ -341,16 +390,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             
                             <div class="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
-                                <span class="bg-surface-container-low text-secondary font-mono text-[11px] px-3 py-1 rounded-full uppercase tracking-wider">${project.project_number}</span>
-                                <a href="${project.github_url}" target="_blank" class="flex items-center gap-2 text-[#735c00] hover:text-[#FF9900] transition-colors font-mono text-sm">
+                                <span class="bg-surface-container-low text-secondary font-mono text-[11px] px-3 py-1 rounded-full uppercase tracking-wider">${escapeHtml(project.project_number)}</span>
+                                <a href="${escapeHtml(project.github_url || '#')}" target="_blank" class="flex items-center gap-2 text-[#735c00] hover:text-[#FF9900] transition-colors font-mono text-sm">
                                     <i class="fa-brands fa-github text-xl"></i> Source Repository
                                 </a>
                             </div>
 
                             <div class="relative z-10 mt-8">
-                                <h3 class="font-headline-lg text-headline-lg text-white mb-4">${project.title}</h3>
+                                <h3 class="font-headline-lg text-headline-lg text-white mb-4">${escapeHtml(project.title)}</h3>
                                 <p class="text-on-primary-container font-body-lg max-w-3xl leading-relaxed mb-6">
-                                    ${project.summary}
+                                    ${escapeHtml(project.summary)}
                                 </p>
                             </div>
                         </div>
@@ -372,11 +421,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     `;
 
-                    container.appendChild(article);
-                });
-            } else {
-                container.innerHTML = `<div class="col-span-full text-center text-error font-body-md">Error loading projects: ${result.message}</div>`;
-            }
+                container.appendChild(article);
+            });
         } catch (error) {
             console.error('Projects API error:', error);
             container.innerHTML = `<div class="col-span-full text-center text-error font-body-md">Error connecting to projects API: ${error.message}</div>`;
@@ -394,16 +440,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch('blogs.php');
+            assertApiConfigured();
+            const response = await fetch(`${blogsEndpoint}/${encodeURIComponent(blogId)}`);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
 
             const result = await response.json();
-            const blogs = result.status === 'success' && Array.isArray(result.data) ? result.data : [];
-            const blog = blogs.find(item => String(item.id) === String(blogId));
+            const blog = normalizeBlog(result.blog || getItems(result).find(item => String(item.id) === String(blogId)) || {});
 
-            if (!blog) {
+            if (!blog.id) {
                 container.innerHTML = `<div class="text-center text-error font-body-md">Blog not found.</div>`;
                 return;
             }

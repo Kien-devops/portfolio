@@ -1,9 +1,0 @@
-version: '3.8'
-
-services:
-  portfolio:
-    build: .
-    container_name: kien-portfolio
-    ports:
-      - "3001:80"
-    restart: unless-stopped
