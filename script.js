@@ -20,6 +20,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const blogsEndpoint = portfolioApiBaseUrl ? `${portfolioApiBaseUrl}/blogs` : '';
     const projectsEndpoint = portfolioApiBaseUrl ? `${portfolioApiBaseUrl}/projects` : '';
 
+    function commentsEndpoint(blogId) {
+        return `${blogsEndpoint}/${encodeURIComponent(blogId)}/comments`;
+    }
+
     function assertApiConfigured() {
         if (!portfolioApiBaseUrl) {
             throw new Error('Portfolio API URL is not configured in config.js');
@@ -40,6 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function normalizeBlog(blog) {
+        const tags = Array.isArray(blog.tags) ? blog.tags : 
+                     (blog.tags ? String(blog.tags).split(',').map(t => t.trim()).filter(Boolean) : []);
         return {
             ...blog,
             title: blog.title || 'Untitled Blog',
@@ -47,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
             content: blog.content || '',
             image_url: blog.image_url || blog.coverImage || blog.imageUrl || '',
             date: blog.date || formatDate(blog.createdAt || blog.updatedAt),
+            tags: tags
         };
     }
 
@@ -93,8 +100,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isUrl(blog.image_url)) return '';
 
         return `
-            <figure class="my-10 overflow-hidden rounded-xl border border-outline-variant/30 bg-surface-container shadow-sm">
-                <img src="${escapeHtml(blog.image_url)}" alt="${escapeHtml(blog.title)}" class="w-full max-h-[460px] object-cover"/>
+            <figure class="my-7 mx-auto w-full max-w-[560px] overflow-hidden rounded-lg border border-outline-variant/30 bg-white shadow-sm">
+                <img src="${escapeHtml(blog.image_url)}" alt="${escapeHtml(blog.title)}" class="h-[220px] md:h-[280px] w-full object-contain p-3"/>
             </figure>
         `;
     }
@@ -194,24 +201,75 @@ document.addEventListener('DOMContentLoaded', () => {
 
             blogs.forEach(blog => {
                 const card = document.createElement('article');
-                card.className = "bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-lg transition-all duration-500 border border-outline-variant/30 flex flex-col overflow-hidden group";
+                card.className = "bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all duration-500 border border-outline-variant/30 flex flex-col-reverse md:flex-row overflow-hidden group w-full cursor-pointer";
+                
+                card.addEventListener('click', (e) => {
+                    if (e.target.closest('a') || e.target.closest('button')) return;
+                    window.location.href = `blog.html?id=${encodeURIComponent(blog.id)}`;
+                });
+
                 const hasImage = isUrl(blog.image_url);
-                    
+                
+                if (hasImage) {
                     card.innerHTML = `
-                        ${renderBlogCardCover(blog)}
-                        <div class="p-8 flex flex-col flex-1">
-                            <div class="flex justify-between items-start gap-4 mb-6">
-                                ${hasImage ? '' : renderBlogCardVisual(blog)}
-                                <span class="font-label-sm text-on-surface-variant tracking-wider uppercase">${escapeHtml(blog.date)}</span>
+                        <!-- Left Side: Content -->
+                        <div class="p-6 md:p-8 flex flex-col justify-between flex-1 min-w-0">
+                            <div>
+                                <h3 class="font-headline-md text-[20px] md:text-headline-md text-primary mb-3 group-hover:text-secondary transition-colors duration-300 leading-snug">
+                                    ${escapeHtml(blog.title)}
+                                </h3>
+                                <p class="text-on-surface-variant font-body-md mb-6 leading-relaxed line-clamp-2 md:line-clamp-3">
+                                    ${escapeHtml(blog.summary)}
+                                </p>
                             </div>
-                            <h3 class="font-headline-md text-headline-md text-primary mb-4 group-hover:text-secondary transition-colors duration-300">${escapeHtml(blog.title)}</h3>
-                            <p class="text-on-surface-variant font-body-md mb-8 leading-relaxed">${escapeHtml(blog.summary)}</p>
-                            <a href="blog.html?id=${encodeURIComponent(blog.id)}" class="font-label-md text-label-md uppercase tracking-widest text-secondary hover:text-primary transition-colors flex items-center gap-2 group/btn">
-                                <span>Read Article</span>
-                                <span class="material-symbols-outlined text-[18px] group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
-                            </a>
+                            <div class="flex flex-wrap items-center gap-y-2 gap-x-6 text-on-surface-variant/80 font-label-sm mt-auto">
+                                <div class="flex items-center text-on-surface-variant/70">
+                                    <span class="material-symbols-outlined text-[18px] mr-1.5">calendar_month</span>
+                                    <span>${escapeHtml(blog.date)}</span>
+                                </div>
+                                ${blog.tags && blog.tags.length ? `
+                                <div class="flex items-center text-on-surface-variant/70 min-w-0">
+                                    <span class="material-symbols-outlined text-[18px] mr-1.5 shrink-0">folder</span>
+                                    <span class="truncate">${escapeHtml(blog.tags.join(', '))}</span>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                        <!-- Right Side: Cover Image -->
+                        <div class="w-full md:w-[34%] h-44 md:h-auto md:shrink-0 relative overflow-hidden bg-white border-b md:border-b-0 md:border-l border-outline-variant/20">
+                            <img src="${escapeHtml(blog.image_url)}" alt="${escapeHtml(blog.title)}" class="absolute inset-0 h-full w-full object-contain p-4 transition-transform duration-700 group-hover:scale-[1.02]"/>
                         </div>
                     `;
+                } else {
+                    card.innerHTML = `
+                        <!-- Full Width Content -->
+                        <div class="p-6 md:p-8 flex flex-col justify-between flex-1 min-w-0">
+                            <div>
+                                <div class="flex items-center gap-3 mb-4">
+                                    ${renderBlogCardVisual(blog)}
+                                </div>
+                                <h3 class="font-headline-md text-[20px] md:text-headline-md text-primary mb-3 group-hover:text-secondary transition-colors duration-300 leading-snug">
+                                    ${escapeHtml(blog.title)}
+                                </h3>
+                                <p class="text-on-surface-variant font-body-md mb-6 leading-relaxed line-clamp-3">
+                                    ${escapeHtml(blog.summary)}
+                                </p>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-y-2 gap-x-6 text-on-surface-variant/80 font-label-sm mt-auto">
+                                <div class="flex items-center text-on-surface-variant/70">
+                                    <span class="material-symbols-outlined text-[18px] mr-1.5">calendar_month</span>
+                                    <span>${escapeHtml(blog.date)}</span>
+                                </div>
+                                ${blog.tags && blog.tags.length ? `
+                                <div class="flex items-center text-on-surface-variant/70 min-w-0">
+                                    <span class="material-symbols-outlined text-[18px] mr-1.5 shrink-0">folder</span>
+                                    <span class="truncate">${escapeHtml(blog.tags.join(', '))}</span>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
 
                 container.appendChild(card);
             });
@@ -293,6 +351,125 @@ document.addEventListener('DOMContentLoaded', () => {
             // Paragraph blocks
             return `<p class="mb-6 text-on-surface-variant leading-8 text-body-lg font-body-md">${escapeHtml(trimmed).replace(/\n/g, '<br>')}</p>`;
         }).join('');
+    }
+
+    function renderCommentItem(comment, blogId, isReply = false) {
+        const replies = Array.isArray(comment.replies) ? comment.replies : [];
+        return `
+            <article class="${isReply ? 'ml-6 md:ml-10' : ''} rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-5 shadow-sm">
+                <div class="flex items-start gap-3">
+                    <div class="w-9 h-9 rounded-full bg-secondary text-on-primary flex items-center justify-center font-bold text-sm shrink-0">
+                        ${escapeHtml((comment.author_name || 'A').slice(0, 1).toUpperCase())}
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <p class="font-label-md text-primary font-semibold">${escapeHtml(comment.author_name || 'Anonymous')}</p>
+                            <span class="text-on-surface-variant/50">/</span>
+                            <time class="font-label-sm text-[12px] text-on-surface-variant/70">${escapeHtml(formatDate(comment.created_at))}</time>
+                        </div>
+                        <p class="mt-3 text-on-surface-variant font-body-md leading-7 whitespace-pre-wrap">${escapeHtml(comment.content || '')}</p>
+                        ${isReply ? '' : `
+                            <button class="mt-4 inline-flex items-center gap-1 text-secondary hover:text-primary transition-colors font-label-md text-label-md uppercase tracking-widest" data-reply-toggle="${escapeHtml(comment.comment_id)}">
+                                <span class="material-symbols-outlined text-[17px]">reply</span>
+                                <span>Reply</span>
+                            </button>
+                            <form class="comment-reply-form hidden mt-4 rounded-lg bg-surface-container-low p-4 border border-outline-variant/20" data-blog-id="${escapeHtml(blogId)}" data-parent-id="${escapeHtml(comment.comment_id)}">
+                                <div class="grid md:grid-cols-2 gap-3 mb-3">
+                                    <input class="rounded-lg border-outline-variant bg-white text-body-md" name="email" type="email" placeholder="Email" required>
+                                    <input class="rounded-lg border-outline-variant bg-white text-body-md" name="author_name" type="text" placeholder="Name optional">
+                                </div>
+                                <textarea class="w-full rounded-lg border-outline-variant bg-white text-body-md" name="content" rows="3" maxlength="2000" placeholder="Write a reply..." required></textarea>
+                                <button class="mt-3 bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md uppercase tracking-widest hover:bg-secondary transition-colors" type="submit">Send Reply</button>
+                                <p class="comment-form-message mt-3 text-sm text-on-surface-variant"></p>
+                            </form>
+                        `}
+                    </div>
+                </div>
+                ${replies.length ? `<div class="mt-4 space-y-4">${replies.map(reply => renderCommentItem(reply, blogId, true)).join('')}</div>` : ''}
+            </article>
+        `;
+    }
+
+    function renderCommentsSection(blogId) {
+        return `
+            <section class="mt-14 pt-10 border-t border-outline-variant/20" id="comments-section" data-blog-id="${escapeHtml(blogId)}">
+                <h2 class="font-headline-lg text-headline-lg text-primary mb-6">Comments</h2>
+                <form id="comment-form" class="rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-5 shadow-sm mb-8" data-blog-id="${escapeHtml(blogId)}">
+                    <div class="grid md:grid-cols-2 gap-3 mb-3">
+                        <input class="rounded-lg border-outline-variant bg-white text-body-md" name="email" type="email" placeholder="Email" required>
+                        <input class="rounded-lg border-outline-variant bg-white text-body-md" name="author_name" type="text" placeholder="Name optional">
+                    </div>
+                    <textarea class="w-full rounded-lg border-outline-variant bg-white text-body-md" name="content" rows="4" maxlength="2000" placeholder="Write a comment..." required></textarea>
+                    <button class="mt-3 bg-primary text-on-primary px-5 py-3 rounded-lg font-label-md text-label-md uppercase tracking-widest hover:bg-secondary transition-colors" type="submit">Send Comment</button>
+                    <p class="comment-form-message mt-3 text-sm text-on-surface-variant"></p>
+                </form>
+                <div id="comments-list" class="space-y-4">
+                    <div class="text-center py-8 text-on-surface-variant">Loading comments...</div>
+                </div>
+            </section>
+        `;
+    }
+
+    async function loadComments(blogId) {
+        const list = document.getElementById('comments-list');
+        if (!list) return;
+
+        try {
+            assertApiConfigured();
+            const response = await fetch(commentsEndpoint(blogId));
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const result = await response.json();
+            const comments = Array.isArray(result.items) ? result.items : [];
+
+            if (!comments.length) {
+                list.innerHTML = `<div class="rounded-xl border border-dashed border-outline-variant/40 bg-surface-container-low p-6 text-center text-on-surface-variant">No comments yet.</div>`;
+                return;
+            }
+
+            list.innerHTML = comments.map(comment => renderCommentItem(comment, blogId)).join('');
+        } catch (error) {
+            list.innerHTML = `<div class="rounded-xl border border-outline-variant/30 bg-surface-container-low p-6 text-center text-error">Error loading comments.</div>`;
+        }
+    }
+
+    function getCommentFormPayload(form) {
+        const formData = new FormData(form);
+        return {
+            email: String(formData.get('email') || '').trim(),
+            author_name: String(formData.get('author_name') || '').trim(),
+            content: String(formData.get('content') || '').trim(),
+        };
+    }
+
+    async function submitCommentForm(form) {
+        const blogId = form.dataset.blogId;
+        const parentId = form.dataset.parentId;
+        const message = form.querySelector('.comment-form-message');
+        const button = form.querySelector('button[type="submit"]');
+        const url = parentId
+            ? `${commentsEndpoint(blogId)}/${encodeURIComponent(parentId)}/replies`
+            : commentsEndpoint(blogId);
+
+        if (message) message.textContent = 'Sending...';
+        if (button) button.disabled = true;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(getCommentFormPayload(form)),
+            });
+            const result = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(result.message || `HTTP ${response.status}`);
+
+            form.reset();
+            if (message) message.textContent = parentId ? 'Reply sent.' : 'Comment sent.';
+            await loadComments(blogId);
+        } catch (error) {
+            if (message) message.textContent = `Error: ${error.message}`;
+        } finally {
+            if (button) button.disabled = false;
+        }
     }
 
     function openBlogModal(blog) {
@@ -467,8 +644,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="w-1.5 h-1.5 rounded-full bg-outline-variant/50 ${hasHeroImage ? '' : 'ml-1'}"></span>
                         <span class="font-label-sm text-secondary uppercase tracking-widest text-[11px]">${escapeHtml(blog.date)}</span>
                     </div>
-                    <h1 class="font-headline-xl text-[34px] md:text-headline-xl text-primary leading-tight mb-8 break-words">${escapeHtml(blog.title)}</h1>
-                    <p class="font-body-lg text-body-lg text-on-surface-variant leading-8 mb-10">${escapeHtml(blog.summary)}</p>
+                    <h1 class="font-headline-xl text-[30px] md:text-[40px] text-primary leading-tight mb-6 break-words">${escapeHtml(blog.title)}</h1>
+                    <p class="font-body-lg text-[17px] md:text-body-lg text-on-surface-variant leading-8 mb-8">${escapeHtml(blog.summary)}</p>
                     ${renderBlogHeroImage(blog)}
                     <div class="flex items-center gap-4 py-4 border-y border-outline-variant/20 mb-10">
                         <div class="w-10 h-10 rounded-full bg-secondary text-on-primary flex items-center justify-center font-bold tracking-tighter text-sm">KN</div>
@@ -480,8 +657,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="font-body-lg text-body-lg text-on-surface-variant leading-8 space-y-4">
                         ${formatBlogContent(blog.content)}
                     </div>
+                    ${renderCommentsSection(blog.id)}
                 </article>
             `;
+            loadComments(blog.id);
         } catch (error) {
             container.innerHTML = `<div class="text-center text-error font-body-md">Error loading blog article.</div>`;
         }
@@ -491,4 +670,18 @@ document.addEventListener('DOMContentLoaded', () => {
     loadBlogs();
     loadBlogDetail();
     loadProjects();
+
+    document.addEventListener('click', (event) => {
+        const toggle = event.target.closest('[data-reply-toggle]');
+        if (!toggle) return;
+        const form = document.querySelector(`.comment-reply-form[data-parent-id="${CSS.escape(toggle.dataset.replyToggle)}"]`);
+        if (form) form.classList.toggle('hidden');
+    });
+
+    document.addEventListener('submit', (event) => {
+        const form = event.target.closest('#comment-form, .comment-reply-form');
+        if (!form) return;
+        event.preventDefault();
+        submitCommentForm(form);
+    });
 });

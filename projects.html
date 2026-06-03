@@ -7,9 +7,10 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.svg"/>
     <title>Projects | Kien Nguyen</title>
     <meta name="description" content="Selected DevOps and DevSecOps projects by Kien Nguyen."/>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Source+Sans+Pro:wght@300;400;600;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="styles.css?v=2"/>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
       tailwind.config = {
@@ -44,14 +45,14 @@
               "container-max": "1200px"
             },
             fontFamily: {
-              "headline-md": ["Playfair Display"],
-              "headline-xl": ["Playfair Display"],
-              "headline-xl-mobile": ["Playfair Display"],
-              "headline-lg": ["Playfair Display"],
-              "body-md": ["Inter"],
-              "body-lg": ["Inter"],
-              "label-md": ["Inter"],
-              "label-sm": ["Inter"],
+              "headline-md": ["Lato"],
+              "headline-xl": ["Lato"],
+              "headline-xl-mobile": ["Lato"],
+              "headline-lg": ["Lato"],
+              "body-md": ["Source Sans Pro"],
+              "body-lg": ["Source Sans Pro"],
+              "label-md": ["Source Sans Pro"],
+              "label-sm": ["Source Sans Pro"],
               "mono": ["Fira Code", "monospace"]
             },
             fontSize: {
@@ -94,8 +95,13 @@
 
     <aside class="fixed top-0 left-0 h-full w-[280px] z-[70] bg-surface-container-low md:bg-background shadow-xl md:shadow-none -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out border-r border-outline-variant/30 flex flex-col justify-between" id="nav-drawer">
         <div class="p-8 flex flex-col items-center">
-            <div class="w-24 h-24 rounded-full bg-primary-container flex items-center justify-center shadow-lg border-2 border-surface-container-lowest overflow-hidden mb-4">
-                <span class="font-headline-md text-secondary text-3xl tracking-tighter">KN</span>
+            <div class="code-avatar" aria-label="Animated developer coding">
+                <div class="code-avatar__hair"></div>
+                <div class="code-avatar__head"></div>
+                <div class="code-avatar__body"></div>
+                <div class="code-avatar__arm code-avatar__arm--left"></div>
+                <div class="code-avatar__arm code-avatar__arm--right"></div>
+                <div class="code-avatar__screen"><span></span><span></span><span></span><i class="code-avatar__cursor"></i></div>
             </div>
             <h2 class="font-headline-md text-headline-md text-primary font-bold">Kien Nguyen</h2>
             <p class="font-label-sm text-on-surface-variant text-center mt-2 italic">DevOps &amp; DevSecOps Engineer</p>
@@ -145,6 +151,6 @@
     </footer>
 
     <script src="config.js?v=1"></script>
-    <script src="script.js?v=11"></script>
+    <script src="script.js?v=15"></script>
 </body>
 </html>

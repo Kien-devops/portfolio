@@ -1,1 +1,304 @@
-/* Custom CSS has been migrated to Tailwind CSS configuration in index.html. This file is kept to prevent 404 errors. */
+/* Shared decorative components. */
+.code-avatar {
+    position: relative;
+    width: 112px;
+    height: 112px;
+    margin-bottom: 16px;
+    border-radius: 9999px;
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 50% 24%, rgba(115, 92, 0, 0.22), transparent 28%),
+        linear-gradient(145deg, #1c1b1b 0%, #111 100%);
+    border: 4px solid #fff;
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.16);
+}
+
+.code-avatar--hero {
+    width: 220px;
+    height: 220px;
+    margin-bottom: 0;
+    border-width: 5px;
+    box-shadow: 0 26px 52px rgba(0, 0, 0, 0.18);
+}
+
+.code-avatar::before {
+    content: "";
+    position: absolute;
+    inset: 12px;
+    border-radius: inherit;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.code-avatar__screen {
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    bottom: 22px;
+    height: 32px;
+    border-radius: 6px;
+    background: #f7f7f5;
+    border: 2px solid #735c00;
+    box-shadow: 0 8px 0 #735c00;
+}
+
+.code-avatar--hero .code-avatar__screen {
+    left: 44px;
+    right: 44px;
+    bottom: 42px;
+    height: 64px;
+    border-radius: 14px;
+    border-width: 4px;
+    box-shadow: 0 16px 0 #735c00;
+}
+
+.code-avatar__screen span {
+    position: absolute;
+    left: 10px;
+    width: 24px;
+    height: 3px;
+    border-radius: 999px;
+    background: #1c1b1b;
+    opacity: 0.75;
+    animation: codeLine 1.8s ease-in-out infinite;
+}
+
+.code-avatar--hero .code-avatar__screen span {
+    left: 22px;
+    width: 48px;
+    height: 6px;
+}
+
+.code-avatar__screen span:nth-child(1) {
+    top: 8px;
+}
+
+.code-avatar__screen span:nth-child(2) {
+    top: 15px;
+    width: 36px;
+    animation-delay: 0.2s;
+}
+
+.code-avatar__screen span:nth-child(3) {
+    top: 22px;
+    width: 18px;
+    animation-delay: 0.4s;
+}
+
+.code-avatar--hero .code-avatar__screen span:nth-child(1) {
+    top: 16px;
+}
+
+.code-avatar--hero .code-avatar__screen span:nth-child(2) {
+    top: 30px;
+    width: 72px;
+}
+
+.code-avatar--hero .code-avatar__screen span:nth-child(3) {
+    top: 44px;
+    width: 38px;
+}
+
+.code-avatar__head {
+    position: absolute;
+    top: 22px;
+    left: 50%;
+    width: 26px;
+    height: 26px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: #f2d2b6;
+    box-shadow: inset 0 -3px 0 rgba(115, 92, 0, 0.22);
+    animation: headNod 2.4s ease-in-out infinite;
+}
+
+.code-avatar--hero .code-avatar__head {
+    top: 42px;
+    width: 54px;
+    height: 54px;
+}
+
+.code-avatar__hair {
+    position: absolute;
+    top: 17px;
+    left: 50%;
+    width: 32px;
+    height: 18px;
+    transform: translateX(-50%);
+    border-radius: 18px 18px 8px 8px;
+    background: #0b0b0b;
+}
+
+.code-avatar--hero .code-avatar__hair {
+    top: 32px;
+    width: 68px;
+    height: 40px;
+    border-radius: 34px 34px 14px 14px;
+}
+
+.code-avatar__body {
+    position: absolute;
+    top: 48px;
+    left: 50%;
+    width: 36px;
+    height: 34px;
+    transform: translateX(-50%);
+    border-radius: 16px 16px 8px 8px;
+    background: #735c00;
+}
+
+.code-avatar--hero .code-avatar__body {
+    top: 96px;
+    width: 82px;
+    height: 70px;
+    border-radius: 34px 34px 16px 16px;
+}
+
+.code-avatar__arm {
+    position: absolute;
+    top: 61px;
+    width: 30px;
+    height: 7px;
+    border-radius: 999px;
+    background: #f2d2b6;
+    transform-origin: 50% 50%;
+}
+
+.code-avatar--hero .code-avatar__arm {
+    top: 124px;
+    width: 62px;
+    height: 13px;
+}
+
+.code-avatar__arm--left {
+    left: 24px;
+    transform: rotate(24deg);
+    animation: typeLeft 0.55s ease-in-out infinite;
+}
+
+.code-avatar--hero .code-avatar__arm--left {
+    left: 42px;
+}
+
+.code-avatar__arm--right {
+    right: 24px;
+    transform: rotate(-24deg);
+    animation: typeRight 0.55s ease-in-out infinite;
+}
+
+.code-avatar--hero .code-avatar__arm--right {
+    right: 42px;
+}
+
+.code-avatar__cursor {
+    position: absolute;
+    right: 9px;
+    top: 8px;
+    width: 3px;
+    height: 16px;
+    border-radius: 999px;
+    background: #735c00;
+    animation: cursorBlink 0.9s steps(2, start) infinite;
+}
+
+.code-avatar--hero .code-avatar__cursor {
+    right: 18px;
+    top: 16px;
+    width: 5px;
+    height: 32px;
+}
+
+@media (min-width: 768px) {
+    .code-avatar--hero {
+        width: 300px;
+        height: 300px;
+    }
+
+    .code-avatar--hero .code-avatar__screen {
+        left: 58px;
+        right: 58px;
+        bottom: 56px;
+        height: 86px;
+    }
+
+    .code-avatar--hero .code-avatar__screen span {
+        left: 30px;
+        width: 64px;
+        height: 7px;
+    }
+
+    .code-avatar--hero .code-avatar__screen span:nth-child(1) {
+        top: 22px;
+    }
+
+    .code-avatar--hero .code-avatar__screen span:nth-child(2) {
+        top: 41px;
+        width: 98px;
+    }
+
+    .code-avatar--hero .code-avatar__screen span:nth-child(3) {
+        top: 60px;
+        width: 54px;
+    }
+
+    .code-avatar--hero .code-avatar__head {
+        top: 58px;
+        width: 72px;
+        height: 72px;
+    }
+
+    .code-avatar--hero .code-avatar__hair {
+        top: 44px;
+        width: 90px;
+        height: 54px;
+    }
+
+    .code-avatar--hero .code-avatar__body {
+        top: 130px;
+        width: 112px;
+        height: 92px;
+    }
+
+    .code-avatar--hero .code-avatar__arm {
+        top: 168px;
+        width: 84px;
+        height: 16px;
+    }
+
+    .code-avatar--hero .code-avatar__arm--left {
+        left: 58px;
+    }
+
+    .code-avatar--hero .code-avatar__arm--right {
+        right: 58px;
+    }
+
+    .code-avatar--hero .code-avatar__cursor {
+        right: 24px;
+        top: 22px;
+        height: 42px;
+    }
+}
+
+@keyframes typeLeft {
+    0%, 100% { transform: rotate(22deg) translateY(0); }
+    50% { transform: rotate(10deg) translateY(4px); }
+}
+
+@keyframes typeRight {
+    0%, 100% { transform: rotate(-22deg) translateY(3px); }
+    50% { transform: rotate(-10deg) translateY(0); }
+}
+
+@keyframes headNod {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(2px); }
+}
+
+@keyframes codeLine {
+    0%, 100% { opacity: 0.4; transform: scaleX(0.72); transform-origin: left; }
+    50% { opacity: 0.9; transform: scaleX(1); transform-origin: left; }
+}
+
+@keyframes cursorBlink {
+    50% { opacity: 0; }
+}

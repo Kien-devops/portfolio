@@ -7,9 +7,10 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.svg"/>
     <title>Contact | Kien Nguyen</title>
     <meta name="description" content="Contact Kien Nguyen for Cloud, DevOps, and DevSecOps opportunities."/>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Source+Sans+Pro:wght@300;400;600;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="styles.css?v=2"/>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
       tailwind.config = {
@@ -19,7 +20,7 @@
             colors: { background: "#fbf9f9", "surface-container-lowest": "#ffffff", "surface-container-low": "#f5f3f3", "surface-container": "#efeded", "surface-container-high": "#e9e8e7", primary: "#000000", "primary-container": "#1c1b1b", "on-primary": "#ffffff", "on-background": "#1b1c1c", "on-surface": "#1b1c1c", "on-surface-variant": "#444748", "outline-variant": "#c4c7c7", secondary: "#735c00" },
             borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
             spacing: { "margin-mobile": "20px", "base-unit": "8px", gutter: "24px", "margin-desktop": "64px", "section-gap": "120px", "container-max": "1200px" },
-            fontFamily: { "headline-md": ["Playfair Display"], "headline-xl": ["Playfair Display"], "headline-xl-mobile": ["Playfair Display"], "headline-lg": ["Playfair Display"], "body-md": ["Inter"], "body-lg": ["Inter"], "label-md": ["Inter"], "label-sm": ["Inter"], mono: ["Fira Code", "monospace"] },
+            fontFamily: { "headline-md": ["Lato"], "headline-xl": ["Lato"], "headline-xl-mobile": ["Lato"], "headline-lg": ["Lato"], "body-md": ["Source Sans Pro"], "body-lg": ["Source Sans Pro"], "label-md": ["Source Sans Pro"], "label-sm": ["Source Sans Pro"], mono: ["Fira Code", "monospace"] },
             fontSize: { "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}], "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "600"}], "headline-xl": ["48px", {"lineHeight": "1.1", "fontWeight": "700"}], "headline-xl-mobile": ["36px", {"lineHeight": "1.2", "fontWeight": "700"}], "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}], "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}], "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}], "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "500"}] }
           }
         }
@@ -39,7 +40,7 @@
     </header>
     <div class="fixed inset-0 bg-black/20 z-[60] hidden transition-opacity duration-300 opacity-0 md:hidden" id="drawer-overlay"></div>
     <aside class="fixed top-0 left-0 h-full w-[280px] z-[70] bg-surface-container-low md:bg-background shadow-xl md:shadow-none -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out border-r border-outline-variant/30 flex flex-col justify-between" id="nav-drawer">
-        <div class="p-8 flex flex-col items-center"><div class="w-24 h-24 rounded-full bg-primary-container flex items-center justify-center shadow-lg border-2 border-surface-container-lowest overflow-hidden mb-4"><span class="font-headline-md text-secondary text-3xl tracking-tighter">KN</span></div><h2 class="font-headline-md text-headline-md text-primary font-bold">Kien Nguyen</h2><p class="font-label-sm text-on-surface-variant text-center mt-2 italic">DevOps &amp; DevSecOps Engineer</p></div>
+        <div class="p-8 flex flex-col items-center"><div class="code-avatar" aria-label="Animated developer coding"><div class="code-avatar__hair"></div><div class="code-avatar__head"></div><div class="code-avatar__body"></div><div class="code-avatar__arm code-avatar__arm--left"></div><div class="code-avatar__arm code-avatar__arm--right"></div><div class="code-avatar__screen"><span></span><span></span><span></span><i class="code-avatar__cursor"></i></div></div><h2 class="font-headline-md text-headline-md text-primary font-bold">Kien Nguyen</h2><p class="font-label-sm text-on-surface-variant text-center mt-2 italic">DevOps &amp; DevSecOps Engineer</p></div>
         <nav class="flex flex-col px-4 gap-2 flex-1">
             <a class="flex items-center gap-4 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors duration-300 font-semibold" href="index.html"><span class="material-symbols-outlined text-[20px] w-5 shrink-0 text-center">home</span><span class="font-label-md text-label-md tracking-wider uppercase">Home</span></a>
             <a class="flex items-center gap-4 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-colors duration-300 font-semibold" href="skills.html"><span class="material-symbols-outlined text-[20px] w-5 shrink-0 text-center">category</span><span class="font-label-md text-label-md tracking-wider uppercase">Skills</span></a>
@@ -77,6 +78,6 @@
     </main>
     <footer class="bg-surface-container text-on-surface border-t border-outline-variant w-full md:pl-[280px]"><div class="flex flex-col items-center gap-base-unit py-12 px-margin-mobile text-center"><span class="font-headline-md text-headline-md text-primary font-bold tracking-tighter mb-4">KN.DEVOPS</span><p class="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant opacity-60">&copy; 2026 Kien Nguyen. All rights reserved.</p></div></footer>
     <script src="config.js?v=1"></script>
-    <script src="script.js?v=11"></script>
+    <script src="script.js?v=15"></script>
 </body>
 </html>

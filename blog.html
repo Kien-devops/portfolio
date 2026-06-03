@@ -7,9 +7,10 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.svg"/>
     <title>Blog | Kien Nguyen</title>
     <meta name="description" content="Blog article by Kien Nguyen."/>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Source+Sans+Pro:wght@300;400;600;700;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <link rel="stylesheet" href="styles.css?v=2"/>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script>
       tailwind.config = {
@@ -34,7 +35,7 @@
             },
             borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
             spacing: { "margin-mobile": "20px", "base-unit": "8px", gutter: "24px", "margin-desktop": "64px", "section-gap": "120px", "container-max": "1200px" },
-            fontFamily: { "headline-md": ["Playfair Display"], "headline-xl": ["Playfair Display"], "headline-xl-mobile": ["Playfair Display"], "headline-lg": ["Playfair Display"], "body-md": ["Inter"], "body-lg": ["Inter"], "label-md": ["Inter"], "label-sm": ["Inter"], mono: ["Fira Code", "monospace"] },
+            fontFamily: { "headline-md": ["Lato"], "headline-xl": ["Lato"], "headline-xl-mobile": ["Lato"], "headline-lg": ["Lato"], "body-md": ["Source Sans Pro"], "body-lg": ["Source Sans Pro"], "label-md": ["Source Sans Pro"], "label-sm": ["Source Sans Pro"], mono: ["Fira Code", "monospace"] },
             fontSize: { "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}], "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "600"}], "headline-xl": ["48px", {"lineHeight": "1.1", "fontWeight": "700"}], "headline-xl-mobile": ["36px", {"lineHeight": "1.2", "fontWeight": "700"}], "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}], "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}], "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}], "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "500"}] }
           }
         }
@@ -46,7 +47,7 @@
         .reveal-up { opacity: 0; transform: translateY(40px); transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
         .reveal-up.active { opacity: 1; transform: translateY(0); }
         .blog-rich-content {
-            font-family: Inter, sans-serif;
+            font-family: Source Sans Pro, sans-serif;
             color: #444748;
             line-height: 1.8;
         }
@@ -54,7 +55,7 @@
         .blog-rich-content h1,
         .blog-rich-content h2,
         .blog-rich-content h3 {
-            font-family: "Playfair Display", serif;
+            font-family: "Lato", serif;
             color: #000;
             font-weight: 700;
             margin-top: 40px;
@@ -124,9 +125,22 @@
         }
 
         .blog-rich-content img {
-            width: 100%;
-            border-radius: 16px;
-            margin: 28px 0;
+            display: block !important;
+            width: auto !important;
+            max-width: min(100%, 560px) !important;
+            max-height: 280px !important;
+            object-fit: contain !important;
+            border-radius: 8px !important;
+            margin: 20px auto !important;
+            padding: 10px !important;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+        }
+
+        .blog-rich-content figure {
+            max-width: 600px !important;
+            margin: 24px auto !important;
+            text-align: center;
         }
     </style>
 </head>
@@ -141,7 +155,7 @@
     <div class="fixed inset-0 bg-black/20 z-[60] hidden transition-opacity duration-300 opacity-0 md:hidden" id="drawer-overlay"></div>
     <aside class="fixed top-0 left-0 h-full w-[280px] z-[70] bg-surface-container-low md:bg-background shadow-xl md:shadow-none -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out border-r border-outline-variant/30 flex flex-col justify-between" id="nav-drawer">
         <div class="p-8 flex flex-col items-center">
-            <div class="w-24 h-24 rounded-full bg-primary-container flex items-center justify-center shadow-lg border-2 border-surface-container-lowest overflow-hidden mb-4"><span class="font-headline-md text-secondary text-3xl tracking-tighter">KN</span></div>
+            <div class="code-avatar" aria-label="Animated developer coding"><div class="code-avatar__hair"></div><div class="code-avatar__head"></div><div class="code-avatar__body"></div><div class="code-avatar__arm code-avatar__arm--left"></div><div class="code-avatar__arm code-avatar__arm--right"></div><div class="code-avatar__screen"><span></span><span></span><span></span><i class="code-avatar__cursor"></i></div></div>
             <h2 class="font-headline-md text-headline-md text-primary font-bold">Kien Nguyen</h2>
             <p class="font-label-sm text-on-surface-variant text-center mt-2 italic">DevOps &amp; DevSecOps Engineer</p>
         </div>
@@ -180,6 +194,6 @@
         </div>
     </footer>
     <script src="config.js?v=1"></script>
-    <script src="script.js?v=11"></script>
+    <script src="script.js?v=15"></script>
 </body>
 </html>
