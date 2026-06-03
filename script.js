@@ -409,6 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="min-w-0 flex-1">
                         <div class="flex flex-wrap items-center gap-2">
                             <p class="font-label-md text-primary font-semibold">${escapeHtml(comment.author_name || 'Anonymous')}</p>
+                            ${comment.author_email ? `<span class="font-label-sm text-[12px] text-on-surface-variant/70">${escapeHtml(comment.author_email)}</span>` : ''}
                             <span class="text-on-surface-variant/50">/</span>
                             <time class="font-label-sm text-[12px] text-on-surface-variant/70">${escapeHtml(formatDate(comment.created_at))}</time>
                         </div>
