@@ -24,6 +24,41 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${blogsEndpoint}/${encodeURIComponent(blogId)}/comments`;
     }
 
+    const CACHE_PREFIX = 'portfolio-cache-v1:';
+
+    function readCache(key) {
+        try {
+            const cached = JSON.parse(localStorage.getItem(`${CACHE_PREFIX}${key}`) || 'null');
+            if (!cached || !cached.data) return null;
+            return cached;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    function writeCache(key, data) {
+        try {
+            localStorage.setItem(`${CACHE_PREFIX}${key}`, JSON.stringify({
+                savedAt: Date.now(),
+                data,
+            }));
+        } catch (error) {
+            // Ignore storage quota/private browsing failures.
+        }
+    }
+
+    async function fetchJsonWithTimeout(url, timeoutMs = 8000) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+            const response = await fetch(url, { signal: controller.signal });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return await response.json();
+        } finally {
+            clearTimeout(timeoutId);
+        }
+    }
+
     function assertApiConfigured() {
         if (!portfolioApiBaseUrl) {
             throw new Error('Portfolio API URL is not configured in config.js');
@@ -179,102 +214,111 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Load Blogs Dynamic Integration ---
+    function renderBlogs(container, blogs) {
+        container.innerHTML = '';
+
+        if (blogs.length === 0) {
+            container.innerHTML = `<div class="col-span-full text-center text-on-surface-variant font-body-md">No blogs found.</div>`;
+            return;
+        }
+
+        blogs.forEach(blog => {
+            const card = document.createElement('article');
+            card.className = "bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all duration-500 border border-outline-variant/30 flex flex-col-reverse md:flex-row overflow-hidden group w-full cursor-pointer";
+
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('a') || e.target.closest('button')) return;
+                window.location.href = `blog.html?id=${encodeURIComponent(blog.id)}`;
+            });
+
+            const hasImage = isUrl(blog.image_url);
+
+            if (hasImage) {
+                card.innerHTML = `
+                    <!-- Left Side: Content -->
+                    <div class="p-6 md:p-8 flex flex-col justify-between flex-1 min-w-0">
+                        <div>
+                            <h3 class="font-headline-md text-[20px] md:text-headline-md text-primary mb-3 group-hover:text-secondary transition-colors duration-300 leading-snug">
+                                ${escapeHtml(blog.title)}
+                            </h3>
+                            <p class="text-on-surface-variant font-body-md mb-6 leading-relaxed line-clamp-2 md:line-clamp-3">
+                                ${escapeHtml(blog.summary)}
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-y-2 gap-x-6 text-on-surface-variant/80 font-label-sm mt-auto">
+                            <div class="flex items-center text-on-surface-variant/70">
+                                <span class="material-symbols-outlined text-[18px] mr-1.5">calendar_month</span>
+                                <span>${escapeHtml(blog.date)}</span>
+                            </div>
+                            ${blog.tags && blog.tags.length ? `
+                            <div class="flex items-center text-on-surface-variant/70 min-w-0">
+                                <span class="material-symbols-outlined text-[18px] mr-1.5 shrink-0">folder</span>
+                                <span class="truncate">${escapeHtml(blog.tags.join(', '))}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <!-- Right Side: Cover Image -->
+                    <div class="w-full md:w-[34%] h-44 md:h-auto md:shrink-0 relative overflow-hidden bg-white border-b md:border-b-0 md:border-l border-outline-variant/20">
+                        <img src="${escapeHtml(blog.image_url)}" alt="${escapeHtml(blog.title)}" class="absolute inset-0 h-full w-full object-contain p-4 transition-transform duration-700 group-hover:scale-[1.02]"/>
+                    </div>
+                `;
+            } else {
+                card.innerHTML = `
+                    <!-- Full Width Content -->
+                    <div class="p-6 md:p-8 flex flex-col justify-between flex-1 min-w-0">
+                        <div>
+                            <div class="flex items-center gap-3 mb-4">
+                                ${renderBlogCardVisual(blog)}
+                            </div>
+                            <h3 class="font-headline-md text-[20px] md:text-headline-md text-primary mb-3 group-hover:text-secondary transition-colors duration-300 leading-snug">
+                                ${escapeHtml(blog.title)}
+                            </h3>
+                            <p class="text-on-surface-variant font-body-md mb-6 leading-relaxed line-clamp-3">
+                                ${escapeHtml(blog.summary)}
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-y-2 gap-x-6 text-on-surface-variant/80 font-label-sm mt-auto">
+                            <div class="flex items-center text-on-surface-variant/70">
+                                <span class="material-symbols-outlined text-[18px] mr-1.5">calendar_month</span>
+                                <span>${escapeHtml(blog.date)}</span>
+                            </div>
+                            ${blog.tags && blog.tags.length ? `
+                            <div class="flex items-center text-on-surface-variant/70 min-w-0">
+                                <span class="material-symbols-outlined text-[18px] mr-1.5 shrink-0">folder</span>
+                                <span class="truncate">${escapeHtml(blog.tags.join(', '))}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.appendChild(card);
+        });
+    }
+
     async function loadBlogs() {
         const container = document.getElementById('blogs-container');
         if (!container) return;
 
+        const cacheKey = 'blogs';
+        const cached = readCache(cacheKey);
+        const hasUsableCache = cached && Array.isArray(cached.data);
+        if (hasUsableCache) {
+            renderBlogs(container, cached.data);
+        }
+
         try {
             assertApiConfigured();
-            const response = await fetch(blogsEndpoint);
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-            const result = await response.json();
-            
-            container.innerHTML = '';
+            const result = await fetchJsonWithTimeout(blogsEndpoint);
             const blogs = getItems(result).map(normalizeBlog);
-                
-            if (blogs.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center text-on-surface-variant font-body-md">No blogs found.</div>`;
-                return;
-            }
-
-            blogs.forEach(blog => {
-                const card = document.createElement('article');
-                card.className = "bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-md transition-all duration-500 border border-outline-variant/30 flex flex-col-reverse md:flex-row overflow-hidden group w-full cursor-pointer";
-                
-                card.addEventListener('click', (e) => {
-                    if (e.target.closest('a') || e.target.closest('button')) return;
-                    window.location.href = `blog.html?id=${encodeURIComponent(blog.id)}`;
-                });
-
-                const hasImage = isUrl(blog.image_url);
-                
-                if (hasImage) {
-                    card.innerHTML = `
-                        <!-- Left Side: Content -->
-                        <div class="p-6 md:p-8 flex flex-col justify-between flex-1 min-w-0">
-                            <div>
-                                <h3 class="font-headline-md text-[20px] md:text-headline-md text-primary mb-3 group-hover:text-secondary transition-colors duration-300 leading-snug">
-                                    ${escapeHtml(blog.title)}
-                                </h3>
-                                <p class="text-on-surface-variant font-body-md mb-6 leading-relaxed line-clamp-2 md:line-clamp-3">
-                                    ${escapeHtml(blog.summary)}
-                                </p>
-                            </div>
-                            <div class="flex flex-wrap items-center gap-y-2 gap-x-6 text-on-surface-variant/80 font-label-sm mt-auto">
-                                <div class="flex items-center text-on-surface-variant/70">
-                                    <span class="material-symbols-outlined text-[18px] mr-1.5">calendar_month</span>
-                                    <span>${escapeHtml(blog.date)}</span>
-                                </div>
-                                ${blog.tags && blog.tags.length ? `
-                                <div class="flex items-center text-on-surface-variant/70 min-w-0">
-                                    <span class="material-symbols-outlined text-[18px] mr-1.5 shrink-0">folder</span>
-                                    <span class="truncate">${escapeHtml(blog.tags.join(', '))}</span>
-                                </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                        <!-- Right Side: Cover Image -->
-                        <div class="w-full md:w-[34%] h-44 md:h-auto md:shrink-0 relative overflow-hidden bg-white border-b md:border-b-0 md:border-l border-outline-variant/20">
-                            <img src="${escapeHtml(blog.image_url)}" alt="${escapeHtml(blog.title)}" class="absolute inset-0 h-full w-full object-contain p-4 transition-transform duration-700 group-hover:scale-[1.02]"/>
-                        </div>
-                    `;
-                } else {
-                    card.innerHTML = `
-                        <!-- Full Width Content -->
-                        <div class="p-6 md:p-8 flex flex-col justify-between flex-1 min-w-0">
-                            <div>
-                                <div class="flex items-center gap-3 mb-4">
-                                    ${renderBlogCardVisual(blog)}
-                                </div>
-                                <h3 class="font-headline-md text-[20px] md:text-headline-md text-primary mb-3 group-hover:text-secondary transition-colors duration-300 leading-snug">
-                                    ${escapeHtml(blog.title)}
-                                </h3>
-                                <p class="text-on-surface-variant font-body-md mb-6 leading-relaxed line-clamp-3">
-                                    ${escapeHtml(blog.summary)}
-                                </p>
-                            </div>
-                            <div class="flex flex-wrap items-center gap-y-2 gap-x-6 text-on-surface-variant/80 font-label-sm mt-auto">
-                                <div class="flex items-center text-on-surface-variant/70">
-                                    <span class="material-symbols-outlined text-[18px] mr-1.5">calendar_month</span>
-                                    <span>${escapeHtml(blog.date)}</span>
-                                </div>
-                                ${blog.tags && blog.tags.length ? `
-                                <div class="flex items-center text-on-surface-variant/70 min-w-0">
-                                    <span class="material-symbols-outlined text-[18px] mr-1.5 shrink-0">folder</span>
-                                    <span class="truncate">${escapeHtml(blog.tags.join(', '))}</span>
-                                </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                    `;
-                }
-
-                container.appendChild(card);
-            });
+            writeCache(cacheKey, blogs);
+            renderBlogs(container, blogs);
         } catch (error) {
-            container.innerHTML = `<div class="col-span-full text-center text-error font-body-md">Error connecting to blogs API: ${escapeHtml(error.message)}</div>`;
+            if (!hasUsableCache) {
+                container.innerHTML = `<div class="col-span-full text-center text-error font-body-md">Error connecting to blogs API: ${escapeHtml(error.message)}</div>`;
+            }
         }
     }
 
@@ -521,88 +565,123 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function renderProjects(container, projects) {
+        container.innerHTML = '';
+
+        if (projects.length === 0) {
+            container.innerHTML = `<div class="col-span-full text-center text-on-surface-variant font-body-md">No projects found.</div>`;
+            return;
+        }
+
+        projects.forEach(project => {
+            const article = document.createElement('article');
+            article.className = "group";
+            const techStack = project.tech_stack;
+            const details = Array.isArray(project.details) ? project.details : [];
+
+            const techBadgesHtml = techStack.map(tech =>
+                `<span class="px-3 py-1 bg-surface-container text-label-sm font-mono text-on-surface rounded">${escapeHtml(tech)}</span>`
+            ).join('');
+
+            const detailsListHtml = details.map(detail =>
+                `<li class="flex gap-3"><i class="${escapeHtml(detail.icon || 'fa-solid fa-circle-check')} text-secondary mt-1"></i> <div><strong>${escapeHtml(detail.detail_title || 'Detail')}:</strong> ${escapeHtml(detail.detail_description || '')}</div></li>`
+            ).join('');
+
+            article.innerHTML = `
+                <div class="relative overflow-hidden rounded-xl bg-primary-container p-8 md:p-12 min-h-[300px] flex flex-col justify-between border border-outline-variant/30 hover:border-secondary transition-all duration-500 shadow-md">
+                    <div class="absolute inset-0 opacity-[0.03] pointer-events-none">
+                        <div class="absolute inset-0 bg-[linear-gradient(45deg,#735c00_25%,transparent_25%,transparent_50%,#735c00_50%,#735c00_75%,transparent_75%,transparent)] [background-size:20px_20px]"></div>
+                    </div>
+                    <div class="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
+                        <span class="bg-surface-container-low text-secondary font-mono text-[11px] px-3 py-1 rounded-full uppercase tracking-wider">${escapeHtml(project.project_number)}</span>
+                        <a href="${escapeHtml(project.github_url || '#')}" target="_blank" class="flex items-center gap-2 text-[#735c00] hover:text-[#FF9900] transition-colors font-mono text-sm">
+                            <i class="fa-brands fa-github text-xl"></i> Source Repository
+                        </a>
+                    </div>
+                    <div class="relative z-10 mt-8">
+                        <h3 class="font-headline-lg text-headline-lg text-white mb-4">${escapeHtml(project.title)}</h3>
+                        <p class="text-on-primary-container font-body-lg max-w-3xl leading-relaxed mb-6">
+                            ${escapeHtml(project.summary)}
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-8 grid md:grid-cols-12 gap-8">
+                    <div class="md:col-span-8 space-y-6">
+                        <h4 class="font-headline-md text-headline-md text-primary">Architecture &amp; DevOps Flow:</h4>
+                        <ul class="space-y-4 text-on-surface-variant font-body-md leading-relaxed">
+                            ${detailsListHtml}
+                        </ul>
+                    </div>
+                    <div class="md:col-span-4 bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 h-fit">
+                        <h4 class="font-label-md text-label-md text-primary uppercase tracking-widest mb-4">Core Tech Stack</h4>
+                        <div class="flex flex-wrap gap-2">
+                            ${techBadgesHtml}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(article);
+        });
+    }
+
     // --- Load Projects Dynamic Integration ---
     async function loadProjects() {
         const container = document.getElementById('projects-container');
         if (!container) return;
 
+        const cacheKey = 'projects';
+        const cached = readCache(cacheKey);
+        const hasUsableCache = cached && Array.isArray(cached.data) && cached.data.length;
+        if (hasUsableCache) {
+            renderProjects(container, cached.data);
+        }
+
         try {
             assertApiConfigured();
-            const response = await fetch(projectsEndpoint);
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-            const result = await response.json();
-            
-            container.innerHTML = '';
+            const result = await fetchJsonWithTimeout(projectsEndpoint);
             const projects = getItems(result).map(normalizeProject);
-                
-            if (projects.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center text-on-surface-variant font-body-md">No projects found.</div>`;
-                return;
-            }
-
-            projects.forEach(project => {
-                const article = document.createElement('article');
-                article.className = "group";
-                const techStack = project.tech_stack;
-                const details = Array.isArray(project.details) ? project.details : [];
-                    
-                    // Create tech badges HTML
-                    const techBadgesHtml = techStack.map(tech => 
-                        `<span class="px-3 py-1 bg-surface-container text-label-sm font-mono text-on-surface rounded">${escapeHtml(tech)}</span>`
-                    ).join('');
-
-                    // Create project details list HTML
-                    const detailsListHtml = details.map(detail => 
-                        `<li class="flex gap-3"><i class="${escapeHtml(detail.icon || 'fa-solid fa-circle-check')} text-secondary mt-1"></i> <div><strong>${escapeHtml(detail.detail_title || 'Detail')}:</strong> ${escapeHtml(detail.detail_description || '')}</div></li>`
-                    ).join('');
-
-                    article.innerHTML = `
-                        <!-- Project Presentation (Clean Tech Box instead of photo) -->
-                        <div class="relative overflow-hidden rounded-xl bg-primary-container p-8 md:p-12 min-h-[300px] flex flex-col justify-between border border-outline-variant/30 hover:border-secondary transition-all duration-500 shadow-md">
-                            <div class="absolute inset-0 opacity-[0.03] pointer-events-none">
-                                <div class="absolute inset-0 bg-[linear-gradient(45deg,#735c00_25%,transparent_25%,transparent_50%,#735c00_50%,#735c00_75%,transparent_75%,transparent)] [background-size:20px_20px]"></div>
-                            </div>
-                            
-                            <div class="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
-                                <span class="bg-surface-container-low text-secondary font-mono text-[11px] px-3 py-1 rounded-full uppercase tracking-wider">${escapeHtml(project.project_number)}</span>
-                                <a href="${escapeHtml(project.github_url || '#')}" target="_blank" class="flex items-center gap-2 text-[#735c00] hover:text-[#FF9900] transition-colors font-mono text-sm">
-                                    <i class="fa-brands fa-github text-xl"></i> Source Repository
-                                </a>
-                            </div>
-
-                            <div class="relative z-10 mt-8">
-                                <h3 class="font-headline-lg text-headline-lg text-white mb-4">${escapeHtml(project.title)}</h3>
-                                <p class="text-on-primary-container font-body-lg max-w-3xl leading-relaxed mb-6">
-                                    ${escapeHtml(project.summary)}
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Project Details -->
-                        <div class="mt-8 grid md:grid-cols-12 gap-8">
-                            <div class="md:col-span-8 space-y-6">
-                                <h4 class="font-headline-md text-headline-md text-primary">Architecture &amp; DevOps Flow:</h4>
-                                <ul class="space-y-4 text-on-surface-variant font-body-md leading-relaxed">
-                                    ${detailsListHtml}
-                                </ul>
-                            </div>
-                            <div class="md:col-span-4 bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/30 h-fit">
-                                <h4 class="font-label-md text-label-md text-primary uppercase tracking-widest mb-4">Core Tech Stack</h4>
-                                <div class="flex flex-wrap gap-2">
-                                    ${techBadgesHtml}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-
-                container.appendChild(article);
-            });
+            writeCache(cacheKey, projects);
+            renderProjects(container, projects);
         } catch (error) {
             console.error('Projects API error:', error);
-            container.innerHTML = `<div class="col-span-full text-center text-error font-body-md">Error connecting to projects API: ${error.message}</div>`;
+            if (!hasUsableCache) {
+                container.innerHTML = `<div class="col-span-full text-center text-error font-body-md">Error connecting to projects API: ${escapeHtml(error.message)}</div>`;
+            }
         }
+    }
+
+    function renderBlogDetail(container, blog) {
+        document.title = `${blog.title} | Kien Nguyen`;
+        const hasHeroImage = isUrl(blog.image_url);
+        container.innerHTML = `
+            <article class="max-w-3xl mx-auto">
+                <a href="blogs.html" class="inline-flex items-center gap-2 font-label-md text-label-md uppercase tracking-widest text-secondary hover:text-primary transition-colors mb-10">
+                    <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                    <span>Back to Blogs</span>
+                </a>
+                <div class="flex items-center gap-3 mb-6">
+                    ${hasHeroImage ? '' : renderBlogCardVisual(blog)}
+                    <span class="w-1.5 h-1.5 rounded-full bg-outline-variant/50 ${hasHeroImage ? '' : 'ml-1'}"></span>
+                    <span class="font-label-sm text-secondary uppercase tracking-widest text-[11px]">${escapeHtml(blog.date)}</span>
+                </div>
+                <h1 class="font-headline-xl text-[30px] md:text-[40px] text-primary leading-tight mb-6 break-words">${escapeHtml(blog.title)}</h1>
+                <p class="font-body-lg text-[17px] md:text-body-lg text-on-surface-variant leading-8 mb-8">${escapeHtml(blog.summary)}</p>
+                ${renderBlogHeroImage(blog)}
+                <div class="flex items-center gap-4 py-4 border-y border-outline-variant/20 mb-10">
+                    <div class="w-10 h-10 rounded-full bg-secondary text-on-primary flex items-center justify-center font-bold tracking-tighter text-sm">KN</div>
+                    <div>
+                        <p class="font-label-md text-primary font-semibold">Kien Nguyen</p>
+                        <p class="font-label-sm text-on-surface-variant/80 text-[12px]">DevOps &amp; DevSecOps Architect</p>
+                    </div>
+                </div>
+                <div class="font-body-lg text-body-lg text-on-surface-variant leading-8 space-y-4">
+                    ${formatBlogContent(blog.content)}
+                </div>
+                ${renderCommentsSection(blog.id)}
+            </article>
+        `;
+        loadComments(blog.id);
     }
 
     async function loadBlogDetail() {
@@ -615,53 +694,31 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const cacheKey = `blog:${blogId}`;
+        const cached = readCache(cacheKey);
+        const cachedBlog = cached && cached.data ? normalizeBlog(cached.data) : null;
+        if (cachedBlog && cachedBlog.id) {
+            renderBlogDetail(container, cachedBlog);
+        }
+
         try {
             assertApiConfigured();
-            const response = await fetch(`${blogsEndpoint}/${encodeURIComponent(blogId)}`);
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-
-            const result = await response.json();
+            const result = await fetchJsonWithTimeout(`${blogsEndpoint}/${encodeURIComponent(blogId)}`);
             const blog = normalizeBlog(result.blog || getItems(result).find(item => String(item.id) === String(blogId)) || {});
 
             if (!blog.id) {
-                container.innerHTML = `<div class="text-center text-error font-body-md">Blog not found.</div>`;
+                if (!cachedBlog) {
+                    container.innerHTML = `<div class="text-center text-error font-body-md">Blog not found.</div>`;
+                }
                 return;
             }
 
-            document.title = `${blog.title} | Kien Nguyen`;
-            const hasHeroImage = isUrl(blog.image_url);
-            container.innerHTML = `
-                <article class="max-w-3xl mx-auto">
-                    <a href="blogs.html" class="inline-flex items-center gap-2 font-label-md text-label-md uppercase tracking-widest text-secondary hover:text-primary transition-colors mb-10">
-                        <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-                        <span>Back to Blogs</span>
-                    </a>
-                    <div class="flex items-center gap-3 mb-6">
-                        ${hasHeroImage ? '' : renderBlogCardVisual(blog)}
-                        <span class="w-1.5 h-1.5 rounded-full bg-outline-variant/50 ${hasHeroImage ? '' : 'ml-1'}"></span>
-                        <span class="font-label-sm text-secondary uppercase tracking-widest text-[11px]">${escapeHtml(blog.date)}</span>
-                    </div>
-                    <h1 class="font-headline-xl text-[30px] md:text-[40px] text-primary leading-tight mb-6 break-words">${escapeHtml(blog.title)}</h1>
-                    <p class="font-body-lg text-[17px] md:text-body-lg text-on-surface-variant leading-8 mb-8">${escapeHtml(blog.summary)}</p>
-                    ${renderBlogHeroImage(blog)}
-                    <div class="flex items-center gap-4 py-4 border-y border-outline-variant/20 mb-10">
-                        <div class="w-10 h-10 rounded-full bg-secondary text-on-primary flex items-center justify-center font-bold tracking-tighter text-sm">KN</div>
-                        <div>
-                            <p class="font-label-md text-primary font-semibold">Kien Nguyen</p>
-                            <p class="font-label-sm text-on-surface-variant/80 text-[12px]">DevOps &amp; DevSecOps Architect</p>
-                        </div>
-                    </div>
-                    <div class="font-body-lg text-body-lg text-on-surface-variant leading-8 space-y-4">
-                        ${formatBlogContent(blog.content)}
-                    </div>
-                    ${renderCommentsSection(blog.id)}
-                </article>
-            `;
-            loadComments(blog.id);
+            writeCache(cacheKey, blog);
+            renderBlogDetail(container, blog);
         } catch (error) {
-            container.innerHTML = `<div class="text-center text-error font-body-md">Error loading blog article.</div>`;
+            if (!cachedBlog) {
+                container.innerHTML = `<div class="text-center text-error font-body-md">Error loading blog article.</div>`;
+            }
         }
     }
 
