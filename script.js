@@ -353,10 +353,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
-    function renderCommentItem(comment, blogId, isReply = false) {
+    function renderCommentItem(comment, blogId, depth = 0) {
         const replies = Array.isArray(comment.replies) ? comment.replies : [];
+        const nestedClass = depth > 0 ? 'ml-4 md:ml-8' : '';
         return `
-            <article class="${isReply ? 'ml-6 md:ml-10' : ''} rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-5 shadow-sm">
+            <article class="${nestedClass} rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-5 shadow-sm">
                 <div class="flex items-start gap-3">
                     <div class="w-9 h-9 rounded-full bg-secondary text-on-primary flex items-center justify-center font-bold text-sm shrink-0">
                         ${escapeHtml((comment.author_name || 'A').slice(0, 1).toUpperCase())}
@@ -368,24 +369,22 @@ document.addEventListener('DOMContentLoaded', () => {
                             <time class="font-label-sm text-[12px] text-on-surface-variant/70">${escapeHtml(formatDate(comment.created_at))}</time>
                         </div>
                         <p class="mt-3 text-on-surface-variant font-body-md leading-7 whitespace-pre-wrap">${escapeHtml(comment.content || '')}</p>
-                        ${isReply ? '' : `
-                            <button class="mt-4 inline-flex items-center gap-1 text-secondary hover:text-primary transition-colors font-label-md text-label-md uppercase tracking-widest" data-reply-toggle="${escapeHtml(comment.comment_id)}">
-                                <span class="material-symbols-outlined text-[17px]">reply</span>
-                                <span>Reply</span>
-                            </button>
-                            <form class="comment-reply-form hidden mt-4 rounded-lg bg-surface-container-low p-4 border border-outline-variant/20" data-blog-id="${escapeHtml(blogId)}" data-parent-id="${escapeHtml(comment.comment_id)}">
-                                <div class="grid md:grid-cols-2 gap-3 mb-3">
-                                    <input class="rounded-lg border-outline-variant bg-white text-body-md" name="email" type="email" placeholder="Email" required>
-                                    <input class="rounded-lg border-outline-variant bg-white text-body-md" name="author_name" type="text" placeholder="Name optional">
-                                </div>
-                                <textarea class="w-full rounded-lg border-outline-variant bg-white text-body-md" name="content" rows="3" maxlength="2000" placeholder="Write a reply..." required></textarea>
-                                <button class="mt-3 bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md uppercase tracking-widest hover:bg-secondary transition-colors" type="submit">Send Reply</button>
-                                <p class="comment-form-message mt-3 text-sm text-on-surface-variant"></p>
-                            </form>
-                        `}
+                        <button class="mt-4 inline-flex items-center gap-1 text-secondary hover:text-primary transition-colors font-label-md text-label-md uppercase tracking-widest" data-reply-toggle="${escapeHtml(comment.comment_id)}">
+                            <span class="material-symbols-outlined text-[17px]">reply</span>
+                            <span>Reply</span>
+                        </button>
+                        <form class="comment-reply-form hidden mt-4 rounded-lg bg-surface-container-low p-4 border border-outline-variant/20" data-blog-id="${escapeHtml(blogId)}" data-parent-id="${escapeHtml(comment.comment_id)}">
+                            <div class="grid md:grid-cols-2 gap-3 mb-3">
+                                <input class="rounded-lg border-outline-variant bg-white text-body-md" name="email" type="email" placeholder="Email" required>
+                                <input class="rounded-lg border-outline-variant bg-white text-body-md" name="author_name" type="text" placeholder="Name optional">
+                            </div>
+                            <textarea class="w-full rounded-lg border-outline-variant bg-white text-body-md" name="content" rows="3" maxlength="2000" placeholder="Write a reply..." required></textarea>
+                            <button class="mt-3 bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md uppercase tracking-widest hover:bg-secondary transition-colors" type="submit">Send Reply</button>
+                            <p class="comment-form-message mt-3 text-sm text-on-surface-variant"></p>
+                        </form>
                     </div>
                 </div>
-                ${replies.length ? `<div class="mt-4 space-y-4">${replies.map(reply => renderCommentItem(reply, blogId, true)).join('')}</div>` : ''}
+                ${replies.length ? `<div class="mt-4 space-y-4">${replies.map(reply => renderCommentItem(reply, blogId, depth + 1)).join('')}</div>` : ''}
             </article>
         `;
     }
