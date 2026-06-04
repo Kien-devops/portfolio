@@ -1,0 +1,166 @@
+name: DevSecOps CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+env:
+  REPO_DIR: /home/monitor/portfolio
+  REPO_URL: https://github.com/Kien-devops/portfolio.git
+  NEXUS_DOCKER_REGISTRY: 100.112.150.56:8082
+  BUILDER_HOST: 100.112.150.56
+  IMAGE_TAG: ${{ github.sha }}
+  BRANCH_NAME: ${{ github.ref_name }}
+  K8S_KUSTOMIZATION: k8s/overlays/prod/kustomization.yaml
+
+jobs:
+  security-gates:
+    name: Trivy filesystem scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: "${{ github.event_name != 'push' || !contains(github.event.head_commit.message, 'ci: update image tag') }}"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTH_KEY }}
+          tags: tag:aaa
+
+      - name: Trivy filesystem and dependency scan
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+          ignore-unfixed: false
+
+  build-push-deploy:
+    name: Build, Push, and Update GitOps
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+      - security-gates
+    if: "${{ github.event_name != 'push' || !contains(github.event.head_commit.message, 'ci: update image tag') }}"
+
+    steps:
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTH_KEY }}
+          tags: tag:aaa
+
+      - name: Verify Builder SSH access (via Tailscale SSH)
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -o BatchMode=yes \
+            -o StrictHostKeyChecking=no \
+            "monitor@${{ env.BUILDER_HOST }}" \
+            "echo 'Builder SSH authentication via Tailscale SSH succeeded'"
+
+      - name: Build and push images on Builder
+        shell: bash
+        env:
+          GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
+          GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
+          NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+          NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          GIT_AUTH=$(printf '%s' "${GIT_USERNAME}:${GIT_PASSWORD}" | base64 | tr -d '\n')
+
+          ssh -o BatchMode=yes \
+            -o StrictHostKeyChecking=no \
+            "monitor@${{ env.BUILDER_HOST }}" \
+            "GIT_AUTH='${GIT_AUTH}' NEXUS_USERNAME='${NEXUS_USERNAME}' NEXUS_PASSWORD='${NEXUS_PASSWORD}' REPO_DIR='${REPO_DIR}' REPO_URL='${REPO_URL}' NEXUS_DOCKER_REGISTRY='${NEXUS_DOCKER_REGISTRY}' IMAGE_TAG='${IMAGE_TAG}' BRANCH_NAME='${BRANCH_NAME}' /bin/bash -s" <<'EOF'
+          set -euo pipefail
+
+          command -v docker >/dev/null 2>&1 || { echo "docker is not installed on Builder"; exit 1; }
+          command -v git >/dev/null 2>&1 || { echo "git is not installed on Builder"; exit 1; }
+
+          if [ ! -d "$REPO_DIR/.git" ]; then
+            rm -rf "$REPO_DIR"
+            git -c http.extraHeader="Authorization: Basic $GIT_AUTH" clone -b "$BRANCH_NAME" "$REPO_URL" "$REPO_DIR"
+          else
+            cd "$REPO_DIR"
+            git remote set-url origin "$REPO_URL"
+            git -c http.extraHeader="Authorization: Basic $GIT_AUTH" fetch origin "$BRANCH_NAME"
+            git reset --hard "origin/$BRANCH_NAME"
+          fi
+
+          cd "$REPO_DIR"
+
+          echo "Building local Docker image..."
+          docker build -t "portfolio:$IMAGE_TAG" -f Dockerfile .
+
+          echo "Scanning local Docker image with Trivy..."
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:0.56.2 image \
+            --severity HIGH,CRITICAL \
+            --exit-code 1 \
+            --ignore-unfixed \
+            "portfolio:$IMAGE_TAG"
+
+          echo "Logging in to Nexus Docker Registry..."
+          echo "$NEXUS_PASSWORD" | docker login --username "$NEXUS_USERNAME" --password-stdin "$NEXUS_DOCKER_REGISTRY"
+
+          echo "Pushing image to Nexus Docker Registry..."
+          docker tag "portfolio:$IMAGE_TAG" "$NEXUS_DOCKER_REGISTRY/portfolio:$IMAGE_TAG"
+          docker push "$NEXUS_DOCKER_REGISTRY/portfolio:$IMAGE_TAG"
+
+          echo "Scanning pushed image from Nexus Docker Registry..."
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v $HOME/.docker/config.json:/root/.docker/config.json \
+            aquasec/trivy:0.56.2 image \
+            --severity HIGH,CRITICAL \
+            --exit-code 1 \
+            --ignore-unfixed \
+            "$NEXUS_DOCKER_REGISTRY/portfolio:$IMAGE_TAG"
+          EOF
+
+      - name: Checkout repo to update manifests
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BRANCH_NAME }}
+
+      - name: Update image tag and registry name in k8s manifests
+        shell: bash
+        run: |
+          set -euo pipefail
+          
+          TARGET_REGISTRY="${{ env.NEXUS_DOCKER_REGISTRY }}"
+
+          echo "Updating Kubernetes overlay at ${{ env.K8S_KUSTOMIZATION }} with registry: ${TARGET_REGISTRY}"
+          
+          # Dynamically replace newName and newTag matching by name prefix
+          sed -i "/name: .*portfolio/{n;s|newName: .*|newName: ${TARGET_REGISTRY}/portfolio|;n;s|newTag: .*|newTag: ${IMAGE_TAG}|;}" "${{ env.K8S_KUSTOMIZATION }}"
+
+      - name: Commit and push updated manifests
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "${{ env.K8S_KUSTOMIZATION }}"
+
+          if git diff --cached --quiet; then
+            echo "No manifest image tag changes to commit."
+            exit 0
+          fi
+
+          git commit -m "ci: update image tag to ${IMAGE_TAG}"
+          git push origin "$BRANCH_NAME"
