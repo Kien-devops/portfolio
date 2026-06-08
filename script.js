@@ -635,13 +635,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const cached = readCache(cacheKey);
         const hasUsableCache = cached && Array.isArray(cached.data) && cached.data.length;
         if (hasUsableCache) {
-            renderProjects(container, cached.data);
+            const sortedCached = [...cached.data].sort((a, b) => parseInt(a.id || 0, 10) - parseInt(b.id || 0, 10));
+            renderProjects(container, sortedCached);
         }
 
         try {
             assertApiConfigured();
             const result = await fetchJsonWithTimeout(projectsEndpoint);
             const projects = getItems(result).map(normalizeProject);
+            projects.sort((a, b) => parseInt(a.id || 0, 10) - parseInt(b.id || 0, 10));
             writeCache(cacheKey, projects);
             renderProjects(container, projects);
         } catch (error) {
