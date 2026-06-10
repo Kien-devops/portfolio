@@ -12,7 +12,7 @@ WORKDIR /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy all static website files
-COPY . .
+COPY out .
 
 # Change ownership of website files to nginx
 RUN chown -R nginx:nginx /usr/share/nginx/html
