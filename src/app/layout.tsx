@@ -14,8 +14,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Kien Devops | DevSecOps & Fullstack Engineer Portfolio",
+  title: "Kien Devops",
   description: "Personal website and portfolio of Kien Devops, featuring experience, technical skills, projects, and DevSecOps pipelines.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

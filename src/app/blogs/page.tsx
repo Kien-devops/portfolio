@@ -7,6 +7,7 @@ import BackgroundGlows from '@/components/BackgroundGlows';
 import BlogCard from '@/components/BlogCard';
 import { fetchBlogs, Blog } from '@/utils/api';
 import { BookOpen } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function BlogsPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -24,7 +25,12 @@ export default function BlogsPage() {
       <Navbar />
       <BackgroundGlows />
 
-      <main className="flex-1 w-full max-w-5xl mx-auto px-4 pt-32 pb-20 space-y-12">
+      <motion.main
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+        className="flex-1 w-full max-w-5xl mx-auto px-4 pt-32 pb-20 space-y-12"
+      >
         {/* Header Block */}
         <section className="space-y-4 text-center max-w-2xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-mono tracking-wider uppercase">
@@ -66,7 +72,7 @@ export default function BlogsPage() {
             ))}
           </section>
         )}
-      </main>
+      </motion.main>
 
       <Footer />
     </>

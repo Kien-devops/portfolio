@@ -26,9 +26,6 @@ export default function Footer() {
           >
             LinkedIn
           </a>
-          <Link href="/pipeline" className="hover:text-foreground transition-colors">
-            Pipeline Visualizer
-          </Link>
         </div>
       </div>
     </footer>
