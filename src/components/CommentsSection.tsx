@@ -1,15 +1,28 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Comment, CommentReply, fetchComments, postComment, postReply } from '@/utils/api';
+import { Comment, fetchComments, postComment, postReply } from '@/utils/api';
 import { MessageSquare, Reply, Send, Loader2, AlertCircle } from 'lucide-react';
 
 interface CommentsSectionProps {
   blogId: string;
 }
 
+// Unified recursive interface for parent comments and replies
+interface CommentNode {
+  comment_id: string;
+  parent_comment_id: string | null;
+  type: 'comment' | 'reply';
+  author_name: string;
+  author_email: string;
+  content: string;
+  created_at: string;
+  reply_count?: number;
+  replies?: CommentNode[];
+}
+
 export default function CommentsSection({ blogId }: CommentsSectionProps) {
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] = useState<CommentNode[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,12 +42,51 @@ export default function CommentsSection({ blogId }: CommentsSectionProps) {
   // Email validation regex
   const validateEmail = (input: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input);
 
+  // Recursive count utility
+  const countComments = (nodes: CommentNode[]): number => {
+    let count = 0;
+    for (const node of nodes) {
+      count += 1;
+      if (node.replies && node.replies.length > 0) {
+        count += countComments(node.replies);
+      }
+    }
+    return count;
+  };
+
+  // Recursive state update utility
+  const addReplyToTree = (items: CommentNode[], parentId: string, newReply: CommentNode): CommentNode[] => {
+    return items.map(item => {
+      if (item.comment_id === parentId) {
+        return {
+          ...item,
+          reply_count: (item.reply_count || 0) + 1,
+          replies: [...(item.replies || []), newReply]
+        };
+      }
+      if (item.replies && item.replies.length > 0) {
+        return {
+          ...item,
+          replies: addReplyToTree(item.replies, parentId, newReply)
+        };
+      }
+      return item;
+    });
+  };
+
   useEffect(() => {
     async function loadData() {
       try {
         setLoading(true);
         const data = await fetchComments(blogId);
-        setComments(data);
+        // Normalize comments tree structure from S3/DynamoDB response
+        const formatNodes = (items: any[]): CommentNode[] => {
+          return items.map(item => ({
+            ...item,
+            replies: item.replies ? formatNodes(item.replies) : []
+          }));
+        };
+        setComments(formatNodes(data));
       } catch (err) {
         console.error(err);
       } finally {
@@ -66,9 +118,12 @@ export default function CommentsSection({ blogId }: CommentsSectionProps) {
       });
 
       if (newComment) {
-        setComments([newComment, ...comments]);
+        const commentNode: CommentNode = {
+          ...newComment,
+          replies: []
+        };
+        setComments([commentNode, ...comments]);
         setContent('');
-        // Keep name and email in state for user convenience
       } else {
         setError('Failed to submit comment. Please try again.');
       }
@@ -102,16 +157,11 @@ export default function CommentsSection({ blogId }: CommentsSectionProps) {
       });
 
       if (newReply) {
-        setComments(comments.map(c => {
-          if (c.comment_id === parentId) {
-            return {
-              ...c,
-              reply_count: c.reply_count + 1,
-              replies: [...(c.replies || []), newReply]
-            };
-          }
-          return c;
-        }));
+        const replyNode: CommentNode = {
+          ...newReply,
+          replies: []
+        };
+        setComments(prevComments => addReplyToTree(prevComments, parentId, replyNode));
         setReplyContent('');
         setReplyingToId(null);
       } else {
@@ -155,12 +205,169 @@ export default function CommentsSection({ blogId }: CommentsSectionProps) {
     }
   };
 
+  // Sanitizes and renders comment text safely, preserving formatting and HTML styling tags
+  const renderCommentContent = (contentString: string) => {
+    if (!contentString) return null;
+
+    if (!/<[a-z][\s\S]*>/i.test(contentString)) {
+      return <span className="whitespace-pre-wrap">{contentString}</span>;
+    }
+
+    let sanitized = contentString;
+    // Strip script and style blocks
+    sanitized = sanitized.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+    sanitized = sanitized.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+    // Strip interactive attributes
+    sanitized = sanitized.replace(/\son\w+\s*=\s*(['"]).*?\1/gi, '');
+    sanitized = sanitized.replace(/\son\w+\s*=\s*\S+/gi, '');
+    // Strip JavaScript URLs
+    sanitized = sanitized.replace(/href\s*=\s*(['"])javascript:.*?\1/gi, '');
+    // Strip embedding tags
+    sanitized = sanitized.replace(/<(iframe|frameset|object|embed|applet|meta|link|base)[^>]*>[\s\S]*?<\/\1>/gi, '');
+    sanitized = sanitized.replace(/<(iframe|frameset|object|embed|applet|meta|link|base)[^>]*>/gi, '');
+
+    return (
+      <span
+        className="comment-html-content whitespace-pre-wrap break-words inline-block w-full"
+        dangerouslySetInnerHTML={{ __html: sanitized }}
+      />
+    );
+  };
+
+  // Recursively renders a comment/reply node and all of its sub-replies
+  const renderCommentNode = (node: CommentNode, depth: number = 0) => {
+    const isParentComment = node.type === 'comment';
+    // Visual indentation wrapper for replies
+    const indentClass = depth > 0 ? 'pl-4 md:pl-6 border-l border-card-border/60 ml-3 md:ml-4' : '';
+
+    return (
+      <div key={node.comment_id} className={`space-y-4 ${indentClass}`}>
+        {/* Comment Panel */}
+        <div className={`border rounded-xl p-4 flex items-start gap-3.5 transition-all ${
+          isParentComment 
+            ? 'bg-card border-card-border' 
+            : 'bg-card/60 border-card-border/80'
+        }`}>
+          {/* User Avatar */}
+          <div className={`rounded-full flex items-center justify-center font-bold shrink-0 select-none ${
+            isParentComment 
+              ? 'w-10 h-10 bg-accent/10 border border-accent/20 text-sm text-accent' 
+              : 'w-8 h-8 bg-foreground/5 border border-foreground/10 text-xs text-text-muted'
+          }`}>
+            {getInitials(node.author_name)}
+          </div>
+
+          {/* User Content */}
+          <div className="flex-1 space-y-1.5 min-w-0">
+            <div className="flex items-center justify-between gap-4">
+              <h5 className={`font-bold text-foreground truncate ${isParentComment ? 'text-sm' : 'text-xs'}`}>
+                {node.author_name}
+              </h5>
+              <span className="text-[10px] font-mono text-text-muted shrink-0">
+                {formatRelativeTime(node.created_at)}
+              </span>
+            </div>
+
+            {/* Comment Body */}
+            <div className={`text-text-muted leading-relaxed ${isParentComment ? 'text-sm' : 'text-xs'}`}>
+              {renderCommentContent(node.content)}
+            </div>
+
+            {/* Reply Button */}
+            <button
+              onClick={() => {
+                setReplyingToId(replyingToId === node.comment_id ? null : node.comment_id);
+                setReplyName(authorName);
+                setReplyEmail(email);
+              }}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-accent hover:text-accent-hover transition-colors mt-2"
+            >
+              <Reply className="w-3.5 h-3.5" />
+              <span>Reply</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Inline Reply Form */}
+        {replyingToId === node.comment_id && (
+          <form
+            onSubmit={(e) => handleReplySubmit(e, node.comment_id)}
+            className="pl-4 md:pl-6 ml-3 md:ml-4 space-y-3 bg-card/40 border border-card-border/60 rounded-xl p-4"
+          >
+            <h6 className="text-xs font-mono font-bold uppercase tracking-wider text-accent">
+              Reply to {node.author_name}
+            </h6>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <input
+                type="text"
+                placeholder="Your name"
+                value={replyName}
+                onChange={(e) => setReplyName(e.target.value)}
+                className="w-full bg-background border border-card-border rounded-lg px-3.5 py-1.5 text-xs text-foreground focus:outline-none focus:border-accent transition-colors"
+                required
+              />
+              <input
+                type="email"
+                placeholder="Your email (private)"
+                value={replyEmail}
+                onChange={(e) => setReplyEmail(e.target.value)}
+                className="w-full bg-background border border-card-border rounded-lg px-3.5 py-1.5 text-xs text-foreground focus:outline-none focus:border-accent transition-colors"
+                required
+              />
+            </div>
+            <textarea
+              rows={2}
+              placeholder="Write a reply..."
+              value={replyContent}
+              onChange={(e) => setReplyContent(e.target.value)}
+              className="w-full bg-background border border-card-border rounded-lg px-3.5 py-2 text-xs text-foreground focus:outline-none focus:border-accent transition-colors resize-y"
+              required
+            />
+            <div className="flex justify-end gap-2 text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => setReplyingToId(null)}
+                className="px-3 py-1.5 rounded-lg border border-card-border text-text-muted hover:text-foreground transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={replySubmitting}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent text-white hover:bg-accent-hover transition-colors disabled:opacity-50"
+              >
+                {replySubmitting ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Posting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Post Reply</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* Recursive Children rendering */}
+        {node.replies && node.replies.length > 0 && (
+          <div className="space-y-4">
+            {node.replies.map((child) => renderCommentNode(child, depth + 1))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-10">
       <div className="flex items-center gap-3 border-b border-card-border pb-4">
         <MessageSquare className="w-6 h-6 text-accent" />
         <h3 className="text-xl font-bold tracking-tight text-foreground">
-          Discussion ({comments.length + comments.reduce((acc, c) => acc + (c.replies?.length || 0), 0)})
+          Discussion ({countComments(comments)})
         </h3>
       </div>
 
@@ -185,6 +392,7 @@ export default function CommentsSection({ blogId }: CommentsSectionProps) {
               onChange={(e) => setAuthorName(e.target.value)}
               placeholder="e.g. Jane Doe"
               className="w-full bg-background border border-card-border rounded-lg px-4 py-2 text-sm text-foreground focus:outline-none focus:border-accent transition-colors"
+              required
             />
           </div>
           <div>
@@ -198,6 +406,7 @@ export default function CommentsSection({ blogId }: CommentsSectionProps) {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="e.g. jane@domain.com"
               className="w-full bg-background border border-card-border rounded-lg px-4 py-2 text-sm text-foreground focus:outline-none focus:border-accent transition-colors"
+              required
             />
           </div>
         </div>
@@ -212,6 +421,7 @@ export default function CommentsSection({ blogId }: CommentsSectionProps) {
             onChange={(e) => setContent(e.target.value)}
             placeholder="Write your thoughts..."
             className="w-full bg-background border border-card-border rounded-lg px-4 py-2.5 text-sm text-foreground focus:outline-none focus:border-accent transition-colors resize-y"
+            required
           />
         </div>
         <div className="flex justify-end">
@@ -249,113 +459,7 @@ export default function CommentsSection({ blogId }: CommentsSectionProps) {
       ) : (
         /* Comments List */
         <div className="space-y-6">
-          {comments.map((comment) => (
-            <div key={comment.comment_id} className="space-y-4">
-              {/* Parent Comment */}
-              <div className="bg-card border border-card-border rounded-xl p-5 flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-sm font-bold text-accent shrink-0 select-none">
-                  {getInitials(comment.author_name)}
-                </div>
-                <div className="flex-1 space-y-2">
-                  <div className="flex items-center justify-between gap-4">
-                    <h5 className="text-sm font-bold text-foreground">{comment.author_name}</h5>
-                    <span className="text-[11px] font-mono text-text-muted">{formatRelativeTime(comment.created_at)}</span>
-                  </div>
-                  <p className="text-sm text-text-muted leading-relaxed whitespace-pre-wrap">{comment.content}</p>
-                  <button
-                    onClick={() => {
-                      setReplyingToId(replyingToId === comment.comment_id ? null : comment.comment_id);
-                      setReplyName(authorName); // prefill matching parent form data for convenience
-                      setReplyEmail(email);
-                    }}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-accent hover:text-accent-hover transition-colors mt-2"
-                  >
-                    <Reply className="w-3.5 h-3.5" />
-                    <span>Reply</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Replies Container */}
-              {comment.replies && comment.replies.length > 0 && (
-                <div className="pl-6 md:pl-10 space-y-4 border-l border-card-border/60 ml-5">
-                  {comment.replies.map((reply) => (
-                    <div key={reply.comment_id} className="bg-card/60 border border-card-border/80 rounded-xl p-4 flex items-start gap-3.5">
-                      <div className="w-8 h-8 rounded-full bg-foreground/5 border border-foreground/10 flex items-center justify-center text-xs font-bold text-text-muted shrink-0 select-none">
-                        {getInitials(reply.author_name)}
-                      </div>
-                      <div className="flex-1 space-y-1.5">
-                        <div className="flex items-center justify-between gap-4">
-                          <h6 className="text-xs font-bold text-foreground">{reply.author_name}</h6>
-                          <span className="text-[10px] font-mono text-text-muted">{formatRelativeTime(reply.created_at)}</span>
-                        </div>
-                        <p className="text-xs text-text-muted leading-relaxed whitespace-pre-wrap">{reply.content}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Reply Form */}
-              {replyingToId === comment.comment_id && (
-                <form
-                  onSubmit={(e) => handleReplySubmit(e, comment.comment_id)}
-                  className="pl-6 md:pl-10 space-y-3 ml-5 bg-card/40 border border-card-border/60 rounded-xl p-4"
-                >
-                  <h6 className="text-xs font-mono font-bold uppercase tracking-wider text-accent">Reply to {comment.author_name}</h6>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <input
-                      type="text"
-                      placeholder="Your name"
-                      value={replyName}
-                      onChange={(e) => setReplyName(e.target.value)}
-                      className="w-full bg-background border border-card-border rounded-lg px-3.5 py-1.5 text-xs text-foreground focus:outline-none focus:border-accent transition-colors"
-                    />
-                    <input
-                      type="email"
-                      placeholder="Your email (private)"
-                      value={replyEmail}
-                      onChange={(e) => setReplyEmail(e.target.value)}
-                      className="w-full bg-background border border-card-border rounded-lg px-3.5 py-1.5 text-xs text-foreground focus:outline-none focus:border-accent transition-colors"
-                    />
-                  </div>
-                  <textarea
-                    rows={2}
-                    placeholder="Write a reply..."
-                    value={replyContent}
-                    onChange={(e) => setReplyContent(e.target.value)}
-                    className="w-full bg-background border border-card-border rounded-lg px-3.5 py-2 text-xs text-foreground focus:outline-none focus:border-accent transition-colors resize-y"
-                  />
-                  <div className="flex justify-end gap-2 text-xs font-semibold">
-                    <button
-                      type="button"
-                      onClick={() => setReplyingToId(null)}
-                      className="px-3 py-1.5 rounded-lg border border-card-border text-text-muted hover:text-foreground transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={replySubmitting}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent text-white hover:bg-accent-hover transition-colors disabled:opacity-50"
-                    >
-                      {replySubmitting ? (
-                        <>
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          <span>Posting...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Send className="w-3.5 h-3.5" />
-                          <span>Post Reply</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </form>
-              )}
-            </div>
-          ))}
+          {comments.map((comment) => renderCommentNode(comment, 0))}
         </div>
       )}
     </div>

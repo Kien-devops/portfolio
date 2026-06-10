@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -11,6 +11,61 @@ import { ChevronLeft, Calendar, User, BookOpen } from 'lucide-react';
 
 interface BlogDetailClientProps {
   id: string;
+}
+
+const isHtmlContent = (content: string) => {
+  const trimmed = content.trim();
+  return trimmed.startsWith('<') || trimmed.includes('<!DOCTYPE') || trimmed.includes('<html');
+};
+
+function SafeHtmlRenderer({ html }: { html: string }) {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  useEffect(() => {
+    const iframe = iframeRef.current;
+    if (!iframe) return;
+
+    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (!doc) return;
+
+    doc.open();
+    doc.write(html);
+    doc.close();
+
+    const handleResize = () => {
+      if (iframe && doc.documentElement) {
+        iframe.style.height = `${doc.documentElement.scrollHeight}px`;
+      }
+    };
+
+    const resizeObserver = new ResizeObserver(() => {
+      handleResize();
+    });
+
+    if (doc.body) {
+      resizeObserver.observe(doc.body);
+    }
+
+    iframe.addEventListener('load', handleResize);
+    const timer = setTimeout(handleResize, 300);
+
+    return () => {
+      clearTimeout(timer);
+      resizeObserver.disconnect();
+      if (iframe) {
+        iframe.removeEventListener('load', handleResize);
+      }
+    };
+  }, [html]);
+
+  return (
+    <iframe
+      ref={iframeRef}
+      className="w-full border-0 overflow-hidden bg-white rounded-2xl shadow-sm"
+      scrolling="no"
+      title="Blog Content"
+    />
+  );
 }
 
 function renderMarkdown(content: string) {
@@ -190,7 +245,11 @@ export default function BlogDetailClient({ id }: BlogDetailClientProps) {
 
           {/* Body Content */}
           <div className="pt-6 font-sans">
-            {renderMarkdown(blog.content)}
+            {isHtmlContent(blog.content) ? (
+              <SafeHtmlRenderer html={blog.content} />
+            ) : (
+              renderMarkdown(blog.content)
+            )}
           </div>
         </article>
 
