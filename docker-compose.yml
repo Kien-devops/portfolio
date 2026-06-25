@@ -5,8 +5,7 @@ services:
     image: kien-portfolio:latest
     container_name: kien-portfolio
     restart: unless-stopped
-    network_mode: host
-    environment:
-      - PORT=3001
+    ports:
+      - "3001:8080"
     env_file:
       - .env.local
