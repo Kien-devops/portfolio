@@ -62,7 +62,7 @@ export function getApiBaseUrl(): string {
   if (typeof window !== 'undefined' && (window as any).PORTFOLIO_API_BASE_URL) {
     return (window as any).PORTFOLIO_API_BASE_URL.replace(/\/$/, '');
   }
-  return (process.env.NEXT_PUBLIC_PORTFOLIO_API_BASE_URL || '').replace(/\/$/, '');
+  return (process.env.NEXT_PUBLIC_PORTFOLIO_API_BASE_URL || '/api').replace(/\/$/, '');
 }
 
 // Default rich mock data to display when the API is not deployed
