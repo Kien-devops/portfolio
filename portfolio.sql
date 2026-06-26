@@ -39,185 +39,196 @@ INSERT INTO [dbo].[blogs] ([id],[title],[summary],[content],[image_url],[created
   <title>Graceful Shutdown và Zero Downtime Deployment</title>
   <style>
     :root {
-      --bg: #f4f7fb;
-      --card: #ffffff;
-      --text: #172033;
-      --muted: #64748b;
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --border: #e2e8f0;
-      --code-bg: #0f172a;
-      --code-text: #e5e7eb;
-      --soft-blue: #eff6ff;
+      --bg-color: #f8fafc;
+      --text-color: #334155;
+      --heading-color: #0f172a;
+      --primary-color: #2563eb;
+      --border-color: #e2e8f0;
+      --tag-bg: #eff6ff;
+      --tag-text: #1d4ed8;
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: linear-gradient(135deg, #eef4ff 0%, #f8fafc 45%, #ffffff 100%);
-      color: var(--text);
-      line-height: 1.75;
+      padding: 0;
+      font-family: ''Inter'', -apple-system, BlinkMacSystemFont, ''Segoe UI'', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: var(--bg-color);
     }
 
-    .page {
-      max-width: 1050px;
-      margin: 0 auto;
-      padding: 32px 18px 64px;
+    .container {
+      max-width: 100%;
+      padding: 2rem;
     }
 
-    .hero {
-      background: linear-gradient(135deg, #1e3a8a, #2563eb);
-      color: white;
-      border-radius: 26px;
-      padding: 44px 34px;
-      box-shadow: 0 22px 55px rgba(37, 99, 235, 0.25);
-      margin-bottom: 28px;
+    header {
+      text-align: left;
+      margin-bottom: 3rem;
     }
 
-    .hero .badge {
-      display: inline-block;
-      background: rgba(255,255,255,0.16);
-      border: 1px solid rgba(255,255,255,0.25);
-      padding: 7px 13px;
-      border-radius: 999px;
-      font-size: 14px;
-      margin-bottom: 16px;
+    h1 {
+      color: var(--heading-color);
+      font-size: 2.5rem;
+      line-height: 1.2;
+      margin: 0 0 0.5rem;
     }
 
-    .hero h1 {
-      margin: 0 0 14px;
-      font-size: clamp(30px, 5vw, 52px);
-      line-height: 1.12;
-      letter-spacing: -0.04em;
-    }
-
-    .hero p {
+    .subtitle {
+      color: #64748b;
+      font-size: 1.1rem;
       margin: 0;
-      max-width: 760px;
-      color: #dbeafe;
-      font-size: 18px;
+      max-width: 900px;
     }
 
-    .content {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 26px;
-      padding: 32px;
-      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+    .blog-post {
+      margin-bottom: 4rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border-color);
     }
 
-    h2 {
-      margin-top: 42px;
-      margin-bottom: 14px;
-      font-size: 30px;
-      line-height: 1.25;
-      color: #0f172a;
-      border-left: 5px solid var(--primary);
-      padding-left: 14px;
+    .post-date {
+      display: block;
+      color: #94a3b8;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
     }
 
-    h3 {
-      margin-top: 28px;
-      margin-bottom: 10px;
-      font-size: 22px;
-      color: #1e3a8a;
+    .post-title {
+      color: var(--heading-color);
+      font-size: 2rem;
+      line-height: 1.3;
+      margin: 0 0 1rem;
     }
 
-    p { margin: 14px 0; }
-
-    ul {
-      padding-left: 0;
-      list-style: none;
-      display: grid;
-      gap: 10px;
-      margin: 18px 0;
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
     }
 
-    li {
-      background: var(--soft-blue);
-      border: 1px solid #bfdbfe;
-      padding: 12px 14px;
-      border-radius: 14px;
+    .tag {
+      background-color: var(--tag-bg);
+      color: var(--tag-text);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
     }
 
-    li::before {
-      content: "✓";
-      color: var(--primary);
-      font-weight: bold;
-      margin-right: 8px;
+    .post-content {
+      font-size: 1.05rem;
     }
 
-    pre {
-      background: var(--code-bg);
-      color: var(--code-text);
-      border-radius: 18px;
-      padding: 18px;
-      overflow-x: auto;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
-      margin: 20px 0;
+    .post-content h2 {
+      color: var(--heading-color);
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+    }
+
+    .post-content h3 {
+      color: var(--heading-color);
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .post-content p {
+      margin-bottom: 1.2rem;
+    }
+
+    .post-content ul {
+      margin-bottom: 1.5rem;
+      padding-left: 1.5rem;
+    }
+
+    .post-content li {
+      margin-bottom: 0.5rem;
     }
 
     code {
-      font-family: Consolas, Monaco, ''Courier New'', monospace;
-      font-size: 14px;
+      background-color: #f1f5f9;
+      color: #ef4444;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.9em;
     }
 
-    p code, li code {
-      background: #e0f2fe;
-      color: #075985;
-      padding: 2px 6px;
-      border-radius: 7px;
+    pre {
+      background-color: #1e293b;
+      color: #f8fafc;
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    pre code {
+      background-color: transparent;
+      color: inherit;
+      padding: 0;
+      font-size: 0.9em;
     }
 
     figure {
-      margin: 24px 0;
-      border-radius: 22px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      background: #fff;
+      margin: 1.5rem 0;
     }
 
     figure img {
       width: 100%;
-      display: block;
-      max-height: 420px;
+      max-height: 360px;
       object-fit: cover;
+      display: block;
+      border-radius: 6px;
     }
 
     figcaption {
-      color: var(--muted);
-      font-size: 14px;
-      padding: 10px 14px;
-      background: #f8fafc;
+      color: #64748b;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
     }
 
-    .note {
-      background: #ecfdf5;
-      border: 1px solid #bbf7d0;
-      border-left: 5px solid #22c55e;
-      padding: 16px 18px;
-      border-radius: 16px;
-      margin: 24px 0;
+    .footer {
+      text-align: center;
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+      color: #64748b;
     }
 
-    @media (max-width: 720px) {
-      .hero, .content { padding: 24px 18px; border-radius: 20px; }
-      h2 { font-size: 24px; }
-      h3 { font-size: 20px; }
+    @media (max-width: 700px) {
+      .container { padding: 1.25rem; }
+      h1 { font-size: 2rem; }
+      .post-title { font-size: 1.6rem; }
     }
+
   </style>
 </head>
 <body>
-  <main class="page">
-    <section class="hero">
-      <span class="badge">Kubernetes • HAProxy • AWS ALB • Zero Downtime</span>
-      <h1>Graceful Shutdown và Zero Downtime Deployment</h1>
-      <p>Hướng dẫn cách phối hợp application, Kubernetes, HAProxy và load balancer để tránh lỗi 502/503 khi rolling update.</p>
-    </section>
+  <div class="container">
+    <header>
+      <h1>Tech Blog & Case Studies</h1>
+      <p class="subtitle">Chia sẻ kiến thức về DevOps, Kubernetes, Load Balancing & Production Deployment</p>
+    </header>
 
-    <article class="content">
+    <article class="blog-post">
+      <time class="post-date">Tháng 6, 2026</time>
+      <h2 class="post-title">Graceful Shutdown và Zero Downtime Deployment</h2>
+      <div class="tags">
+        <span class="tag">Kubernetes</span>
+        <span class="tag">HAProxy</span>
+        <span class="tag">AWS ALB</span>
+        <span class="tag">Zero Downtime</span>
+        <span class="tag">DevOps</span>
+      </div>
+      <div class="post-content">
 <p>Khi deploy version mới, Kubernetes hoặc hệ thống orchestration sẽ terminate instance/pod cũ. Nếu ứng dụng tắt ngay lập tức, các request đang xử lý có thể bị mất kết nối. Nếu load balancer vẫn tiếp tục gửi traffic vào backend đang shutdown, người dùng có thể gặp lỗi 502, 503, connection reset hoặc timeout.</p>
 <p>Trong một hệ thống web/API thực tế, request thường đi qua nhiều lớp:</p>
 <pre><code class="language-text">Client -&gt; AWS ALB -&gt; HAProxy -&gt; Kubernetes Service -&gt; Pod/Application</code></pre>
@@ -422,30 +433,28 @@ done</code></pre>
 <h2 id="kết-luận">Kết luận</h2>
 <p>Zero downtime không chỉ là bật rolling update. Nó là sự phối hợp giữa application, Kubernetes, HAProxy và ALB.</p>
 <p>App phải shutdown graceful, readiness phải phản ánh trạng thái nhận traffic, load balancer phải có connection draining, grace period phải đủ dài, và cuối cùng vẫn phải test bằng traffic thật hoặc load test.</p>
+      </div>
     </article>
-  </main>
+
+    <footer class="footer">Blog thực hành DevOps Production - UI đơn giản, full trang.</footer>
+  </div>
 </body>
-</html>','https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=1400&auto=format&fit=crop','2026-05-28 17:36:50.143'),(5,'Xây dựng hệ thống xử lý ảnh Event-Driven trên AWS','Trong bài viết này, chúng ta xây dựng pipeline serverless với S3, SQS, Lambda, DynamoDB Stream và SNS.','<!DOCTYPE html>
+</html>','https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=1400&auto=format&fit=crop','2026-05-29 00:36:50.000'),(5,'Xây dựng hệ thống xử lý ảnh Event-Driven trên AWS','Trong bài viết này, chúng ta xây dựng pipeline serverless với S3, SQS, Lambda, DynamoDB Stream và SNS.','<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Xây dựng hệ thống xử lý ảnh Event-Driven trên AWS</title>
-  <meta name="description" content="Trong bài viết này, chúng ta xây dựng pipeline serverless với S3, SQS, Lambda, DynamoDB Stream và SNS." />
+  <title>Xây dựng hệ thống xử lý ảnh Event-Driven trên AWS với S3, SQS, Lambda, DynamoDB Stream và SNS</title>
+  <meta name="description" content="Pipeline serverless với S3, SQS, Lambda, DynamoDB Stream và SNS." />
   <style>
     :root {
-      --bg: #f6f8fc;
-      --card: #ffffff;
-      --text: #172033;
-      --muted: #5b6475;
-      --primary: #2563eb;
-      --primary-soft: #eff6ff;
-      --border: #e5e7eb;
-      --code-bg: #0f172a;
-      --code-text: #e5e7eb;
-      --success: #10b981;
-      --warning: #f97316;
-      --shadow: 0 18px 50px rgba(15, 23, 42, 0.10);
+      --bg-color: #f8fafc;
+      --text-color: #334155;
+      --heading-color: #0f172a;
+      --primary-color: #2563eb;
+      --border-color: #e2e8f0;
+      --tag-bg: #eff6ff;
+      --tag-text: #1d4ed8;
     }
 
     * {
@@ -453,193 +462,187 @@ done</code></pre>
     }
 
     body {
+      font-family: ''Inter'', -apple-system, BlinkMacSystemFont, ''Segoe UI'', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--text-color);
+      background-color: var(--bg-color);
       margin: 0;
-      font-family: Inter, "Segoe UI", Arial, sans-serif;
-      line-height: 1.75;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(37, 99, 235, 0.14), transparent 32rem),
-        linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
+      padding: 0;
     }
 
-    .page {
-      width: min(1120px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 36px 0 60px;
+    .container {
+      max-width: 100%;
+      padding: 2rem;
     }
 
-    .hero {
-      background: linear-gradient(135deg, #0f172a, #1d4ed8);
-      color: white;
-      padding: 44px;
-      border-radius: 28px;
-      box-shadow: var(--shadow);
-      margin-bottom: 28px;
-      overflow: hidden;
-      position: relative;
+    header {
+      text-align: left;
+      margin-bottom: 3rem;
     }
 
-    .hero::after {
-      content: "";
-      position: absolute;
-      width: 260px;
-      height: 260px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.13);
-      right: -80px;
-      top: -90px;
+    h1 {
+      color: var(--heading-color);
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
     }
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.14);
-      border: 1px solid rgba(255,255,255,.25);
-      font-weight: 700;
-      font-size: 13px;
-      margin-bottom: 18px;
-    }
-
-    .hero h1 {
-      margin: 0;
-      font-size: clamp(30px, 5vw, 54px);
-      line-height: 1.12;
-      letter-spacing: -0.04em;
+    .subtitle {
+      color: #64748b;
+      font-size: 1.1rem;
       max-width: 900px;
     }
 
-    .hero p {
-      color: rgba(255,255,255,.86);
-      max-width: 780px;
-      font-size: 18px;
-      margin: 18px 0 0;
+    .blog-post {
+      margin-bottom: 4rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border-color);
     }
 
-    .blog-content {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 28px;
-      padding: clamp(22px, 4vw, 48px);
-      box-shadow: var(--shadow);
+    .post-date {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      display: block;
     }
 
-    .blog-content > h1 {
-      display: none;
+    .post-title {
+      color: var(--heading-color);
+      font-size: 2rem;
+      margin-top: 0;
+      margin-bottom: 1rem;
+      line-height: 1.3;
     }
 
-    h2 {
-      margin-top: 42px;
-      padding-top: 16px;
-      border-top: 1px solid var(--border);
-      font-size: clamp(22px, 3vw, 31px);
-      line-height: 1.25;
-      letter-spacing: -0.02em;
-      color: #0f172a;
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
     }
 
-    h3 {
-      margin-top: 28px;
-      font-size: 21px;
-      color: #1e3a8a;
+    .tag {
+      background-color: var(--tag-bg);
+      color: var(--tag-text);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
     }
 
-    p {
-      color: var(--muted);
-      margin: 14px 0;
+    .post-content {
+      font-size: 1.05rem;
     }
 
-    ul {
-      padding-left: 22px;
-      color: var(--muted);
+    .post-content h2 {
+      color: var(--heading-color);
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
     }
 
-    li {
-      margin: 8px 0;
+    .post-content h3 {
+      color: var(--heading-color);
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .post-content p {
+      margin-bottom: 1.2rem;
+    }
+
+    .post-content ul {
+      margin-bottom: 1.5rem;
+      padding-left: 1.5rem;
+    }
+
+    .post-content li {
+      margin-bottom: 0.5rem;
+    }
+
+    .post-content a {
+      color: var(--primary-color);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .post-content a:hover {
+      text-decoration: underline;
     }
 
     code {
-      font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
-      font-size: .94em;
-    }
-
-    p code, li code {
-      background: var(--primary-soft);
-      color: #1d4ed8;
-      padding: 2px 6px;
-      border-radius: 7px;
-      border: 1px solid #dbeafe;
+      background-color: #f1f5f9;
+      color: #ef4444;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.9em;
     }
 
     pre {
-      background: var(--code-bg) !important;
-      color: var(--code-text) !important;
-      padding: 18px 20px !important;
-      border-radius: 16px !important;
-      overflow: auto !important;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.07);
-      line-height: 1.55;
-      margin: 18px 0 24px !important;
+      background-color: #1e293b;
+      color: #f8fafc;
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
     }
 
     pre code {
+      background-color: transparent;
       color: inherit;
-      background: transparent;
-      border: 0;
       padding: 0;
-      white-space: pre;
+      font-size: 0.9em;
     }
 
     table {
-      width: 100% !important;
-      border-collapse: separate !important;
-      border-spacing: 0 !important;
-      overflow: hidden;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      margin: 24px 0 !important;
-    }
-
-    th {
-      background: #eef4ff !important;
-      color: #0f172a;
-      font-weight: 800;
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      background: transparent;
     }
 
     th, td {
-      border: 0 !important;
-      border-bottom: 1px solid var(--border) !important;
-      padding: 14px 16px !important;
+      border: 1px solid var(--border-color);
+      padding: 0.75rem;
       text-align: left;
       vertical-align: top;
     }
 
-    tr:last-child td {
-      border-bottom: 0 !important;
+    th {
+      background: #f1f5f9;
+      color: var(--heading-color);
     }
 
-    .footer-note {
+    .post-content > div {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .footer {
       text-align: center;
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
       color: #64748b;
-      font-size: 14px;
-      margin-top: 26px;
     }
 
-    @media (max-width: 720px) {
-      .page {
-        width: min(100% - 18px, 1120px);
-        padding: 16px 0 36px;
+    @media (max-width: 600px) {
+      .container {
+        padding: 1.25rem;
       }
 
-      .hero {
-        padding: 28px 22px;
-        border-radius: 22px;
+      h1 {
+        font-size: 2rem;
       }
 
-      .blog-content {
-        border-radius: 22px;
+      .post-title {
+        font-size: 1.55rem;
       }
 
       table {
@@ -650,18 +653,28 @@ done</code></pre>
   </style>
 </head>
 <body>
-  <main class="page">
-    <section class="hero">
-      <div class="badge">AWS Serverless · Event-Driven Architecture</div>
-      <h1>Xây dựng hệ thống xử lý ảnh Event-Driven trên AWS</h1>
-      <p>Trong bài viết này, chúng ta xây dựng pipeline serverless với S3, SQS, Lambda, DynamoDB Stream và SNS.</p>
-    </section>
+  <div class="container">
+    <header>
+      <h1>Tech Blog & Case Studies</h1>
+      <p class="subtitle">Chia sẻ kiến thức về AWS Serverless, Event-Driven Architecture và Cloud Computing.</p>
+    </header>
 
-    "<article class="blog-content">
+    <article class="blog-post">
+      <time class="post-date">Tháng 6, 2026</time>
+      <h2 class="post-title">Xây dựng hệ thống xử lý ảnh Event-Driven trên AWS với S3, SQS, Lambda, DynamoDB Stream và SNS</h2>
 
-  <h1>Xây dựng hệ thống xử lý ảnh Event-Driven trên AWS với S3, SQS, Lambda, DynamoDB Stream và SNS</h1>
+      <div class="tags">
+        <span class="tag">AWS Serverless</span>
+        <span class="tag">Event-Driven</span>
+        <span class="tag">S3</span>
+        <span class="tag">SQS</span>
+        <span class="tag">Lambda</span>
+        <span class="tag">DynamoDB</span>
+        <span class="tag">SNS</span>
+      </div>
 
-  <p>
+      <div class="post-content">
+<p>
     Trong bài viết này, chúng ta sẽ xây dựng một hệ thống serverless hoàn chỉnh trên AWS.
     Khi người dùng upload ảnh lên Amazon S3, hệ thống sẽ tự động lưu metadata của ảnh vào DynamoDB
     và gửi email thông báo thông qua Amazon SNS.
@@ -689,8 +702,8 @@ done</code></pre>
 
   <h2>2. Kiến trúc tổng thể</h2>
 
-  <div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:16px;padding:24px;margin:24px 0;">
-    <div style="display:flex;flex-direction:column;align-items:center;gap:12px;font-size:18px;font-weight:600;">
+  <div>
+    <div>
       <div>👤 User Upload Image</div>
       <div>⬇️</div>
       <div>🪣 Amazon S3</div>
@@ -711,41 +724,41 @@ done</code></pre>
 
   <h2>3. Các dịch vụ sử dụng</h2>
 
-  <table style="width:100%;border-collapse:collapse;margin:24px 0;">
+  <table>
     <thead>
-      <tr style="background:#f1f5f9;">
-        <th style="border:1px solid #e5e7eb;padding:12px;text-align:left;">Dịch vụ</th>
-        <th style="border:1px solid #e5e7eb;padding:12px;text-align:left;">Vai trò</th>
+      <tr>
+        <th>Dịch vụ</th>
+        <th>Vai trò</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td style="border:1px solid #e5e7eb;padding:12px;">Amazon S3</td>
-        <td style="border:1px solid #e5e7eb;padding:12px;">Lưu trữ ảnh upload</td>
+        <td>Amazon S3</td>
+        <td>Lưu trữ ảnh upload</td>
       </tr>
       <tr>
-        <td style="border:1px solid #e5e7eb;padding:12px;">Amazon SQS</td>
-        <td style="border:1px solid #e5e7eb;padding:12px;">Hàng đợi trung gian để buffer event</td>
+        <td>Amazon SQS</td>
+        <td>Hàng đợi trung gian để buffer event</td>
       </tr>
       <tr>
-        <td style="border:1px solid #e5e7eb;padding:12px;">AWS Lambda #1</td>
-        <td style="border:1px solid #e5e7eb;padding:12px;">Đọc message từ SQS và lưu metadata vào DynamoDB</td>
+        <td>AWS Lambda #1</td>
+        <td>Đọc message từ SQS và lưu metadata vào DynamoDB</td>
       </tr>
       <tr>
-        <td style="border:1px solid #e5e7eb;padding:12px;">Amazon DynamoDB</td>
-        <td style="border:1px solid #e5e7eb;padding:12px;">Lưu metadata của ảnh</td>
+        <td>Amazon DynamoDB</td>
+        <td>Lưu metadata của ảnh</td>
       </tr>
       <tr>
-        <td style="border:1px solid #e5e7eb;padding:12px;">DynamoDB Stream</td>
-        <td style="border:1px solid #e5e7eb;padding:12px;">Phát event khi có item mới</td>
+        <td>DynamoDB Stream</td>
+        <td>Phát event khi có item mới</td>
       </tr>
       <tr>
-        <td style="border:1px solid #e5e7eb;padding:12px;">AWS Lambda #2</td>
-        <td style="border:1px solid #e5e7eb;padding:12px;">Đọc DynamoDB Stream và gửi notification</td>
+        <td>AWS Lambda #2</td>
+        <td>Đọc DynamoDB Stream và gửi notification</td>
       </tr>
       <tr>
-        <td style="border:1px solid #e5e7eb;padding:12px;">Amazon SNS</td>
-        <td style="border:1px solid #e5e7eb;padding:12px;">Gửi email thông báo</td>
+        <td>Amazon SNS</td>
+        <td>Gửi email thông báo</td>
       </tr>
     </tbody>
   </table>
@@ -757,9 +770,9 @@ done</code></pre>
     Tuy nhiên, trong môi trường production, cách này không tối ưu nếu lượng upload tăng đột biến hoặc Lambda gặp lỗi tạm thời.
   </p>
 
-  <div style="background:#ecfdf5;border-left:5px solid #10b981;padding:16px;border-radius:8px;margin:20px 0;">
+  <div>
     <strong>Thiết kế tốt hơn:</strong>
-    <p style="margin:8px 0 0;">S3 → SQS → Lambda</p>
+    <p>S3 → SQS → Lambda</p>
   </div>
 
   <p>SQS giúp hệ thống:</p>
@@ -775,7 +788,7 @@ done</code></pre>
 
   <p>Đầu tiên, tạo một S3 bucket để lưu ảnh upload.</p>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>Bucket name: image-upload-source-bucket-kien
+  <pre><code>Bucket name: image-upload-source-bucket-kien
 Region: ap-southeast-2
 Event type: ObjectCreated:Put</code></pre>
 
@@ -787,7 +800,7 @@ Event type: ObjectCreated:Put</code></pre>
 
   <p>Tạo một SQS Standard Queue:</p>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>Queue name: image-upload-queue
+  <pre><code>Queue name: image-upload-queue
 Queue type: Standard</code></pre>
 
   <p>
@@ -800,7 +813,7 @@ Queue type: Standard</code></pre>
     Để S3 có thể gửi message vào SQS, queue cần có policy cho phép service <code>s3.amazonaws.com</code> gọi <code>sqs:SendMessage</code>.
   </p>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>{
+  <pre><code>{
   "Version": "2012-10-17",
   "Statement": [
     {
@@ -827,7 +840,7 @@ Queue type: Standard</code></pre>
 
   <p>Trong S3 bucket, vào phần Properties → Event notifications và tạo event:</p>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>Event name: image-upload-event
+  <pre><code>Event name: image-upload-event
 Event type: PUT
 Destination: SQS Queue
 Queue: image-upload-queue</code></pre>
@@ -840,13 +853,13 @@ Queue: image-upload-queue</code></pre>
 
   <p>Tạo bảng DynamoDB để lưu metadata ảnh.</p>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>Table name: ImageMetadataTable
+  <pre><code>Table name: ImageMetadataTable
 Partition key: image_id
 Type: String</code></pre>
 
   <p>Một item mẫu sau khi upload ảnh:</p>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>{
+  <pre><code>{
   "image_id": "image-upload-source-bucket-kien/anh.jpg",
   "bucket_name": "image-upload-source-bucket-kien",
   "object_key": "anh.jpg",
@@ -861,7 +874,7 @@ Type: String</code></pre>
     DynamoDB Stream giúp phát hiện khi bảng có item mới được thêm vào.
   </p>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>Stream status: Enabled
+  <pre><code>Stream status: Enabled
 View type: NEW_AND_OLD_IMAGES</code></pre>
 
   <p>
@@ -872,7 +885,7 @@ View type: NEW_AND_OLD_IMAGES</code></pre>
 
   <p>Lambda đầu tiên có nhiệm vụ đọc message từ SQS và ghi metadata vào DynamoDB.</p>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>Function name: ProcessImageMetadataFunction
+  <pre><code>Function name: ProcessImageMetadataFunction
 Runtime: Python 3.13
 Trigger: Amazon SQS
 Environment variable:
@@ -880,7 +893,7 @@ TABLE_NAME=ImageMetadataTable</code></pre>
 
   <h3>Code Lambda #1</h3>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>import json
+  <pre><code>import json
 import os
 import boto3
 from datetime import datetime, timezone
@@ -939,7 +952,7 @@ def lambda_handler(event, context):
     <li>Ghi log vào CloudWatch.</li>
   </ul>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>AWSLambdaBasicExecutionRole
+  <pre><code>AWSLambdaBasicExecutionRole
 AmazonSQSFullAccess
 AmazonDynamoDBFullAccess</code></pre>
 
@@ -947,19 +960,19 @@ AmazonDynamoDBFullAccess</code></pre>
 
   <p>Tạo SNS Topic để gửi email thông báo.</p>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>Topic name: image-upload-notification-topic
+  <pre><code>Topic name: image-upload-notification-topic
 Type: Standard</code></pre>
 
-  <div style="background:#fff7ed;border-left:5px solid #f97316;padding:16px;border-radius:8px;margin:20px 0;">
+  <div>
     <strong>Lưu ý:</strong>
-    <p style="margin:8px 0 0;">
+    <p>
       Không tạo SNS FIFO Topic. FIFO Topic không hỗ trợ Email Subscription trong trường hợp này.
     </p>
   </div>
 
   <h3>Tạo Email Subscription</h3>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>Protocol: Email
+  <pre><code>Protocol: Email
 Endpoint: your-email@gmail.com
 Status: Confirmed</code></pre>
 
@@ -973,7 +986,7 @@ Status: Confirmed</code></pre>
     Lambda thứ hai nhận event từ DynamoDB Stream và gửi email thông báo qua SNS.
   </p>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>Function name: NotifyImageUploadFunction
+  <pre><code>Function name: NotifyImageUploadFunction
 Runtime: Python 3.13
 Trigger: DynamoDB Stream
 Environment variable:
@@ -981,7 +994,7 @@ SNS_TOPIC_ARN=arn:aws:sns:ap-southeast-2:606030503959:image-upload-notification-
 
   <h3>Code Lambda #2</h3>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>import json
+  <pre><code>import json
 import os
 import boto3
 
@@ -1065,7 +1078,7 @@ Created At: {created_at}
 
   <h3>IAM Role cho Lambda #2</h3>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>AWSLambdaBasicExecutionRole
+  <pre><code>AWSLambdaBasicExecutionRole
 AmazonSNSFullAccess
 AWSLambdaDynamoDBExecutionRole</code></pre>
 
@@ -1073,7 +1086,7 @@ AWSLambdaDynamoDBExecutionRole</code></pre>
 
   <p>Trong DynamoDB Table, tạo trigger:</p>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>Source: ImageMetadataTable Stream
+  <pre><code>Source: ImageMetadataTable Stream
 Destination: NotifyImageUploadFunction
 Starting position: Latest
 State: Enabled</code></pre>
@@ -1092,7 +1105,7 @@ State: Enabled</code></pre>
     Nếu thấy message in flight, nghĩa là Lambda đang nhận message từ queue.
   </p>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>Messages Available: 0
+  <pre><code>Messages Available: 0
 Messages In Flight: 1</code></pre>
 
   <h3>Kiểm tra DynamoDB</h3>
@@ -1101,7 +1114,7 @@ Messages In Flight: 1</code></pre>
     Trong bảng ImageMetadataTable, item mới sẽ xuất hiện.
   </p>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>image_id: image-upload-source-bucket-kien/anh.jpg
+  <pre><code>image_id: image-upload-source-bucket-kien/anh.jpg
 bucket_name: image-upload-source-bucket-kien
 object_key: anh.jpg
 object_size: 271646
@@ -1111,7 +1124,7 @@ status: UPLOADED</code></pre>
 
   <p>Email nhận được sẽ có nội dung:</p>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>Subject: New Image Uploaded
+  <pre><code>Subject: New Image Uploaded
 
 A new image has been uploaded.
 
@@ -1126,7 +1139,7 @@ Created At: 2026-05-31T18:03:10.902576+00:00</code></pre>
 
   <h3>Lỗi 1: S3 không gửi được event vào SQS</h3>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>Unable to validate the following destination configurations</code></pre>
+  <pre><code>Unable to validate the following destination configurations</code></pre>
 
   <p>Nguyên nhân là SQS chưa cấp quyền cho S3 gửi message.</p>
 
@@ -1134,7 +1147,7 @@ Created At: 2026-05-31T18:03:10.902576+00:00</code></pre>
 
   <h3>Lỗi 2: Lambda #1 không ghi được DynamoDB</h3>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>AccessDeniedException when calling the PutItem operation</code></pre>
+  <pre><code>AccessDeniedException when calling the PutItem operation</code></pre>
 
   <p>
     Nguyên nhân là role của Lambda thiếu quyền <code>dynamodb:PutItem</code>.
@@ -1158,7 +1171,7 @@ Created At: 2026-05-31T18:03:10.902576+00:00</code></pre>
 
   <p>Kiểm tra SNS Subscription phải ở trạng thái:</p>
 
-  <pre style="background:#0f172a;color:#e5e7eb;padding:16px;border-radius:12px;overflow:auto;"><code>Confirmed</code></pre>
+  <pre><code>Confirmed</code></pre>
 
   <p>
     Nếu là Pending confirmation, hãy mở email và bấm xác nhận.
@@ -1168,8 +1181,8 @@ Created At: 2026-05-31T18:03:10.902576+00:00</code></pre>
 
   <p>Sau khi hoàn thành, hệ thống hoạt động theo luồng:</p>
 
-  <div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:16px;padding:24px;margin:24px 0;">
-    <div style="display:flex;flex-direction:column;align-items:center;gap:10px;font-size:17px;font-weight:600;">
+  <div>
+    <div>
       <div>Upload ảnh vào S3</div>
       <div>⬇️</div>
       <div>S3 gửi event vào SQS</div>
@@ -1210,182 +1223,209 @@ Created At: 2026-05-31T18:03:10.902576+00:00</code></pre>
     Đây là một bài lab rất phù hợp để học AWS Serverless, Event-Driven Architecture,
     cũng như đưa vào portfolio khi học AWS Developer Associate hoặc Solutions Architect.
   </p>
+      </div>
+    </article>
 
-    <p class="footer-note">HTML article generated from provided content.</p>
-  </main>
+    <footer class="footer">
+      Blog thực hành AWS Serverless Event-Driven Architecture.
+    </footer>
+  </div>
 </body>
-</html>','https://media.cloudmentor.pro/assets/use-an-s3-bucket-event-to-trigger-sqs-queue-to-insert-image-info-into-dynamodb-table-202403/ad8de2c4-adb6-41a5-a33d-47f7cf2f0ced.png','2026-05-31 18:19:03.670'),(6,'Blog - CI/CD AWS SAM với GitHub Actions','Blog này tổng hợp cách triển khai ứng dụng AWS SAM với Lambda, API Gateway, DynamoDB, S3 Artifact Bucket và CloudFormation thông qua GitHub Actions.','<!DOCTYPE html>
+</html>','https://media.cloudmentor.pro/assets/use-an-s3-bucket-event-to-trigger-sqs-queue-to-insert-image-info-into-dynamodb-table-202403/ad8de2c4-adb6-41a5-a33d-47f7cf2f0ced.png','2026-06-01 01:19:03.000'),(6,'Blog - CI/CD AWS SAM với GitHub Actions','Blog này tổng hợp cách triển khai ứng dụng AWS SAM với Lambda, API Gateway, DynamoDB, S3 Artifact Bucket và CloudFormation thông qua GitHub Actions.','<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Blog - CI/CD AWS SAM với GitHub Actions</title>
   <style>
+    :root {
+      --bg-color: #f8fafc;
+      --text-color: #334155;
+      --heading-color: #0f172a;
+      --primary-color: #2563eb;
+      --border-color: #e2e8f0;
+      --tag-bg: #eff6ff;
+      --tag-text: #1d4ed8;
+      --muted-color: #64748b;
+    }
+
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      line-height: 1.6;
-      background: #f4f6f8;
-      color: #222;
+      padding: 0;
+      font-family: ''Inter'', -apple-system, BlinkMacSystemFont, ''Segoe UI'', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.65;
+      color: var(--text-color);
+      background: var(--bg-color);
     }
 
     .container {
-      max-width: 900px;
-      margin: auto;
-      background: #fff;
-      padding: 30px 24px;
-      min-height: 100vh;
-    }
-
-    .hero {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .hero img {
       width: 100%;
-      max-height: 300px;
-      object-fit: cover;
-      border-radius: 12px;
-      margin-bottom: 18px;
+      max-width: 100%;
+      padding: 2rem;
+    }
+
+    header {
+      text-align: left;
+      margin-bottom: 3rem;
     }
 
     h1 {
-      margin-bottom: 8px;
-      font-size: 32px;
-      color: #111827;
+      margin: 0 0 0.5rem;
+      color: var(--heading-color);
+      font-size: 2.5rem;
+      line-height: 1.2;
+      letter-spacing: -0.03em;
     }
 
-    h2 {
-      margin-top: 30px;
-      color: #1f2937;
-      border-left: 5px solid #f59e0b;
-      padding-left: 12px;
+    .subtitle {
+      margin: 0;
+      color: var(--muted-color);
+      font-size: 1.1rem;
     }
 
-    h3 {
-      margin-top: 22px;
-      color: #374151;
+    .blog-post {
+      margin-bottom: 4rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border-color);
     }
 
-    p { margin: 10px 0; }
+    .post-date {
+      display: block;
+      margin-bottom: 1rem;
+      color: #94a3b8;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
 
-    ul, ol { padding-left: 24px; }
+    .post-title {
+      margin: 0 0 1rem;
+      color: var(--heading-color);
+      font-size: 2rem;
+      line-height: 1.3;
+    }
 
-    li { margin-bottom: 8px; }
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
 
     .tag {
       display: inline-block;
-      background: #fff7ed;
-      color: #c2410c;
-      padding: 6px 12px;
-      border-radius: 999px;
-      font-size: 14px;
-      margin: 4px;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
     }
 
-    .flow {
-      background: #111827;
-      color: #f9fafb;
-      padding: 18px;
-      border-radius: 10px;
-      overflow-x: auto;
-      font-family: Consolas, monospace;
-      font-size: 15px;
-      margin-top: 12px;
+    .post-content {
+      font-size: 1.05rem;
     }
+
+    .post-content h2 {
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      color: var(--heading-color);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .post-content h3 {
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      color: var(--heading-color);
+    }
+
+    .post-content p { margin: 0 0 1.2rem; }
+    .post-content ul, .post-content ol { margin: 0 0 1.5rem; padding-left: 1.5rem; }
+    .post-content li { margin-bottom: 0.5rem; }
+
+    a {
+      color: var(--primary-color);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    a:hover { text-decoration: underline; }
 
     code {
-      background: #f3f4f6;
-      color: #111827;
-      padding: 2px 6px;
-      border-radius: 5px;
-      font-family: Consolas, monospace;
+      background: #f1f5f9;
+      color: #ef4444;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.9em;
     }
 
     pre {
-      background: #111827;
-      color: #f9fafb;
-      padding: 16px;
-      border-radius: 10px;
+      margin: 0 0 1.5rem;
+      padding: 1rem;
       overflow-x: auto;
-      line-height: 1.5;
+      background: #1e293b;
+      color: #f8fafc;
+      border-radius: 6px;
     }
 
     pre code {
       background: transparent;
       color: inherit;
       padding: 0;
-      border-radius: 0;
+      font-size: 0.9em;
     }
 
-    .note {
-      background: #ecfdf5;
-      border-left: 5px solid #10b981;
-      padding: 14px;
-      border-radius: 8px;
-      margin-top: 16px;
+    .flow {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      overflow-x: auto;
+      background: #1e293b;
+      color: #f8fafc;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.95rem;
     }
 
-
-    .repo-box {
-      background: #f8fafc;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      padding: 16px;
-      margin-top: 16px;
+    .note, .warning {
+      margin: 1.5rem 0;
+      padding: 1rem;
+      border-radius: 6px;
+      background: #f1f5f9;
     }
 
-    .repo-button {
-      display: inline-block;
-      margin-top: 10px;
-      background: #111827;
-      color: #ffffff;
-      text-decoration: none;
-      padding: 10px 16px;
-      border-radius: 8px;
-      font-weight: bold;
-    }
+    .note { border-left: 4px solid #10b981; }
+    .warning { border-left: 4px solid #f97316; }
 
-    .repo-button:hover {
-      background: #374151;
-    }
-
-    .warning {
-      background: #fff7ed;
-      border-left: 5px solid #f97316;
-      padding: 14px;
-      border-radius: 8px;
-      margin-top: 16px;
-    }
-
-    footer {
-      margin-top: 40px;
-      padding-top: 20px;
-      border-top: 1px solid #e5e7eb;
+    .footer {
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+      color: var(--muted-color);
       text-align: center;
-      color: #6b7280;
-      font-size: 14px;
+      font-size: 0.95rem;
     }
 
-    @media (max-width: 600px) {
-      .container { padding: 22px 16px; }
-      h1 { font-size: 26px; }
+    @media (max-width: 768px) {
+      .container { padding: 1.25rem; }
+      h1 { font-size: 2rem; }
+      .post-title { font-size: 1.6rem; }
     }
   </style>
 </head>
 <body>
   <main class="container">
-    <section class="hero">
-      <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80" alt="Cloud computing architecture">
-      <h1>Triển khai CI/CD AWS SAM bằng GitHub Actions</h1>
-      <p>
-        Bài viết này hướng dẫn cách tạo pipeline tự động để build và deploy ứng dụng
-        serverless gồm Lambda, API Gateway và DynamoDB lên AWS.
-      </p>
-      <div>
+    <header>
+      <h1>Tech Blog & Case Studies</h1>
+      <p class="subtitle">Chia sẻ kiến thức về DevOps, Cloud Computing & Serverless Architecture</p>
+    </header>
+
+    <article class="blog-post">
+      <time class="post-date">Tháng 6, 2026</time>
+      <h2 class="post-title">Triển khai CI/CD AWS SAM bằng GitHub Actions</h2>
+      <div class="tags">
         <span class="tag">AWS SAM</span>
         <span class="tag">GitHub Actions</span>
         <span class="tag">Lambda</span>
@@ -1393,100 +1433,65 @@ Created At: 2026-05-31T18:03:10.902576+00:00</code></pre>
         <span class="tag">DynamoDB</span>
       </div>
 
-      <div class="repo-box">
-        <strong>Source code dự án:</strong>
-        <p>Repository GitHub chứa code mẫu AWS SAM, Lambda, template và workflow CI/CD.</p>
-        <a class="repo-button" href="https://github.com/Kien-devops/SAM" target="_blank" rel="noopener noreferrer">
-          Xem repository trên GitHub
-        </a>
-      </div>
-    </section>
+      <div class="post-content">
+        <p>Bài viết này hướng dẫn cách tạo pipeline tự động để build và deploy ứng dụng serverless gồm Lambda, API Gateway và DynamoDB lên AWS.</p>
 
-    <section>
-      <h2>1. Mục tiêu bài lab</h2>
-      <p>Sau khi làm xong, hệ thống sẽ chạy theo luồng:</p>
-      <div class="flow">
-Developer → GitHub Repository → GitHub Actions<br>
-→ sam build → Upload artifact lên S3<br>
-→ sam deploy → CloudFormation<br>
-→ API Gateway → Lambda → DynamoDB
-      </div>
-      <ul>
-        <li>Push code lên GitHub.</li>
-        <li>GitHub Actions tự động chạy pipeline.</li>
-        <li>SAM build code Lambda.</li>
-        <li>SAM deploy hạ tầng lên AWS.</li>
-        <li>Người dùng gọi API <code>/hello</code> để kiểm tra kết quả.</li>
-      </ul>
-    </section>
+        <h3>🔗 Source code dự án</h3>
+        <p>Repository GitHub chứa code mẫu AWS SAM, Lambda, template và workflow CI/CD:<br>
+          <a href="https://github.com/Kien-devops/SAM" target="_blank" rel="noopener noreferrer">GitHub: Kien-devops/SAM</a>
+        </p>
 
-    <section>
-      <h2>2. Các thành phần chính</h2>
+        <h2>1. Mục tiêu bài lab</h2>
+        <p>Sau khi làm xong, hệ thống sẽ chạy theo luồng:</p>
+        <div class="flow">Developer → GitHub Repository → GitHub Actions<br>→ sam build → Upload artifact lên S3<br>→ sam deploy → CloudFormation<br>→ API Gateway → Lambda → DynamoDB</div>
+        <ul>
+          <li>Push code lên GitHub.</li>
+          <li>GitHub Actions tự động chạy pipeline.</li>
+          <li>SAM build code Lambda.</li>
+          <li>SAM deploy hạ tầng lên AWS.</li>
+          <li>Người dùng gọi API <code>/hello</code> để kiểm tra kết quả.</li>
+        </ul>
 
-      <h3>GitHub Actions</h3>
-      <p>
-        Là nơi chạy pipeline CI/CD. Khi bạn push code lên nhánh <code>main</code>,
-        workflow sẽ tự động được kích hoạt.
-      </p>
+        <h2>2. Các thành phần chính</h2>
+        <h3>GitHub Actions</h3>
+        <p>Là nơi chạy pipeline CI/CD. Khi bạn push code lên nhánh <code>main</code>, workflow sẽ tự động được kích hoạt.</p>
 
-      <h3>AWS SAM</h3>
-      <p>
-        Dùng để build và deploy ứng dụng serverless. SAM đọc file <code>template.yaml</code>
-        rồi triển khai Lambda, API Gateway và DynamoDB thông qua CloudFormation.
-      </p>
+        <h3>AWS SAM</h3>
+        <p>Dùng để build và deploy ứng dụng serverless. SAM đọc file <code>template.yaml</code> rồi triển khai Lambda, API Gateway và DynamoDB thông qua CloudFormation.</p>
 
-      <h3>S3 Bucket</h3>
-      <p>
-        Dùng để lưu file zip chứa source code Lambda sau khi build.
-      </p>
+        <h3>S3 Bucket</h3>
+        <p>Dùng để lưu file zip chứa source code Lambda sau khi build.</p>
 
-      <h3>CloudFormation</h3>
-      <p>
-        Nhận template từ SAM và tạo hoặc cập nhật tài nguyên trên AWS.
-      </p>
+        <h3>CloudFormation</h3>
+        <p>Nhận template từ SAM và tạo hoặc cập nhật tài nguyên trên AWS.</p>
 
-      <h3>Lambda, API Gateway, DynamoDB</h3>
-      <p>
-        API Gateway nhận request từ người dùng, chuyển vào Lambda.
-        Lambda xử lý logic và có thể làm việc với DynamoDB.
-      </p>
-    </section>
+        <h3>Lambda, API Gateway, DynamoDB</h3>
+        <p>API Gateway nhận request từ người dùng, chuyển vào Lambda. Lambda xử lý logic và có thể làm việc với DynamoDB.</p>
 
-    <section>
-      <h2>3. Chuẩn bị</h2>
-      <ol>
-        <li>Tài khoản AWS.</li>
-        <li>Repository GitHub chứa source code SAM: <a href="https://github.com/Kien-devops/SAM" target="_blank" rel="noopener noreferrer">Kien-devops/SAM</a>.</li>
-        <li>Một S3 Bucket để lưu artifact.</li>
-        <li>IAM User hoặc IAM Role có quyền deploy AWS.</li>
-        <li>GitHub Secrets để lưu thông tin AWS.</li>
-      </ol>
+        <h2>3. Chuẩn bị</h2>
+        <ol>
+          <li>Tài khoản AWS.</li>
+          <li>Repository GitHub chứa source code SAM: <a href="https://github.com/Kien-devops/SAM" target="_blank" rel="noopener noreferrer">Kien-devops/SAM</a>.</li>
+          <li>Một S3 Bucket để lưu artifact.</li>
+          <li>IAM User hoặc IAM Role có quyền deploy AWS.</li>
+          <li>GitHub Secrets để lưu thông tin AWS.</li>
+        </ol>
+        <div class="warning"><strong>Lưu ý:</strong> Không ghi Access Key trực tiếp vào code. Hãy lưu trong GitHub Secrets.</div>
 
-      <div class="warning">
-        <strong>Lưu ý:</strong> Không ghi Access Key trực tiếp vào code.
-        Hãy lưu trong GitHub Secrets.
-      </div>
-    </section>
+        <h2>4. Cấu hình GitHub Secrets</h2>
+        <p>Vào repository GitHub:</p>
+        <pre><code>Settings → Secrets and variables → Actions → New repository secret</code></pre>
+        <p>Thêm các secret sau:</p>
+        <ul>
+          <li><code>AWS_ACCESS_KEY_ID</code>: Access Key ID của AWS.</li>
+          <li><code>AWS_SECRET_ACCESS_KEY</code>: Secret Access Key của AWS.</li>
+          <li><code>S3_BUCKET</code>: Tên S3 Bucket dùng để chứa artifact.</li>
+        </ul>
 
-    <section>
-      <h2>4. Cấu hình GitHub Secrets</h2>
-      <p>Vào repository GitHub:</p>
-      <pre>Settings → Secrets and variables → Actions → New repository secret</pre>
-
-      <p>Thêm các secret sau:</p>
-      <ul>
-        <li><code>AWS_ACCESS_KEY_ID</code>: Access Key ID của AWS.</li>
-        <li><code>AWS_SECRET_ACCESS_KEY</code>: Secret Access Key của AWS.</li>
-        <li><code>S3_BUCKET</code>: Tên S3 Bucket dùng để chứa artifact.</li>
-      </ul>
-    </section>
-
-    <section>
-      <h2>5. File GitHub Actions deploy.yml</h2>
-      <p>Tạo file tại đường dẫn:</p>
-      <pre>.github/workflows/deploy.yml</pre>
-
-      <pre><code>name: Deploy AWS SAM
+        <h2>5. File GitHub Actions deploy.yml</h2>
+        <p>Tạo file tại đường dẫn:</p>
+        <pre><code>.github/workflows/deploy.yml</code></pre>
+        <pre><code>name: Deploy AWS SAM
 
 on:
   push:
@@ -1517,11 +1522,9 @@ jobs:
       - name: SAM Deploy
         run: |
           sam deploy             --stack-name kien-sam             --s3-bucket ${{ secrets.S3_BUCKET }}             --capabilities CAPABILITY_IAM             --region ap-southeast-2             --no-confirm-changeset             --no-fail-on-empty-changeset</code></pre>
-    </section>
 
-    <section>
-      <h2>6. Cấu trúc project</h2>
-      <pre><code>.
+        <h2>6. Cấu trúc project</h2>
+        <pre><code>.
 ├── app.py
 ├── requirements.txt
 ├── template.yaml
@@ -1529,77 +1532,1434 @@ jobs:
 └── .github
     └── workflows
         └── deploy.yml</code></pre>
+        <ul>
+          <li><code>app.py</code>: Code chính của Lambda.</li>
+          <li><code>requirements.txt</code>: Thư viện Python cần cài.</li>
+          <li><code>template.yaml</code>: Khai báo Lambda, API Gateway, DynamoDB.</li>
+          <li><code>event.json</code>: File test local cho Lambda.</li>
+          <li><code>deploy.yml</code>: Pipeline CI/CD.</li>
+        </ul>
 
-      <ul>
-        <li><code>app.py</code>: Code chính của Lambda.</li>
-        <li><code>requirements.txt</code>: Thư viện Python cần cài.</li>
-        <li><code>template.yaml</code>: Khai báo Lambda, API Gateway, DynamoDB.</li>
-        <li><code>event.json</code>: File test local cho Lambda.</li>
-        <li><code>deploy.yml</code>: Pipeline CI/CD.</li>
-      </ul>
-    </section>
-
-    <section>
-      <h2>7. Cách chạy pipeline</h2>
-      <p>Commit và push code lên GitHub:</p>
-      <pre><code>git add .
+        <h2>7. Cách chạy pipeline</h2>
+        <p>Commit và push code lên GitHub:</p>
+        <pre><code>git add .
 git commit -m "setup aws sam cicd"
 git push origin main</code></pre>
+        <p>Sau khi push, vào tab <strong>Actions</strong> trên GitHub để xem pipeline đang chạy. Nếu chạy thành công, ứng dụng sẽ được deploy lên AWS.</p>
 
-      <p>
-        Sau khi push, vào tab <strong>Actions</strong> trên GitHub để xem pipeline đang chạy.
-        Nếu chạy thành công, ứng dụng sẽ được deploy lên AWS.
-      </p>
-    </section>
-
-    <section>
-      <h2>8. Test API sau khi deploy</h2>
-      <p>
-        Vào AWS CloudFormation, chọn stack, mở tab <strong>Outputs</strong>,
-        copy URL của API Gateway.
-      </p>
-
-      <p>Test bằng lệnh:</p>
-      <pre><code>curl https://&lt;api-id&gt;.execute-api.ap-southeast-2.amazonaws.com/hello</code></pre>
-
-      <p>Kết quả mong đợi:</p>
-      <pre><code>{
+        <h2>8. Test API sau khi deploy</h2>
+        <p>Vào AWS CloudFormation, chọn stack, mở tab <strong>Outputs</strong>, copy URL của API Gateway.</p>
+        <p>Test bằng lệnh:</p>
+        <pre><code>curl https://&lt;api-id&gt;.execute-api.ap-southeast-2.amazonaws.com/hello</code></pre>
+        <p>Kết quả mong đợi:</p>
+        <pre><code>{
   "message": "kết nối thành công sam",
   "method": "GET",
   "path": "/hello",
   "tableName": "sam-cicd-users"
 }</code></pre>
-    </section>
 
-    <section>
-      <h2>9. Lỗi thường gặp</h2>
-      <ul>
-        <li><strong>Pipeline không chạy:</strong> Kiểm tra file có đúng đường dẫn <code>.github/workflows/deploy.yml</code> không.</li>
-        <li><strong>Lỗi AWS Credentials:</strong> Kiểm tra lại GitHub Secrets.</li>
-        <li><strong>Lỗi quyền IAM:</strong> Kiểm tra IAM có quyền với S3, CloudFormation, Lambda, API Gateway và DynamoDB không.</li>
-        <li><strong>Lỗi S3 Bucket:</strong> Kiểm tra tên bucket trong secret <code>S3_BUCKET</code>.</li>
-        <li><strong>API lỗi:</strong> Kiểm tra CloudWatch Logs của Lambda.</li>
-      </ul>
-    </section>
+        <h2>9. Lỗi thường gặp</h2>
+        <ul>
+          <li><strong>Pipeline không chạy:</strong> Kiểm tra file có đúng đường dẫn <code>.github/workflows/deploy.yml</code> không.</li>
+          <li><strong>Lỗi AWS Credentials:</strong> Kiểm tra lại GitHub Secrets.</li>
+          <li><strong>Lỗi quyền IAM:</strong> Kiểm tra IAM có quyền với S3, CloudFormation, Lambda, API Gateway và DynamoDB không.</li>
+          <li><strong>Lỗi S3 Bucket:</strong> Kiểm tra tên bucket trong secret <code>S3_BUCKET</code>.</li>
+          <li><strong>API lỗi:</strong> Kiểm tra CloudWatch Logs của Lambda.</li>
+        </ul>
 
-    <section>
-      <h2>10. Dọn dẹp tài nguyên</h2>
-      <ol>
-        <li>Xóa stack trong CloudFormation.</li>
-        <li>Xóa DynamoDB Table nếu table còn được giữ lại.</li>
-        <li>Làm trống và xóa S3 Bucket nếu không dùng nữa.</li>
-      </ol>
+        <h2>10. Dọn dẹp tài nguyên</h2>
+        <ol>
+          <li>Xóa stack trong CloudFormation.</li>
+          <li>Xóa DynamoDB Table nếu table còn được giữ lại.</li>
+          <li>Làm trống và xóa S3 Bucket nếu không dùng nữa.</li>
+        </ol>
 
-      <div class="note">
-        <strong>Kết luận:</strong> Chỉ cần push code lên GitHub, GitHub Actions sẽ tự động build và deploy ứng dụng serverless lên AWS bằng SAM.
+        <div class="note"><strong>Kết luận:</strong> Chỉ cần push code lên GitHub, GitHub Actions sẽ tự động build và deploy ứng dụng serverless lên AWS bằng SAM.</div>
       </div>
-    </section>
+    </article>
 
-    <footer>
-      Blog thực hành CI/CD AWS SAM - Một page đơn giản, đủ nội dung để làm theo.
-    </footer>
+    <p class="footer">Blog thực hành CI/CD AWS SAM - Giao diện full trang, đơn giản, dễ đọc.</p>
   </main>
 </body>
-</html>','https://media.cloudmentor.pro/assets/create-build-and-deploy-a-sample-hello-world-app-using-aws-sam-202403/a07fd96d-8a4b-419a-bcee-2bb167bc2715.png','2026-06-02 03:00:25.510');
+</html>
+','https://media.cloudmentor.pro/assets/create-build-and-deploy-a-sample-hello-world-app-using-aws-sam-202403/a07fd96d-8a4b-419a-bcee-2bb167bc2715.png','2026-06-02 10:00:25.000'),(7,'GitOps không chỉ là CI/CD — đó là mô hình vận hành hiện đại','GitOps sử dụng Git làm single source of truth để quản lý cả ứng dụng và hạ tầng, giúp triển khai an toàn hơn, dễ kiểm toán hơn và tự động khôi phục khi có sai lệch cấu hình.','<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GitOps: Operating Model cho Cloud Native Delivery</title>
+  <meta name="description" content="Bài blog giải thích GitOps: single source of truth, pull-based delivery, repository segregation, drift detection và quy trình vận hành trên Kubernetes." />
+  <style>
+    :root {
+      --bg-color: #f8fafc;
+      --text-color: #334155;
+      --heading-color: #0f172a;
+      --primary-color: #2563eb;
+      --border-color: #e2e8f0;
+      --tag-bg: #eff6ff;
+      --tag-text: #1d4ed8;
+      --muted: #64748b;
+      --code-bg: #1e293b;
+      --code-text: #f8fafc;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: ''Inter'', -apple-system, BlinkMacSystemFont, ''Segoe UI'', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.7;
+      color: var(--text-color);
+      background-color: var(--bg-color);
+    }
+
+    .container {
+      max-width: 100%;
+      padding: 2rem;
+    }
+
+    header {
+      text-align: left;
+      margin-bottom: 3rem;
+    }
+
+    h1 {
+      color: var(--heading-color);
+      font-size: 2.5rem;
+      line-height: 1.2;
+      margin: 0 0 0.75rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 1.1rem;
+      max-width: 980px;
+      margin: 0 0 1.2rem;
+    }
+
+    .blog-post {
+      margin-bottom: 4rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .post-date {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin: 1rem 0 1.5rem;
+    }
+
+    .tag {
+      background-color: var(--tag-bg);
+      color: var(--tag-text);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .post-content {
+      font-size: 1.05rem;
+    }
+
+    .post-content h2 {
+      color: var(--heading-color);
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+      font-size: 1.75rem;
+      line-height: 1.3;
+    }
+
+    .post-content h3 {
+      color: var(--heading-color);
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+    }
+
+    .post-content p {
+      margin-bottom: 1.2rem;
+    }
+
+    .lead {
+      font-size: 1.1rem;
+      color: #475569;
+    }
+
+    .post-content ul,
+    .post-content ol {
+      margin-bottom: 1.5rem;
+      padding-left: 1.5rem;
+    }
+
+    .post-content li {
+      margin-bottom: 0.5rem;
+    }
+
+    a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    code {
+      background-color: #f1f5f9;
+      color: #ef4444;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.9em;
+    }
+
+    pre {
+      background-color: var(--code-bg);
+      color: var(--code-text);
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    pre code {
+      background-color: transparent;
+      color: inherit;
+      padding: 0;
+      font-size: 0.9em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      background: #ffffff;
+    }
+
+    th,
+    td {
+      border: 1px solid var(--border-color);
+      padding: 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: var(--heading-color);
+    }
+
+    .simple-flow {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      padding: 1rem 1.2rem;
+      margin: 1.5rem 0;
+    }
+
+    .simple-flow ol {
+      margin: 0;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-color);
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 700px) {
+      .container {
+        padding: 1.25rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .post-content h2 {
+        font-size: 1.45rem;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>GitOps không chỉ là CI/CD — đó là mô hình vận hành hiện đại</h1>
+      <p class="subtitle">
+        GitOps sử dụng Git làm single source of truth để quản lý ứng dụng và hạ tầng,
+        giúp triển khai an toàn hơn, dễ kiểm toán hơn và tự động khôi phục khi có sai lệch cấu hình.
+      </p>
+      <div class="tags">
+        <span class="tag">GitOps</span>
+        <span class="tag">Kubernetes</span>
+        <span class="tag">Argo CD</span>
+        <span class="tag">Flux CD</span>
+        <span class="tag">DevOps</span>
+      </div>
+    </header>
+
+    <article class="blog-post">
+      <time class="post-date">Tháng 6, 2026</time>
+
+      <div class="post-content">
+        <h2>GitOps là gì?</h2>
+        <p class="lead">
+          GitOps là một operating model trong đó mọi thay đổi của ứng dụng và hạ tầng đều được mô tả bằng file khai báo,
+          lưu trong Git, review bằng Pull Request và tự động đồng bộ xuống môi trường chạy thực tế.
+        </p>
+        <p>
+          Điểm quan trọng nhất của GitOps không nằm ở việc dùng công cụ nào, mà nằm ở nguyên tắc:
+          <strong>Git là trạng thái mong muốn</strong>. Nếu hệ thống đang chạy khác với Git, controller sẽ phát hiện drift
+          và đưa hệ thống quay lại đúng trạng thái đã khai báo.
+        </p>
+
+        <h2>1. Những vấn đề trước khi có GitOps</h2>
+        <h3>Không có single source of truth</h3>
+        <p>
+          Cấu hình hạ tầng có thể nằm rải rác trên máy kỹ sư, jump host hoặc server CI.
+          Khi có sự cố, rất khó biết phiên bản nào là đúng.
+        </p>
+
+        <h3>Configuration drift</h3>
+        <p>
+          Ví dụ manifest khai báo 5 replicas, nhưng ai đó chỉnh thủ công xuống 3.
+          Nếu không có controller giám sát, hệ thống sẽ tiếp tục chạy sai.
+        </p>
+
+        <h3>Rủi ro bảo mật</h3>
+        <p>
+          CI truyền thống thường phải giữ credential để push trực tiếp vào Kubernetes cluster,
+          làm tăng bề mặt tấn công.
+        </p>
+
+        <h3>Rollback và audit khó khăn</h3>
+        <p>
+          Nếu cấu hình không được versioning đầy đủ, việc xác định thay đổi gây lỗi và rollback trở nên phức tạp.
+        </p>
+
+        <h2>2. Nguyên tắc cốt lõi của GitOps</h2>
+        <p>Theo tinh thần Open GitOps, một hệ thống GitOps đúng nghĩa cần xoay quanh các nguyên tắc sau:</p>
+        <ul>
+          <li><strong>Declarative:</strong> Mọi tài nguyên được mô tả bằng file khai báo như Kubernetes manifest, Helm chart hoặc Terraform.</li>
+          <li><strong>Versioned & Immutable:</strong> Mọi thay đổi đi qua Git commit, branch, pull request và lịch sử version rõ ràng.</li>
+          <li><strong>Pulled Automatically:</strong> Controller nằm trong cluster tự kéo cấu hình từ Git, không để CI push trực tiếp vào cluster.</li>
+          <li><strong>Continuously Reconciled:</strong> Controller liên tục so sánh current state với desired state.</li>
+          <li><strong>Self-healing:</strong> Nếu có drift do thao tác thủ công, hệ thống tự đưa trạng thái quay lại đúng với Git.</li>
+          <li><strong>Audit-friendly:</strong> Mọi thay đổi có người tạo, người review, thời điểm merge và commit hash rõ ràng.</li>
+        </ul>
+
+        <h2>3. Kiến trúc hai repository</h2>
+        <p>
+          Thực hành GitOps chuẩn thường tách rõ <strong>Application Repository</strong> và
+          <strong>Application Configuration Repository</strong>. Cách tách này giúp phân quyền rõ ràng giữa application team
+          và DevOps/platform team.
+        </p>
+
+        <h3>Application Repository</h3>
+        <ul>
+          <li>Chứa source code ứng dụng.</li>
+          <li>Chứa Dockerfile.</li>
+          <li>Chứa Jenkinsfile hoặc GitHub Actions workflow.</li>
+          <li>Chạy test, scan và build image.</li>
+          <li>Push image lên registry như Amazon ECR hoặc Docker Hub.</li>
+        </ul>
+
+        <h3>Configuration Repository</h3>
+        <ul>
+          <li>Chứa Kubernetes manifests.</li>
+          <li>Chứa Helm chart hoặc Kustomize overlay.</li>
+          <li>Chứa Terraform nếu cần quản lý hạ tầng.</li>
+          <li>Quy định image version, replicas, config và ingress.</li>
+          <li>Là nơi GitOps Controller theo dõi.</li>
+        </ul>
+
+        <pre><code>gitops-demo/
+├── app-repo/
+│   ├── src/
+│   ├── Dockerfile
+│   └── Jenkinsfile
+└── config-repo/
+    ├── dev/
+    │   └── deployment.yaml
+    ├── staging/
+    │   └── deployment.yaml
+    └── prod/
+        └── deployment.yaml</code></pre>
+
+        <h2>4. Quy trình GitOps từ source code đến production</h2>
+        <p>
+          Trong GitOps, CI chỉ chịu trách nhiệm build artifact. Phần deploy do GitOps Controller trong cluster đảm nhiệm.
+          Điều này giúp CI không cần credential truy cập Kubernetes cluster.
+        </p>
+
+        <div class="simple-flow">
+          <ol>
+            <li>Developer tạo Pull Request vào application repository.</li>
+            <li>CI chạy test, kiểm tra chất lượng và security scan.</li>
+            <li>CI build container image.</li>
+            <li>Image được push lên Amazon ECR hoặc Docker Hub bằng image digest.</li>
+            <li>Automation tạo Pull Request vào configuration repository để cập nhật image mới.</li>
+            <li>DevOps review và merge Pull Request cấu hình.</li>
+            <li>Argo CD hoặc Flux CD phát hiện thay đổi trong Git.</li>
+            <li>Controller pull manifest mới về cluster, apply và reconcile liên tục.</li>
+          </ol>
+        </div>
+
+        <h2>5. Push-based vs Pull-based</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Tiêu chí</th>
+              <th>Push-based CI/CD truyền thống</th>
+              <th>Pull-based GitOps</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Cách triển khai</td>
+              <td>CI push trực tiếp thay đổi vào cluster.</td>
+              <td>Controller trong cluster pull cấu hình từ Git.</td>
+            </tr>
+            <tr>
+              <td>Credential</td>
+              <td>CI cần quyền truy cập cluster.</td>
+              <td>CI không cần chạm vào cluster.</td>
+            </tr>
+            <tr>
+              <td>Drift detection</td>
+              <td>Khó phát hiện nếu có sửa thủ công.</td>
+              <td>Controller liên tục phát hiện và sửa drift.</td>
+            </tr>
+            <tr>
+              <td>Rollback</td>
+              <td>Chạy lại pipeline hoặc thao tác thủ công.</td>
+              <td>Dùng git revert, controller tự đồng bộ lại.</td>
+            </tr>
+            <tr>
+              <td>Bảo mật</td>
+              <td>Rủi ro cao hơn do CI giữ secret mạnh.</td>
+              <td>An toàn hơn theo nguyên tắc least privilege.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2>6. Vì sao GitOps trưởng thành nhất trên Kubernetes?</h2>
+        <p>
+          Kubernetes vốn được thiết kế dựa trên mô hình reconciliation. Khi bạn khai báo Deployment có 5 replicas,
+          Kubernetes controller sẽ liên tục đảm bảo hệ thống thật sự có 5 pod đang chạy.
+        </p>
+        <p>
+          GitOps mở rộng ý tưởng này: không chỉ object trong cluster được reconcile,
+          mà toàn bộ cấu hình triển khai cũng được reconcile với Git.
+        </p>
+
+        <h2>Kết luận</h2>
+        <p>
+          GitOps biến Git thành trung tâm vận hành: mọi thay đổi đều được khai báo, review, versioning, audit và tự động đồng bộ.
+          Với Kubernetes, mô hình này đặc biệt mạnh vì tận dụng trực tiếp cơ chế controller và reconciliation vốn có của nền tảng.
+        </p>
+      </div>
+    </article>
+
+    <footer class="footer">
+      <p>© 2026 · GitOps Blog Template · Built with HTML and CSS</p>
+    </footer>
+  </div>
+</body>
+</html>
+',NULL,'2026-06-08 16:52:31.597'),(8,'Case Study: Xây dựng & Triển khai Hệ thống E-Commerce Hybrid với AWS ECS, SAM và Terraform','Case Study chi tiết về việc xây dựng kiến trúc Hybrid trên AWS kết hợp Amazon ECS (Fargate) và AWS SAM cho hệ thống E-Commerce chịu tải cao với Terraform CI/CD.','<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps & Cloud Architecture Case Study</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --text-color: #334155;
+            --heading-color: #0f172a;
+            --primary-color: #2563eb;
+            --secondary-color: #3b82f6;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --tag-bg: #eff6ff;
+            --tag-text: #1d4ed8;
+        }
+
+        body {
+            font-family: ''Inter'', -apple-system, BlinkMacSystemFont, ''Segoe UI'', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: left;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            color: var(--heading-color);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .blog-post {
+            margin-bottom: 4rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .post-date {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .post-title {
+            color: var(--heading-color);
+            font-size: 2rem;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tag {
+            background-color: var(--tag-bg);
+            color: var(--tag-text);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .post-content {
+            font-size: 1.05rem;
+        }
+
+        .post-content h2 {
+            color: var(--heading-color);
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .post-content h3 {
+            color: var(--heading-color);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .post-content p {
+            margin-bottom: 1.2rem;
+        }
+
+        .post-content ul {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+
+        .post-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background-color: #f1f5f9;
+            color: #ef4444;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background-color: #1e293b;
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+        
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+            font-size: 0.9em;
+        }
+
+        .read-more {
+            display: inline-block;
+            margin-top: 1.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .read-more:hover {
+            color: #1e40af;
+            text-decoration: underline;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Tech Blog & Case Studies</h1>
+            <p class="subtitle">Chia sẻ kiến thức về DevOps, Cloud Computing & System Architecture</p>
+        </header>
+
+        <article class="blog-post">
+            <time class="post-date">Tháng 6, 2026</time>
+            <h2 class="post-title">Case Study: Xây dựng & Triển khai Hệ thống E-Commerce Hybrid với AWS ECS, SAM và Terraform</h2>
+            <div class="tags">
+                <span class="tag">System Architecture</span>
+                <span class="tag">AWS ECS</span>
+                <span class="tag">AWS SAM</span>
+                <span class="tag">Terraform</span>
+                <span class="tag">CI/CD</span>
+            </div>
+            <div class="post-content">
+                <p>Nhiều bạn có nhắn tin hỏi mình về cách triển khai chi tiết một kiến trúc hệ thống thương mại điện tử (E-Commerce) chịu tải cao trên AWS. Làm sao để cân bằng giữa hiệu suất ổn định cho các luồng xử lý chính và khả năng mở rộng linh hoạt cho các tác vụ bất đồng bộ? Trong dự án gần đây nhất, mình đã áp dụng kiến trúc <strong>Hybrid</strong> trên AWS, kết hợp <strong>Amazon ECS (Fargate)</strong> và <strong>AWS SAM (Serverless Application Model)</strong>. Dưới đây là bài phân tích và hướng dẫn chi tiết từ A đến Z.</p>
+                
+                <h3>🔗 Mã Nguồn Dự Án (Source Code)</h3>
+                <p>Toàn bộ source code của dự án được mở công khai tại GitHub. Bạn có thể clone về để vọc vạch: <br>
+                <strong><a href="https://github.com/Kien-devops/sam-iac-project" target="_blank" style="color: var(--primary-color); font-weight: bold; text-decoration: none;">GitHub: Kien-devops/sam-iac-project</a></strong></p>
+
+                <h2>Phần 1: Tại sao lại là kiến trúc Hybrid?</h2>
+                <p>Mỗi công nghệ đều có điểm mạnh riêng. Mình sử dụng kiến trúc Container (ECS Fargate) cho các REST API cốt lõi (như Authentication, Catalog, Orders). Fargate giúp đội ngũ frontend (React + Vite) và backend (Express.js) dễ dàng đồng bộ môi trường phát triển thông qua Docker, đồng thời đảm bảo API luôn "nóng" để phản hồi ngay lập tức cho khách hàng.</p>
+                <p>Ngược lại, với các tác vụ xử lý ngầm và event-driven như gửi thông báo (SNS/SQS) hay xử lý file invoice trên S3, việc chạy liên tục một container là vô cùng lãng phí. Đây là lúc AWS SAM tỏa sáng. Các Lambda functions được kích hoạt tự động dựa trên sự kiện, giúp tiết kiệm chi phí tối đa mà vẫn đảm bảo khả năng scale vô hạn khi có flash sale.</p>
+
+                <h2>Phần 2: Hệ thống hoạt động dưới nền tảng (Under the Hood) như thế nào?</h2>
+                <p>Để hiểu rõ hơn, chúng ta hãy đi sâu vào cách từng request của người dùng được định tuyến và xử lý bên trong hệ thống AWS.</p>
+
+                <h3>Mạng lưới (Network Layer & VPC)</h3>
+                <p>Hệ thống nằm hoàn toàn trong một VPC riêng biệt. Kiến trúc mạng được bảo mật nhiều lớp:</p>
+                <ul>
+                    <li><strong>Public Subnets</strong>: Nằm ở 2 Availability Zones khác nhau, chứa Application Load Balancer (ALB) và NAT Gateway.</li>
+                    <li><strong>Private Subnets</strong>: Các container (ECS Fargate) của Frontend và Backend được giấu kín hoàn toàn tại đây. Chúng không có Public IP, không thể bị truy cập trực tiếp từ Internet, và chỉ kết nối ra ngoài thông qua NAT Gateway.</li>
+                </ul>
+
+                <h3>Bộ cân bằng tải (Application Load Balancer)</h3>
+                <p>ALB đảm nhận vai trò định tuyến (Path-Based Routing) cực kỳ thông minh tại Layer 7:</p>
+                <ul>
+                    <li>Nếu user gọi các endpoint bắt đầu bằng <code>/api/*</code>, ALB sẽ đẩy traffic về <strong>Backend Express container</strong> (Target Group port 3000).</li>
+                    <li>Với mọi đường dẫn khác, ALB mặc định đẩy về <strong>Frontend Nginx container</strong> (Target Group port 80) để load giao diện React (SPA).</li>
+                </ul>
+
+                <h3>Lớp xử lý sự kiện Serverless (AWS SAM)</h3>
+                <p>Giả sử một khách hàng vừa thanh toán thành công đơn hàng. Nếu bắt Backend làm việc tạo file PDF hóa đơn và gọi server mail để gửi thư, API sẽ bị block và phản hồi chậm. Giải pháp Event-Driven của mình là:</p>
+                <ul>
+                    <li>Backend Express lưu đơn hàng vào DB và lập tức ném một sự kiện vào <strong>Amazon SNS (OrderCreatedTopic)</strong> rồi trả kết quả ngay cho User.</li>
+                    <li>SNS đẩy thông điệp này vào hàng đợi <strong>Amazon SQS</strong>. SQS làm bộ đệm (buffer) đảm bảo hệ thống không sập dù có hàng nghìn đơn hàng cùng lúc.</li>
+                    <li>Các <strong>AWS Lambda functions</strong> (như <code>send-email</code> và <code>generate-invoice</code>) tự động lắng nghe SQS và thực hiện tạo file PDF tải lên S3 cũng như gửi mail giả lập. Tất cả diễn ra song song và cách ly với Backend.</li>
+                </ul>
+
+                <h2>Phần 3: Tự động hóa CI/CD với Terraform & GitHub Actions</h2>
+                <p>Thay vì click chuột tạo từng VPC hay Application Load Balancer trên giao diện AWS Console thủ công và dễ sai sót, toàn bộ hạ tầng được quản lý bằng <strong>Terraform</strong> (nằm trong thư mục <code>infrastructure/terraform/</code>).</p>
+                <p>Thay vì dồn tất cả vào một workflow khổng lồ, mình thiết kế các GitHub Actions workflows riêng biệt nhằm tối ưu thời gian chạy:</p>
+                <ul>
+                    <li><strong>Frontend Pipeline:</strong> Tự động build React SPA qua Vite, đóng gói Docker và đẩy lên ECR.</li>
+                    <li><strong>Backend Pipeline:</strong> Chạy Unit tests với Jest, sau đó quét lỗ hổng bảo mật Docker image bằng <strong>Trivy</strong> trước khi deploy (DevSecOps).</li>
+                    <li><strong>Serverless Pipeline:</strong> Chạy <code>sam build</code> và deploy các CloudFormation templates tương ứng với AWS Lambda.</li>
+                    <li><strong>Infrastructure Pipeline:</strong> Luôn kiểm tra <code>terraform fmt</code> và <code>terraform plan</code> để tránh các sai sót làm sập hệ thống.</li>
+                </ul>
+
+                <h2>Phần 4: Hướng dẫn Setup & Thực hành</h2>
+                
+                <p>Bạn có thể trải nghiệm dự án này theo 2 cách: Chạy thử ở dưới Local hoặc Deploy thẳng lên Cloud (AWS) tự động thông qua CI/CD.</p>
+
+                <h3>Cách 1: Chạy thử nghiệm ở Local (Local Sandbox)</h3>
+                <p>Nếu bạn chỉ muốn xem code hoạt động ra sao mà không tốn phí Cloud, hãy sử dụng Docker Compose:</p>
+                <pre><code># 1. Clone source code
+git clone https://github.com/Kien-devops/sam-iac-project.git
+cd sam-iac-project
+
+# 2. Khởi chạy toàn bộ hệ thống
+./scripts/local-start.sh</code></pre>
+                <p>Kiểm tra tại trình duyệt: <br>
+                - Frontend: <code>http://localhost:8080</code><br>
+                - Backend Health Check: <code>http://localhost:3000/api/health</code></p>
+                <p>Sau khi vọc vạch xong, bạn dùng lệnh <code>./scripts/local-stop.sh</code> để tắt và dọn dẹp các container.</p>
+
+                <h3>Cách 2: Triển khai lên AWS Cloud bằng GitHub Actions (CI/CD)</h3>
+                <p>Hệ thống này đã được thiết lập sẵn các luồng CI/CD. Thay vì phải tự gõ từng lệnh Terraform hay SAM, bạn chỉ cần cấu hình GitHub Repo của mình để nó tự động làm mọi thứ.</p>
+
+                <p><strong>Bước 1: Tạo Repository của riêng bạn</strong></p>
+                <pre><code>git clone https://github.com/Kien-devops/sam-iac-project.git
+cd sam-iac-project
+# Xóa git cũ và đẩy code lên Repo mới của bạn
+rm -rf .git
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin https://github.com/&lt;USERNAME_CỦA_BẠN&gt;/&lt;REPO_CỦA_BẠN&gt;.git
+git push -u origin main</code></pre>
+
+                <p><strong>Bước 2: Cấu hình GitHub Actions Secrets</strong></p>
+                <p>Truy cập vào trang Repository của bạn trên GitHub, chọn <strong>Settings</strong> > <strong>Secrets and variables</strong> > <strong>Actions</strong>. Bạn cần thêm 2 biến Secret sau để GitHub có quyền truy cập vào AWS của bạn:</p>
+                <ul>
+                    <li><code>AWS_ACCESS_KEY_ID</code>: Key ID tài khoản IAM của bạn.</li>
+                    <li><code>AWS_SECRET_ACCESS_KEY</code>: Secret Key tài khoản IAM của bạn.</li>
+                </ul>
+
+                <p><strong>Bước 3: Tận hưởng sự tự động hóa</strong></p>
+                <p>Từ bây giờ, mỗi khi bạn commit và push code lên nhánh <code>main</code>, GitHub Actions sẽ tự động kích hoạt. Nó sẽ tự động format code, quét bảo mật Trivy, build Docker Images, chạy Terraform để cấp phát hạ tầng, và deploy lên ECS Fargate cùng AWS Lambda. Thật sự là rảnh tay!</p>
+
+                <h2>Lời Kết</h2>
+                <p>Việc kết hợp giữa kiến trúc Container (ECS), Serverless (SAM) và tự động hoá với Terraform đem lại một hệ thống cực kỳ bền vững, dễ dàng nâng cấp. Nếu gặp khó khăn ở bước nào, hãy mở một Issue trên GitHub repo nhé, mình sẽ hỗ trợ nhiệt tình!</p>
+            </div>
+        </article>
+
+    </div>
+</body>
+</html>',NULL,'2026-06-08 17:55:35.843'),(9,'Kubernetes CRD & Argo CD Application CRD Deep Dive','Tìm hiểu chuyên sâu về Kubernetes Custom Resource Definition (CRD), Controller Pattern và cách Argo CD sử dụng Application CRD để triển khai GitOps. Bài viết giải thích chi tiết từ cơ chế hoạt động bên trong Kubernetes đến kiến trúc Production với AppProject, ApplicationSet và App-of-Apps.','<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kubernetes CRD & Argo CD Application CRD Deep Dive</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --text-color: #334155;
+            --heading-color: #0f172a;
+            --primary-color: #2563eb;
+            --secondary-color: #3b82f6;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --tag-bg: #eff6ff;
+            --tag-text: #1d4ed8;
+        }
+
+        body {
+            font-family: ''Inter'', -apple-system, BlinkMacSystemFont, ''Segoe UI'', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: left;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            color: var(--heading-color);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .blog-post {
+            margin-bottom: 4rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .post-date {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .post-title {
+            color: var(--heading-color);
+            font-size: 2rem;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tag {
+            background-color: var(--tag-bg);
+            color: var(--tag-text);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .post-content {
+            font-size: 1.05rem;
+        }
+
+        .post-content h2 {
+            color: var(--heading-color);
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .post-content h3 {
+            color: var(--heading-color);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .post-content p {
+            margin-bottom: 1.2rem;
+        }
+
+        .post-content ul {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+
+        .post-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        code {
+            background-color: #f1f5f9;
+            color: #ef4444;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background-color: #1e293b;
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+        
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+            font-size: 0.9em;
+        }
+
+        .note {
+            border-left: 4px solid var(--primary-color);
+            background: #eff6ff;
+            padding: 1rem 1.25rem;
+            margin: 1.5rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .warning {
+            border-left: 4px solid #f97316;
+            background: #fff7ed;
+            padding: 1rem 1.25rem;
+            margin: 1.5rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Tech Blog & Case Studies</h1>
+            <p class="subtitle">Chia sẻ kiến thức về DevOps, Kubernetes, GitOps & Platform Engineering</p>
+        </header>
+
+        <article class="blog-post">
+            <time class="post-date">Tháng 6, 2026</time>
+            <h2 class="post-title">Kubernetes CRD Explained: Từ Custom Resource đến Argo CD Application CRD trong GitOps</h2>
+            <div class="tags">
+                <span class="tag">Kubernetes</span>
+                <span class="tag">CRD</span>
+                <span class="tag">Controller</span>
+                <span class="tag">Argo CD</span>
+                <span class="tag">GitOps</span>
+                <span class="tag">Platform Engineering</span>
+            </div>
+
+            <div class="post-content">
+                <p>Khi mới học Kubernetes, chúng ta thường bắt đầu với các resource quen thuộc như <code>Pod</code>, <code>Deployment</code>, <code>Service</code>, <code>ConfigMap</code> hay <code>Secret</code>. Nhưng khi đi sâu hơn vào hệ sinh thái Kubernetes, bạn sẽ gặp rất nhiều resource lạ như <code>Application</code> của Argo CD, <code>Certificate</code> của cert-manager, <code>ExternalSecret</code> của External Secrets Operator, hoặc <code>Prometheus</code> của Prometheus Operator. Những resource này không có sẵn trong Kubernetes ban đầu. Chúng tồn tại nhờ một cơ chế cực kỳ quan trọng: <strong>Custom Resource Definition</strong>, thường gọi ngắn là <strong>CRD</strong>.</p>
+
+                <p>Bài viết này sẽ giải thích CRD theo hướng thực chiến DevOps: CRD là gì, vì sao Kubernetes cần CRD, Controller liên quan như thế nào, Operator Pattern là gì, và cuối cùng là cách Argo CD dùng <code>Application CRD</code> để biến Git repository thành nguồn sự thật cho Kubernetes cluster.</p>
+
+                <h2>Phần 1: Kubernetes Resource là gì?</h2>
+                <p>Trong Kubernetes, mọi thứ bạn tạo ra đều được biểu diễn dưới dạng resource. Ví dụ khi bạn muốn chạy một ứng dụng Nginx, bạn thường viết một file YAML như sau:</p>
+
+<pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: demo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.25
+          ports:
+            - containerPort: 80</code></pre>
+
+                <p>Khi chạy lệnh:</p>
+
+<pre><code>kubectl apply -f deployment.yaml</code></pre>
+
+                <p><code>kubectl</code> gửi YAML này đến Kubernetes API Server. API Server kiểm tra xem resource này có hợp lệ không, sau đó lưu trạng thái mong muốn vào <code>etcd</code>. Từ đây, Kubernetes Controller sẽ quan sát và hành động để trạng thái thực tế trong cluster khớp với trạng thái mong muốn.</p>
+
+                <div class="note">
+                    <strong>Ý tưởng cốt lõi:</strong> Kubernetes không đơn giản là chạy lệnh một lần rồi thôi. Kubernetes hoạt động theo mô hình desired state. Bạn khai báo "tôi muốn gì", còn Kubernetes liên tục cố gắng làm cho cluster trở thành đúng như vậy.
+                </div>
+
+                <h3>Built-in Resource</h3>
+                <p>Các resource như <code>Pod</code>, <code>Deployment</code>, <code>Service</code>, <code>ConfigMap</code>, <code>Secret</code>, <code>Namespace</code> là các resource có sẵn trong Kubernetes. Bạn có thể xem danh sách này bằng:</p>
+
+<pre><code>kubectl api-resources</code></pre>
+
+                <p>Mỗi resource có một schema riêng. Schema này nói cho Kubernetes biết field nào hợp lệ, field nào bắt buộc, field nào sai, và resource đó thuộc API group nào.</p>
+
+                <h2>Phần 2: CRD là gì?</h2>
+                <p><strong>CRD</strong> là viết tắt của <strong>Custom Resource Definition</strong>. Đây là cách để mở rộng Kubernetes bằng cách thêm một loại resource mới mà Kubernetes ban đầu không có.</p>
+
+                <p>Ví dụ Kubernetes mặc định không biết resource này:</p>
+
+<pre><code>apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: frontend-prod
+  namespace: argocd</code></pre>
+
+                <p>Nếu chưa cài Argo CD mà bạn apply file trên, Kubernetes sẽ báo lỗi kiểu:</p>
+
+<pre><code>error: resource mapping not found for name: "frontend-prod" namespace: "argocd"
+no matches for kind "Application" in version "argoproj.io/v1alpha1"</code></pre>
+
+                <p>Lý do là Kubernetes chưa biết <code>kind: Application</code> là gì. Sau khi cài Argo CD, Argo CD sẽ cài thêm CRD vào cluster. Lúc đó Kubernetes bắt đầu hiểu resource mới tên là <code>Application</code>.</p>
+
+                <p>Bạn có thể kiểm tra bằng:</p>
+
+<pre><code>kubectl api-resources | grep argoproj</code></pre>
+
+                <p>Kết quả thường có dạng:</p>
+
+<pre><code>applications        app,apps        argoproj.io/v1alpha1
+applicationsets     appset          argoproj.io/v1alpha1
+appprojects         appproj         argoproj.io/v1alpha1</code></pre>
+
+                <h3>CRD giúp Kubernetes hiểu thêm ngôn ngữ mới</h3>
+                <p>Có thể hiểu đơn giản:</p>
+
+                <ul>
+                    <li><strong>Deployment</strong> là ngôn ngữ built-in của Kubernetes.</li>
+                    <li><strong>Application</strong> là ngôn ngữ do Argo CD thêm vào Kubernetes.</li>
+                    <li><strong>Certificate</strong> là ngôn ngữ do cert-manager thêm vào Kubernetes.</li>
+                    <li><strong>ExternalSecret</strong> là ngôn ngữ do External Secrets Operator thêm vào Kubernetes.</li>
+                </ul>
+
+                <h2>Phần 3: CRD khác Custom Resource như thế nào?</h2>
+                <p>Đây là điểm rất nhiều bạn bị nhầm.</p>
+
+                <ul>
+                    <li><strong>CRD</strong> là định nghĩa loại resource mới.</li>
+                    <li><strong>Custom Resource</strong> là object cụ thể được tạo ra từ CRD đó.</li>
+                </ul>
+
+                <p>Ví dụ Argo CD cài CRD tên là <code>applications.argoproj.io</code>. Sau đó bạn tạo một custom resource cụ thể:</p>
+
+<pre><code>apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hospital-frontend-prod
+  namespace: argocd
+spec:
+  source:
+    repoURL: https://github.com/Kien-devops/k8s-home.git
+    targetRevision: main
+    path: deploy/workloads/hospital-frontend/overlays/prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: hospital-prod</code></pre>
+
+                <p>Trong ví dụ này:</p>
+
+                <ul>
+                    <li><code>applications.argoproj.io</code> là CRD.</li>
+                    <li><code>hospital-frontend-prod</code> là custom resource thuộc kind <code>Application</code>.</li>
+                </ul>
+
+                <h2>Phần 4: Controller là gì?</h2>
+                <p>CRD chỉ làm cho Kubernetes hiểu và lưu được một resource mới. Nhưng CRD tự nó không làm gì cả. Muốn resource mới có hành vi thật, cần có <strong>Controller</strong>.</p>
+
+                <p>Controller là một process chạy liên tục trong cluster. Nó quan sát Kubernetes API, đọc desired state, so sánh với actual state, rồi thực hiện hành động để reconcile.</p>
+
+<pre><code>Desired State trong Kubernetes API
+        |
+        v
+Controller quan sát
+        |
+        v
+So sánh với trạng thái thực tế
+        |
+        v
+Tạo / sửa / xóa resource để khớp desired state</code></pre>
+
+                <h3>Ví dụ với Deployment Controller</h3>
+                <p>Khi bạn tạo Deployment với <code>replicas: 3</code>, Deployment Controller sẽ đảm bảo luôn có 3 Pod chạy. Nếu một Pod chết, controller tạo Pod mới. Nếu có quá nhiều Pod, controller xóa bớt.</p>
+
+                <p>Đó là reconciliation loop:</p>
+
+<pre><code>Observe → Compare → Act → Repeat</code></pre>
+
+                <div class="note">
+                    <strong>Senior DevOps mindset:</strong> Kubernetes mạnh không phải vì YAML, mà vì Controller. YAML chỉ mô tả mong muốn. Controller mới là thành phần biến mong muốn đó thành hiện thực.
+                </div>
+
+                <h2>Phần 5: Operator Pattern</h2>
+                <p>Khi một hệ thống dùng CRD kết hợp với Controller, chúng ta thường gọi đó là <strong>Operator Pattern</strong>.</p>
+
+                <p>Công thức dễ nhớ:</p>
+
+<pre><code>Operator = CRD + Controller + Domain Logic</code></pre>
+
+                <p>Ví dụ:</p>
+
+                <ul>
+                    <li><strong>Argo CD</strong>: Application CRD + Application Controller.</li>
+                    <li><strong>cert-manager</strong>: Certificate CRD + cert-manager controller.</li>
+                    <li><strong>Prometheus Operator</strong>: Prometheus CRD + Prometheus controller.</li>
+                    <li><strong>External Secrets Operator</strong>: ExternalSecret CRD + External Secrets controller.</li>
+                </ul>
+
+                <h2>Phần 6: Argo CD Application CRD là gì?</h2>
+                <p><code>Application</code> là một CRD của Argo CD. Nó không phải là frontend, backend hay service đang chạy. Nó là một Kubernetes custom resource dùng để mô tả:</p>
+
+                <ul>
+                    <li>Argo CD cần lấy manifest từ Git repo nào.</li>
+                    <li>Lấy branch, tag hoặc commit nào.</li>
+                    <li>Lấy folder nào trong repo.</li>
+                    <li>Deploy vào cluster nào.</li>
+                    <li>Deploy vào namespace nào.</li>
+                    <li>Sync thủ công hay tự động.</li>
+                    <li>Có tự xóa resource thừa không.</li>
+                    <li>Có tự sửa drift không.</li>
+                </ul>
+
+                <h3>Ví dụ Application CRD production</h3>
+
+<pre><code>apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hospital-backend-prod
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: hospital-backend
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: hospital-platform
+    environment: prod
+spec:
+  project: hospital
+
+  source:
+    repoURL: https://github.com/Kien-devops/k8s-home.git
+    targetRevision: main
+    path: deploy/workloads/hospital-backend/overlays/prod
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: hospital-prod
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      - PruneLast=true
+
+  revisionHistoryLimit: 10</code></pre>
+
+                <h2>Phần 7: Giải thích từng field trong Application</h2>
+
+                <h3><code>apiVersion</code></h3>
+<pre><code>apiVersion: argoproj.io/v1alpha1</code></pre>
+                <p>Field này nói resource thuộc API group của Argo CD. Nếu CRD của Argo CD chưa được cài, Kubernetes sẽ không hiểu API version này.</p>
+
+                <h3><code>kind</code></h3>
+<pre><code>kind: Application</code></pre>
+                <p>Đây là loại resource mà Argo CD Application Controller sẽ quan sát.</p>
+
+                <h3><code>metadata.name</code></h3>
+<pre><code>metadata:
+  name: hospital-backend-prod</code></pre>
+                <p>Đây là tên Application trong Argo CD UI và CLI. Tên này giúp phân biệt Application, nhưng không quyết định nội dung deploy. Nội dung deploy do <code>spec.source</code> quyết định.</p>
+
+                <h3><code>metadata.namespace</code></h3>
+<pre><code>namespace: argocd</code></pre>
+                <p>Application object thường được tạo trong namespace <code>argocd</code>, nơi Argo CD control plane đang chạy. Điều này không có nghĩa workload thật cũng chạy trong namespace <code>argocd</code>.</p>
+
+                <h3><code>spec.project</code></h3>
+<pre><code>project: hospital</code></pre>
+                <p><code>AppProject</code> là boundary bảo mật của Argo CD. Nó giới hạn repo nào được dùng, namespace nào được deploy, resource nào được phép tạo. Production không nên dùng mãi project <code>default</code>.</p>
+
+                <h3><code>spec.source</code></h3>
+<pre><code>source:
+  repoURL: https://github.com/Kien-devops/k8s-home.git
+  targetRevision: main
+  path: deploy/workloads/hospital-backend/overlays/prod</code></pre>
+                <p>Đây là nguồn desired state. Argo CD sẽ clone repo, checkout revision, rồi render manifest trong path được chỉ định.</p>
+
+                <h3><code>spec.destination</code></h3>
+<pre><code>destination:
+  server: https://kubernetes.default.svc
+  namespace: hospital-prod</code></pre>
+                <p>Đây là nơi deploy. <code>https://kubernetes.default.svc</code> nghĩa là cluster nội bộ nơi Argo CD đang chạy. Namespace <code>hospital-prod</code> là nơi resource thật được apply.</p>
+
+                <h3><code>syncPolicy</code></h3>
+<pre><code>syncPolicy:
+  automated:
+    prune: true
+    selfHeal: true</code></pre>
+                <p><code>automated</code> bật auto-sync. <code>prune</code> cho phép xóa resource khỏi cluster khi resource bị xóa khỏi Git. <code>selfHeal</code> giúp Argo CD sửa lại nếu ai đó chỉnh tay trong cluster khiến live state lệch khỏi Git.</p>
+
+                <h2>Phần 8: Argo CD đồng bộ từ Git về cluster như thế nào?</h2>
+
+                <p>Luồng hoạt động thực tế:</p>
+
+<pre><code>Developer push code
+        |
+        v
+CI build Docker image
+        |
+        v
+Push image to registry
+        |
+        v
+Update GitOps manifest
+        |
+        v
+Argo CD Repo Server render manifest
+        |
+        v
+Application Controller compare desired vs live
+        |
+        v
+Sync Engine apply to Kubernetes API
+        |
+        v
+Kubernetes controllers rollout workloads
+        |
+        v
+Pods running</code></pre>
+
+                <p>Argo CD không trực tiếp "chạy container". Nó chỉ apply Kubernetes manifest. Sau đó Kubernetes Deployment Controller, ReplicaSet Controller, Scheduler, Kubelet mới là các thành phần thật sự tạo Pod và chạy container.</p>
+
+                <h2>Phần 9: Argo CD phân biệt nhiều app như thế nào?</h2>
+                <p>Giả sử bạn có frontend, backend và payment service. Cách chuẩn là mỗi service có một folder manifest riêng và một Argo CD Application riêng.</p>
+
+<pre><code>gitops-repo/
+├── deploy/
+│   ├── workloads/
+│   │   ├── hospital-frontend/
+│   │   │   └── overlays/prod/
+│   │   ├── hospital-backend/
+│   │   │   └── overlays/prod/
+│   │   └── payment-service/
+│   │       └── overlays/prod/
+│   └── argocd/
+│       └── applications/
+│           └── workloads/
+│               ├── hospital-frontend-prod.yaml
+│               ├── hospital-backend-prod.yaml
+│               └── payment-service-prod.yaml</code></pre>
+
+                <p>Argo CD phân biệt bằng:</p>
+
+                <ul>
+                    <li><code>metadata.name</code>: tên Application trong Argo CD.</li>
+                    <li><code>spec.source.repoURL</code>: repo Git.</li>
+                    <li><code>spec.source.path</code>: folder manifest.</li>
+                    <li><code>spec.destination.server</code>: cluster đích.</li>
+                    <li><code>spec.destination.namespace</code>: namespace đích.</li>
+                </ul>
+
+                <div class="warning">
+                    <strong>Lưu ý quan trọng:</strong> Argo CD không deploy theo tên app. Tên app chỉ là ID quản lý. Thứ quyết định deploy cái gì là <code>source</code>. Thứ quyết định deploy đi đâu là <code>destination</code>.
+                </div>
+
+                <h2>Phần 10: Sync Status và Health Status</h2>
+
+                <p>Argo CD có hai loại trạng thái rất quan trọng:</p>
+
+                <h3>Sync Status</h3>
+                <p>Sync status trả lời câu hỏi: live state trong cluster có giống desired state trong Git không?</p>
+
+                <ul>
+                    <li><strong>Synced</strong>: Git và cluster giống nhau.</li>
+                    <li><strong>OutOfSync</strong>: Git và cluster đang lệch nhau.</li>
+                    <li><strong>Unknown</strong>: Argo CD chưa xác định được trạng thái.</li>
+                </ul>
+
+                <h3>Health Status</h3>
+                <p>Health status trả lời câu hỏi: resource chạy có khỏe không?</p>
+
+                <ul>
+                    <li><strong>Healthy</strong>: app chạy ổn.</li>
+                    <li><strong>Progressing</strong>: đang rollout.</li>
+                    <li><strong>Degraded</strong>: app có lỗi.</li>
+                    <li><strong>Missing</strong>: resource trong Git có nhưng cluster chưa có.</li>
+                </ul>
+
+                <p>Ví dụ nếu Git có image sai:</p>
+
+<pre><code>image: hospital-backend:not-found</code></pre>
+
+                <p>Argo CD vẫn có thể báo:</p>
+
+<pre><code>Sync Status: Synced
+Health Status: Degraded</code></pre>
+
+                <p>Nghĩa là Argo CD đã apply đúng manifest trong Git, nhưng app chạy lỗi.</p>
+
+                <h2>Phần 11: AppProject trong Argo CD</h2>
+
+                <p>Production không nên để tất cả Application dùng project <code>default</code>. AppProject giúp tạo boundary cho team và environment.</p>
+
+<pre><code>apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: hospital
+  namespace: argocd
+spec:
+  description: Hospital application workloads
+
+  sourceRepos:
+    - https://github.com/Kien-devops/k8s-home.git
+
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: hospital-*
+
+  namespaceResourceWhitelist:
+    - group: ""
+      kind: Service
+    - group: ""
+      kind: ConfigMap
+    - group: apps
+      kind: Deployment
+    - group: networking.k8s.io
+      kind: Ingress
+    - group: networking.k8s.io
+      kind: NetworkPolicy</code></pre>
+
+                <p>Với cấu hình này, các Application thuộc project <code>hospital</code> chỉ được deploy vào namespace bắt đầu bằng <code>hospital-</code>, chỉ được lấy manifest từ repo được cho phép, và chỉ được tạo những resource đã whitelist.</p>
+
+                <h2>Phần 12: App of Apps Pattern</h2>
+
+                <p>Khi số lượng Application tăng lên, bạn không nên apply thủ công từng file:</p>
+
+<pre><code>kubectl apply -f hospital-frontend-prod.yaml
+kubectl apply -f hospital-backend-prod.yaml
+kubectl apply -f prometheus.yaml
+kubectl apply -f loki.yaml</code></pre>
+
+                <p>Thay vào đó, dùng một root Application để quản lý các child Application.</p>
+
+<pre><code>apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cluster-bootstrap
+  namespace: argocd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/Kien-devops/k8s-home.git
+    targetRevision: main
+    path: deploy/argocd
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true</code></pre>
+
+                <p>Sau đó bạn chỉ cần apply một lần:</p>
+
+<pre><code>kubectl apply -f deploy/argocd/bootstrap/root-application.yaml</code></pre>
+
+                <p>Từ đó về sau, Argo CD tự quản lý các Application con.</p>
+
+                <h2>Phần 13: Kustomize và CRD trong GitOps</h2>
+
+                <p>Với GitOps production, bạn không nên để tất cả manifest trong một folder lớn. Nên tách base và overlay.</p>
+
+<pre><code>deploy/workloads/hospital-backend/
+├── base/
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   ├── network-policy.yaml
+│   └── kustomization.yaml
+└── overlays/
+    ├── dev/
+    │   ├── kustomization.yaml
+    │   └── patch-deployment.yaml
+    └── prod/
+        ├── kustomization.yaml
+        └── patch-deployment.yaml</code></pre>
+
+                <p>Base chứa cấu hình chung. Overlay chứa khác biệt giữa môi trường dev, staging, prod.</p>
+
+                <h3>Overlay prod ví dụ</h3>
+
+<pre><code>apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: hospital-prod
+
+resources:
+  - ../../base
+
+patches:
+  - path: patch-deployment.yaml
+
+images:
+  - name: hospital-backend
+    newName: 100.112.150.56:8082/hospital-backend
+    newTag: sha-abc1234</code></pre>
+
+                <p>CI/CD chỉ cần update <code>newTag</code> trong overlay. Không nên sửa thẳng file <code>deployment.yaml</code> trong base.</p>
+
+                <h2>Phần 14: Những lỗi thường gặp khi dùng CRD và Argo CD</h2>
+
+                <ul>
+                    <li><strong>Apply Custom Resource trước khi CRD tồn tại:</strong> Kubernetes sẽ báo không biết kind đó.</li>
+                    <li><strong>Dùng một Application khổng lồ:</strong> frontend lỗi kéo theo backend, monitoring, logging cùng một trạng thái.</li>
+                    <li><strong>Dùng project default cho mọi thứ:</strong> không có boundary bảo mật.</li>
+                    <li><strong>Sửa tay resource trong cluster:</strong> tạo drift với Git.</li>
+                    <li><strong>Hai Application quản lý cùng một resource:</strong> gây shared resource warning và khó debug.</li>
+                    <li><strong>Hardcode namespace trong base:</strong> làm manifest khó tái sử dụng cho dev/prod.</li>
+                    <li><strong>CI sửa deployment.yaml trực tiếp:</strong> làm base mất tính trung lập môi trường.</li>
+                </ul>
+
+                <h2>Phần 15: Checklist Senior DevOps</h2>
+
+                <ul>
+                    <li>Mỗi deployable unit có một Argo CD Application riêng.</li>
+                    <li>Mỗi workload có base và overlay riêng.</li>
+                    <li>Không dùng <code>default</code> project cho production workload.</li>
+                    <li>Dùng AppProject để giới hạn source repo, namespace và resource.</li>
+                    <li>Dùng App of Apps hoặc ApplicationSet để bootstrap cluster.</li>
+                    <li>Dùng image tag bất biến, tốt hơn nữa là image digest.</li>
+                    <li>CI cập nhật overlay, không sửa base.</li>
+                    <li>Không sửa tay resource trong cluster.</li>
+                    <li>Kiểm tra manifest bằng <code>kustomize build</code>, <code>kubeconform</code>, <code>yamllint</code>.</li>
+                    <li>Thiết kế folder theo ownership: workloads, platform, argocd, infrastructure, docs.</li>
+                </ul>
+
+                <h2>Lời kết</h2>
+                <p>CRD là một trong những lý do khiến Kubernetes trở thành nền tảng mạnh mẽ cho Cloud Native và Platform Engineering. Nhờ CRD, Kubernetes không chỉ quản lý Pod hay Service, mà còn có thể quản lý certificate, secret, monitoring stack, security policy, GitOps application và rất nhiều hệ thống phức tạp khác.</p>
+
+                <p>Argo CD Application CRD là một ví dụ rất thực tế: nó biến Git repository thành desired state, Application Controller liên tục so sánh Git với cluster, và Kubernetes trở thành nơi tự động reconcile hạ tầng ứng dụng. Khi hiểu rõ CRD, Controller và reconciliation loop, bạn sẽ không còn xem Argo CD như một công cụ "magic", mà sẽ hiểu chính xác tại sao GitOps hoạt động và cách thiết kế nó ở level Senior DevOps.</p>
+            </div>
+        </article>
+
+        <div class="footer">
+            <p>© 2026 DevOps & Platform Engineering Blog. Built for learning, architecture and hands-on practice.</p>
+        </div>
+    </div>
+</body>
+</html>
+',NULL,'2026-06-26 15:19:55.480');
+
 INSERT INTO [dbo].[project_details] ([id],[project_id],[icon],[detail_title],[detail_description]) VALUES (1,1,'fa-solid fa-route','Traffic Routing','Internet requests navigate through an external HAProxy Edge Load Balancer, forwarding into a Kubernetes Traefik Gateway API, exposing isolated Frontend and Backend service endpoints.'),(2,1,'fa-solid fa-server','Application Stack','Front-facing UI crafted in React 19 + Vite. Microservice backends run ASP.NET Core 9 API connecting securely to a Microsoft SQL Server database.'),(3,1,'fa-solid fa-shield','IaC & Bootstrapping','Terraform provisions AWS EC2 instances dynamically. Custom Ansible Playbooks configure dependencies, kernel parameters, and boot them into a private Kubernetes cluster.'),(4,1,'fa-solid fa-gears','Metric-driven Autoscaling','Prometheus watches system load. On threshold breaches, Alertmanager sends webhook alerts to a Python scaling daemon, which dynamically provisions and joins new worker nodes via Terraform & Ansible.'),(5,2,'fa-solid fa-shield-halved','DevSecOps Pipeline','Multi-stage GitHub Actions workflows enforce SonarQube quality gates, audit dependencies using Nexus, scan container layers via Trivy, and push to Amazon ECR.'),(6,2,'fa-brands fa-aws','EKS Infrastructure','Configured using modular Terraform modules. Implements IAM Roles for Service Accounts (IRSA/OIDC) for fine-grained pod access control and KMS-encrypted secrets.'),(7,2,'fa-solid fa-lock','Cluster Security Policies','Active runtime security audits using Falco. Custom Kyverno policies enforce non-root container constraints and block privilege escalation paths.'),(8,2,'fa-solid fa-chart-line','Centralized Observability','Real-time cluster state dashboarding. Centralized log shipping via Promtail into Loki, queried within Grafana, paired with custom Alertmanager triggers.'),(9,3,'fa-solid fa-server','Application Stack','Front-facing UI crafted in React 19 + Vite. Microservice backends run ASP.NET Core 9 API connecting securely to a Microsoft SQL Server database, integrated with a node-local standalone Redis DaemonSet for caching.'),(10,3,'fa-solid fa-shield-halved','DevSecOps Pipeline','Multi-stage GitHub Actions workflows restore dependencies through cached NuGet/npm groups in a local Nexus Repository, enforce SonarQube quality gates, perform Trivy filesystem scans, and archive build artifacts.'),(11,3,'fa-solid fa-shield','Supply Chain Security','A remote build host connected via a secure Tailscale VPN SSH link downloads the ZIP artifacts from Nexus, builds non-root alpine-based Docker images, performs Trivy image security scans (failing on HIGH or CRITICAL alerts), and pushes them to a local Nexus Docker Registry.'),(12,3,'fa-solid fa-route','GitOps Continuous Delivery','The workflow dynamically updates manifest image tags in Git. Argo CD monitors the Git repository as the single source of truth and automates declarative zero-drift sync to the self-hosted Kubernetes cluster.'),(13,3,'fa-solid fa-lock','Cluster Hardening & Security Policies','Enforces Kyverno policy baselines at the admission stage, tracks cluster-wide vulnerabilities via Trivy Operator reports, and implements Falco for real-time runtime security anomaly detection.'),(14,3,'fa-solid fa-chart-line','Observability & Logging','Centralized log collection is handled via Promtail shipping logs to Loki, while cluster-wide metrics are gathered by Prometheus Operator, and Alertmanager handles alert notifications, all queried and visualized on custom Grafana dashboards.');
 INSERT INTO [dbo].[projects] ([id],[project_number],[title],[summary],[github_url],[tech_stack]) VALUES (1,'PROJECT 01','Hospital Platform CI/CD, GitOps, Kubernetes & Auto Scaling','A full-stack hospital management platform deployed through an automated DevOps pipeline featuring dynamic metric-driven infrastructure scaling.','https://github.com/Kien-devops/cicd-ecr-kube-ec2-gitaction.git','AWS EC2, Kubernetes, HAProxy, Traefik API, Terraform, Ansible, Argo CD, Prometheus'),(2,'PROJECT 02','Hospital EKS DevSecOps GitOps Platform','An end-to-end cloud platform demonstrating EKS cluster hardening, multi-gate security scanning, and declarative zero-drift deployments.','https://github.com/Kien-devops/eks-cicd-argocd-sec-monitor.git','AWS EKS, Argo CD, SonarQube, Trivy, Kyverno, Falco, Loki / Promtail, Terraform'),(3,'PROJECT 03','Hospital On-Premise DevSecOps GitOps Platform','An end-to-end self-hosted on-premise Kubernetes platform demonstrating multi-layer security scanning, dependency caching, GitOps continuous delivery, and full-stack observability.','https://github.com/Kien-devops/k8s-home.git','Kubernetes (On-Premise), Argo CD, Nexus Repository, SonarQube, Trivy, Tailscale, Kyverno, Falco, Loki / Promtail, HAProxy / Traefik');
