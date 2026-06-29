@@ -9,10 +9,10 @@ permissions:
   contents: write
 
 env:
-  REPO_DIR: /home/monitor/portfolio
+  REPO_DIR: /home/node/portfolio
   REPO_URL: https://github.com/Kien-devops/portfolio.git
   NEXUS_DOCKER_REGISTRY: 100.112.150.56:8082
-  BUILDER_HOST: 100.112.150.56
+  BUILDER_HOST: 100.69.133.58
   IMAGE_TAG: ${{ github.sha }}
   BRANCH_NAME: ${{ github.ref_name }}
   K8S_KUSTOMIZATION: k8s/overlays/prod/kustomization.yaml
@@ -66,7 +66,7 @@ jobs:
           set -euo pipefail
           ssh -o BatchMode=yes \
             -o StrictHostKeyChecking=no \
-            "monitor@${{ env.BUILDER_HOST }}" \
+            "node@${{ env.BUILDER_HOST }}" \
             "echo 'Builder SSH authentication via Tailscale SSH succeeded'"
 
       - name: Build and push images on Builder
@@ -83,7 +83,7 @@ jobs:
 
           ssh -o BatchMode=yes \
             -o StrictHostKeyChecking=no \
-            "monitor@${{ env.BUILDER_HOST }}" \
+            "node@${{ env.BUILDER_HOST }}" \
             "GIT_AUTH='${GIT_AUTH}' NEXUS_USERNAME='${NEXUS_USERNAME}' NEXUS_PASSWORD='${NEXUS_PASSWORD}' REPO_DIR='${REPO_DIR}' REPO_URL='${REPO_URL}' NEXUS_DOCKER_REGISTRY='${NEXUS_DOCKER_REGISTRY}' IMAGE_TAG='${IMAGE_TAG}' BRANCH_NAME='${BRANCH_NAME}' /bin/bash -s" <<'EOF'
           set -euo pipefail
 

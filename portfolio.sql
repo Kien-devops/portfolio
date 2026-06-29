@@ -1,4 +1,4 @@
-﻿DROP TABLE [dbo].[blogs];
+DROP TABLE [dbo].[blogs];
 CREATE TABLE [dbo].[blogs] (
     [id] int,
     [title] nvarchar(255),
@@ -2963,3 +2963,61 @@ images:
 
 INSERT INTO [dbo].[project_details] ([id],[project_id],[icon],[detail_title],[detail_description]) VALUES (1,1,'fa-solid fa-route','Traffic Routing','Internet requests navigate through an external HAProxy Edge Load Balancer, forwarding into a Kubernetes Traefik Gateway API, exposing isolated Frontend and Backend service endpoints.'),(2,1,'fa-solid fa-server','Application Stack','Front-facing UI crafted in React 19 + Vite. Microservice backends run ASP.NET Core 9 API connecting securely to a Microsoft SQL Server database.'),(3,1,'fa-solid fa-shield','IaC & Bootstrapping','Terraform provisions AWS EC2 instances dynamically. Custom Ansible Playbooks configure dependencies, kernel parameters, and boot them into a private Kubernetes cluster.'),(4,1,'fa-solid fa-gears','Metric-driven Autoscaling','Prometheus watches system load. On threshold breaches, Alertmanager sends webhook alerts to a Python scaling daemon, which dynamically provisions and joins new worker nodes via Terraform & Ansible.'),(5,2,'fa-solid fa-shield-halved','DevSecOps Pipeline','Multi-stage GitHub Actions workflows enforce SonarQube quality gates, audit dependencies using Nexus, scan container layers via Trivy, and push to Amazon ECR.'),(6,2,'fa-brands fa-aws','EKS Infrastructure','Configured using modular Terraform modules. Implements IAM Roles for Service Accounts (IRSA/OIDC) for fine-grained pod access control and KMS-encrypted secrets.'),(7,2,'fa-solid fa-lock','Cluster Security Policies','Active runtime security audits using Falco. Custom Kyverno policies enforce non-root container constraints and block privilege escalation paths.'),(8,2,'fa-solid fa-chart-line','Centralized Observability','Real-time cluster state dashboarding. Centralized log shipping via Promtail into Loki, queried within Grafana, paired with custom Alertmanager triggers.'),(9,3,'fa-solid fa-server','Application Stack','Front-facing UI crafted in React 19 + Vite. Microservice backends run ASP.NET Core 9 API connecting securely to a Microsoft SQL Server database, integrated with a node-local standalone Redis DaemonSet for caching.'),(10,3,'fa-solid fa-shield-halved','DevSecOps Pipeline','Multi-stage GitHub Actions workflows restore dependencies through cached NuGet/npm groups in a local Nexus Repository, enforce SonarQube quality gates, perform Trivy filesystem scans, and archive build artifacts.'),(11,3,'fa-solid fa-shield','Supply Chain Security','A remote build host connected via a secure Tailscale VPN SSH link downloads the ZIP artifacts from Nexus, builds non-root alpine-based Docker images, performs Trivy image security scans (failing on HIGH or CRITICAL alerts), and pushes them to a local Nexus Docker Registry.'),(12,3,'fa-solid fa-route','GitOps Continuous Delivery','The workflow dynamically updates manifest image tags in Git. Argo CD monitors the Git repository as the single source of truth and automates declarative zero-drift sync to the self-hosted Kubernetes cluster.'),(13,3,'fa-solid fa-lock','Cluster Hardening & Security Policies','Enforces Kyverno policy baselines at the admission stage, tracks cluster-wide vulnerabilities via Trivy Operator reports, and implements Falco for real-time runtime security anomaly detection.'),(14,3,'fa-solid fa-chart-line','Observability & Logging','Centralized log collection is handled via Promtail shipping logs to Loki, while cluster-wide metrics are gathered by Prometheus Operator, and Alertmanager handles alert notifications, all queried and visualized on custom Grafana dashboards.');
 INSERT INTO [dbo].[projects] ([id],[project_number],[title],[summary],[github_url],[tech_stack]) VALUES (1,'PROJECT 01','Hospital Platform CI/CD, GitOps, Kubernetes & Auto Scaling','A full-stack hospital management platform deployed through an automated DevOps pipeline featuring dynamic metric-driven infrastructure scaling.','https://github.com/Kien-devops/cicd-ecr-kube-ec2-gitaction.git','AWS EC2, Kubernetes, HAProxy, Traefik API, Terraform, Ansible, Argo CD, Prometheus'),(2,'PROJECT 02','Hospital EKS DevSecOps GitOps Platform','An end-to-end cloud platform demonstrating EKS cluster hardening, multi-gate security scanning, and declarative zero-drift deployments.','https://github.com/Kien-devops/eks-cicd-argocd-sec-monitor.git','AWS EKS, Argo CD, SonarQube, Trivy, Kyverno, Falco, Loki / Promtail, Terraform'),(3,'PROJECT 03','Hospital On-Premise DevSecOps GitOps Platform','An end-to-end self-hosted on-premise Kubernetes platform demonstrating multi-layer security scanning, dependency caching, GitOps continuous delivery, and full-stack observability.','https://github.com/Kien-devops/k8s-home.git','Kubernetes (On-Premise), Argo CD, Nexus Repository, SonarQube, Trivy, Tailscale, Kyverno, Falco, Loki / Promtail, HAProxy / Traefik');
+
+DROP TABLE IF EXISTS [dbo].[study_comments];
+DROP TABLE IF EXISTS [dbo].[study_lessons];
+DROP TABLE IF EXISTS [dbo].[studies];
+
+CREATE TABLE [dbo].[studies] (
+    [id] INT IDENTITY(1,1) PRIMARY KEY,
+    [title] NVARCHAR(255) NOT NULL,
+    [summary] NVARCHAR(MAX) NOT NULL,
+    [content] NVARCHAR(MAX) NOT NULL,
+    [image_url] NVARCHAR(MAX) NULL,
+    [category] NVARCHAR(100) NULL,
+    [created_at] DATETIME DEFAULT GETDATE()
+);
+
+CREATE TABLE [dbo].[study_lessons] (
+    [id] INT IDENTITY(1,1) PRIMARY KEY,
+    [study_id] INT NOT NULL,
+    [title] NVARCHAR(255) NOT NULL,
+    [video_url] NVARCHAR(MAX) NOT NULL,
+    [duration] NVARCHAR(50) NULL,
+    [order_num] INT NOT NULL,
+    CONSTRAINT [FK_study_lessons_studies] FOREIGN KEY ([study_id]) 
+      REFERENCES [dbo].[studies]([id]) ON DELETE CASCADE
+);
+
+CREATE TABLE [dbo].[study_comments] (
+    [comment_id] NVARCHAR(255) PRIMARY KEY,
+    [study_id] INT NOT NULL,
+    [parent_comment_id] NVARCHAR(255) NULL,
+    [type] NVARCHAR(50) NOT NULL,
+    [author_name] NVARCHAR(255) NOT NULL,
+    [author_email] NVARCHAR(255) NOT NULL,
+    [author_email_hash] NVARCHAR(64) NULL,
+    [content] NVARCHAR(MAX) NOT NULL,
+    [created_at] DATETIME NOT NULL DEFAULT GETDATE(),
+    [reply_count] INT NOT NULL DEFAULT 0,
+    [status] NVARCHAR(50) NOT NULL DEFAULT 'approved',
+    CONSTRAINT [FK_study_comments_studies] FOREIGN KEY ([study_id]) 
+      REFERENCES [dbo].[studies]([id]) ON DELETE CASCADE
+);
+
+SET IDENTITY_INSERT [dbo].[studies] ON;
+INSERT INTO [dbo].[studies] ([id], [title], [summary], [content], [image_url], [category], [created_at]) VALUES 
+(1, 'Docker Containerization for Beginners', 'Learn how to write efficient Dockerfiles, manage image builds, and pick secure alpine/distroless base images to optimize container deployments.', 'This free Udemy course walks you through the fundamentals of Docker containerization. You will learn to write container blueprints, setup local Dev environments, build small size production images, and link services together using Docker Compose.', 'fa-solid fa-box-open', 'Docker', '2026-06-27 12:00:00.000'),
+(2, 'Kubernetes Cluster Orchestration', 'A deep dive into Kubernetes container network interface, scheduling primitives, cluster architecture components, and security policies.', 'Dive deep into container orchestration. This course covers Kubernetes cluster architecture (Control Plane and Nodes), workload controllers (Pods, Deployments, ReplicaSets), services routing, and securing network access boundaries.', 'fa-solid fa-network-wired', 'Kubernetes', '2026-06-27 12:05:00.000'),
+(3, 'Terraform Infrastructure as Code', 'Avoid state corruption in shared teams. Learn how to store state securely in AWS S3 and lock state executions using DynamoDB tables.', 'Understand state management, remote backends, modules structure, and variables definitions in Terraform to orchestrate cloud infrastructures in a secure and reproducible way.', 'fa-solid fa-code', 'CI/CD', '2026-06-27 12:10:00.000');
+SET IDENTITY_INSERT [dbo].[studies] OFF;
+
+INSERT INTO [dbo].[study_lessons] (study_id, title, video_url, duration, order_num) VALUES
+(1, '1. Introduction to Containers & Docker', 'https://www.youtube.com/watch?v=fqMOX6JJhGo', '10:15', 1),
+(1, '2. Writing Your First Dockerfile', 'https://www.youtube.com/watch?v=3c-iKn5q1Fs', '14:22', 2),
+(1, '3. Docker Compose Multi-Container Setup', 'https://www.youtube.com/watch?v=Qw9zlE3t8Ko', '18:45', 3),
+(2, '1. Kubernetes Architecture Explained', 'https://www.youtube.com/watch?v=VnvRFRk_51k', '12:40', 1),
+(2, '2. Deployments, Pods and Services', 'https://www.youtube.com/watch?v=T4Z75qy07kY', '16:10', 2),
+(2, '3. ConfigMaps and Secrets Configuration', 'https://www.youtube.com/watch?v=MTn_IpC4P1k', '11:55', 3),
+(3, '1. Terraform Basics & Providers', 'https://www.youtube.com/watch?v=h970ZzbhxT4', '09:30', 1),
+(3, '2. Managing Terraform State Remote Backend', 'https://www.youtube.com/watch?v=YGP9jH_UynY', '15:15', 2);

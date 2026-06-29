@@ -9,7 +9,7 @@ spec:
     - name: http
       protocol: HTTP
       port: 8000
-      hostname: portfolio.teamdevops.shop
+      hostname: www.kiendev.site
       allowedRoutes:
         namespaces:
           from: Same

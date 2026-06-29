@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Download, Mail, Shield, Award, Calendar, MapPin, Briefcase } from 'lucide-react';
+import { ArrowRight, Mail, Briefcase, MapPin, ExternalLink } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import BackgroundGlows from '@/components/BackgroundGlows';
@@ -10,25 +11,116 @@ import ProjectCard from '@/components/ProjectCard';
 import BlogCard from '@/components/BlogCard';
 import { fetchProjects, fetchBlogs, fetchTimeline, Project, Blog, TimelineItem } from '@/utils/api';
 
+// ─── Skill categories ─────────────────────────────────────────────────────────
 const SKILL_CATEGORIES = [
   {
     name: 'Cloud & Infrastructure',
-    skills: ['AWS', 'Amazon EKS', 'VPC Peering', 'IAM Security', 'ECR', 'Route53', 'Terraform', 'Ansible']
+    icon: 'fa-brands fa-aws',
+    color: 'from-orange-500/10 to-transparent',
+    accent: 'text-orange-400',
+    skills: ['AWS', 'Amazon EKS', 'VPC Peering', 'IAM Security', 'ECR', 'Route53', 'Terraform', 'Ansible'],
+    featured: true,
   },
   {
     name: 'Containers & Delivery',
-    skills: ['Docker', 'Kubernetes', 'Kustomize', 'Helm Charts', 'Argo CD', 'GitHub Actions', 'GitLab CI']
+    icon: 'fa-brands fa-docker',
+    color: 'from-blue-500/10 to-transparent',
+    accent: 'text-blue-400',
+    skills: ['Docker', 'Kubernetes', 'Kustomize', 'Helm Charts', 'Argo CD', 'GitHub Actions', 'GitLab CI'],
+    featured: false,
   },
   {
     name: 'Security & Quality',
-    skills: ['Trivy Scan', 'SonarQube', 'Kyverno Rules', 'OWASP ZAP', 'IAM Policies', 'Network Policies']
+    icon: 'fa-solid fa-shield-halved',
+    color: 'from-red-500/10 to-transparent',
+    accent: 'text-red-400',
+    skills: ['Trivy Scan', 'SonarQube', 'Kyverno Rules', 'OWASP ZAP', 'IAM Policies', 'Network Policies'],
+    featured: false,
   },
   {
-    name: 'Observability & Logic',
-    skills: ['Prometheus', 'Grafana', 'Loki Stack', 'Alertmanager', 'Bash Scripting', 'Python', 'NodeJS']
-  }
+    name: 'Observability & Scripting',
+    icon: 'fa-solid fa-chart-line',
+    color: 'from-emerald-500/10 to-transparent',
+    accent: 'text-emerald-400',
+    skills: ['Prometheus', 'Grafana', 'Loki Stack', 'Alertmanager', 'Bash Scripting', 'Python', 'NodeJS'],
+    featured: false,
+  },
 ];
 
+// ─── Terminal lines for hero animation ───────────────────────────────────────
+const TERMINAL_LINES = [
+  { prompt: '$', cmd: 'kubectl get nodes --all-namespaces', delay: 0 },
+  { prompt: '>', cmd: 'NAME        STATUS   ROLES    AGE   VERSION', delay: 0.6, output: true },
+  { prompt: '>', cmd: 'eks-node-1  Ready    <none>   47d   v1.29.0', delay: 0.9, output: true },
+  { prompt: '$', cmd: 'terraform apply -auto-approve', delay: 1.5 },
+  { prompt: '>', cmd: 'Apply complete! 12 added, 0 changed, 0 destroyed.', delay: 2.1, output: true },
+  { prompt: '$', cmd: 'argocd app sync production', delay: 2.7 },
+  { prompt: '>', cmd: 'SYNCED  Healthy  production/api', delay: 3.2, output: true },
+];
+
+// ─── Fade-up animation variant ───────────────────────────────────────────────
+const fadeUp = (delay = 0) => ({
+  initial: { opacity: 0, y: 20 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, amount: 0.2 },
+  transition: { duration: 0.55, delay, ease: [0.16, 1, 0.3, 1] as const },
+});
+
+// ─── TerminalBlock component ──────────────────────────────────────────────────
+function TerminalBlock() {
+  const reduce = useReducedMotion();
+  const [visibleLines, setVisibleLines] = useState(0);
+
+  useEffect(() => {
+    if (reduce) { setVisibleLines(TERMINAL_LINES.length); return; }
+    let i = 0;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    TERMINAL_LINES.forEach((line) => {
+      timers.push(setTimeout(() => setVisibleLines((n) => n + 1), (line.delay + 0.3) * 1000));
+    });
+    return () => timers.forEach(clearTimeout);
+  }, [reduce]);
+
+  return (
+    <div className="relative rounded-xl border border-white/8 bg-black/50 backdrop-blur-md overflow-hidden shadow-2xl">
+      {/* Title bar */}
+      <div className="flex items-center gap-1.5 px-4 py-3 border-b border-white/6 bg-white/3">
+        <span className="w-3 h-3 rounded-full bg-red-500/60" />
+        <span className="w-3 h-3 rounded-full bg-yellow-500/60" />
+        <span className="w-3 h-3 rounded-full bg-green-500/60" />
+        <span className="ml-3 text-[11px] font-mono text-white/30 tracking-wider">devops — zsh</span>
+      </div>
+      {/* Lines */}
+      <div className="p-5 space-y-2 font-mono text-[12px] leading-relaxed min-h-[220px]">
+        {TERMINAL_LINES.slice(0, visibleLines).map((line, i) => (
+          <motion.div
+            key={i}
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
+            className="flex gap-2"
+          >
+            <span className={line.output ? 'text-white/25' : 'text-accent'}>
+              {line.prompt}
+            </span>
+            <span className={line.output ? 'text-white/50' : 'text-white/85'}>
+              {line.cmd}
+            </span>
+          </motion.div>
+        ))}
+        {/* Blinking cursor on last line */}
+        {visibleLines >= TERMINAL_LINES.length && (
+          <div className="flex gap-2">
+            <span className="text-accent">$</span>
+            <span className="terminal-cursor" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -38,21 +130,12 @@ export default function Home() {
   const [timelineLoading, setTimelineLoading] = useState(true);
 
   useEffect(() => {
-    fetchProjects().then((data) => {
-      setProjects(data);
-      setProjectsLoading(false);
-    });
-    fetchBlogs().then((data) => {
-      setBlogs(data.slice(0, 2)); // Show latest 2 articles on landing page
-      setBlogsLoading(false);
-    });
-    fetchTimeline().then((data) => {
-      setTimeline(data);
-      setTimelineLoading(false);
-    });
+    fetchProjects().then((data) => { setProjects(data); setProjectsLoading(false); });
+    fetchBlogs().then((data) => { setBlogs(data.slice(0, 2)); setBlogsLoading(false); });
+    fetchTimeline().then((data) => { setTimeline(data); setTimelineLoading(false); });
   }, []);
 
-  const experiences = timeline.filter((item) => item.type === 'experience');
+  const experiences    = timeline.filter((item) => item.type === 'experience');
   const certifications = timeline.filter((item) => item.type === 'certification');
 
   return (
@@ -60,255 +143,263 @@ export default function Home() {
       <Navbar />
       <BackgroundGlows />
 
-      <main className="flex-1 w-full max-w-5xl mx-auto px-4 pt-32 pb-20 space-y-28 md:space-y-36">
-        {/* HERO SECTION */}
-        <section id="about" className="relative flex flex-col md:flex-row items-center gap-12 pt-8 md:pt-16">
-          <div className="flex-1 space-y-6 text-center md:text-left">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-mono tracking-wider uppercase">
-              <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-              <span>Available for Consulting</span>
-            </div>
-            <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-tight text-foreground">
-              Hi, I'm <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-accent-hover">Kien Devops</span>
-            </h1>
-            <p className="text-lg md:text-xl text-text-muted max-w-xl mx-auto md:mx-0 font-medium">
-              DevOps &amp; DevSecOps Engineer. Specializing in secure, high-availability EKS cluster topographies, declarative GitOps deployments, and shift-left security.
-            </p>
+      <main className="flex-1 w-full max-w-5xl mx-auto px-4 pt-28 pb-24 space-y-32 md:space-y-40">
 
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-4">
+        {/* ── HERO: Split-screen ─────────────────────────────────────────── */}
+        <section id="about" className="relative grid grid-cols-1 md:grid-cols-2 gap-12 items-center min-h-[100dvh] -mt-8 pt-16 md:pt-0">
+          {/* Left: content */}
+          <div className="space-y-7">
+            {/* Single eyebrow — HERO (eyebrow 1/3) */}
+            <motion.div
+              {...fadeUp(0.1)}
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/8 border border-accent/20 text-accent text-[11px] font-mono tracking-widest uppercase"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-50" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
+              </span>
+              Available for Consulting
+            </motion.div>
+
+            <motion.h1
+              {...fadeUp(0.2)}
+              className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter leading-[1.05] text-foreground"
+            >
+              Hi, I'm{' '}
+              <span className="text-gradient">Kien Nguyen</span>
+            </motion.h1>
+
+            <motion.p
+              {...fadeUp(0.3)}
+              className="text-base md:text-lg text-text-muted leading-relaxed max-w-[48ch]"
+            >
+              DevOps &amp; DevSecOps Engineer. Secure EKS clusters, GitOps deployments, shift-left security.
+            </motion.p>
+
+            <motion.div
+              {...fadeUp(0.4)}
+              className="flex flex-wrap items-center gap-3 pt-2"
+            >
               <a
                 href="#projects"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-accent hover:bg-accent-hover text-white font-bold text-sm transition-all duration-300 shadow-lg shadow-accent/20 cursor-pointer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-accent hover:bg-accent-hover text-black font-bold text-sm transition-all duration-250 active:scale-[0.98]"
               >
-                <span>View My Works</span>
+                View Work
                 <ArrowRight className="w-4 h-4" />
               </a>
               <a
                 href="#contact"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-foreground/5 hover:bg-foreground/10 text-foreground border border-card-border font-bold text-sm transition-all duration-300 cursor-pointer"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-card-border hover:border-accent/40 text-foreground font-semibold text-sm transition-all duration-250 active:scale-[0.98]"
               >
                 <Mail className="w-4 h-4 text-accent" />
-                <span>Contact Me</span>
+                Contact
               </a>
-            </div>
+            </motion.div>
           </div>
 
-          {/* Avatar Orb Graphics */}
-          <div className="relative shrink-0 select-none">
-            <div className="absolute inset-0 bg-accent/20 rounded-full blur-3xl" />
-            <div className="relative w-52 h-52 md:w-64 md:h-64 rounded-full bg-card border-4 border-card-border/80 flex items-center justify-center shadow-2xl transition-transform duration-700 hover:rotate-3 overflow-hidden">
-              <div className="text-center space-y-1">
-                <span className="block font-sans text-5xl md:text-6xl font-black text-accent tracking-tighter">KN</span>
-                <span className="block font-mono text-[9px] text-text-muted uppercase tracking-widest">
-                  vpc // peering // security
-                </span>
-              </div>
-            </div>
-          </div>
+          {/* Right: Terminal block */}
+          <motion.div
+            initial={{ opacity: 0, x: 24 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <TerminalBlock />
+          </motion.div>
         </section>
 
-        {/* VERIFIED CREDENTIALS / CERTIFICATIONS */}
-        <section className="space-y-8">
-          <div className="space-y-2">
-            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-accent">
-              Credentials
-            </span>
-            <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">
-              Industry Certifications
-            </h2>
-          </div>
+        {/* ── CERTIFICATIONS: horizontal scroll-snap strip ────────────────── */}
+        <section className="space-y-6">
+          <motion.h2
+            {...fadeUp(0)}
+            className="text-xl font-bold tracking-tight text-foreground"
+          >
+            Industry Certifications
+          </motion.h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {timelineLoading ? (
-              [1, 2].map((i) => (
-                <div key={i} className="h-24 rounded-2xl bg-card border border-card-border/80 flex items-center p-6 animate-pulse gap-5">
-                  <div className="w-14 h-14 rounded-xl bg-foreground/10" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-5 bg-foreground/10 rounded w-2/3" />
-                    <div className="h-3 bg-foreground/10 rounded w-1/3" />
-                  </div>
-                </div>
-              ))
-            ) : certifications.length === 0 ? (
-              <div className="col-span-full text-center py-6 text-text-muted text-sm font-mono bg-card border border-card-border rounded-2xl">
-                No certifications found.
-              </div>
-            ) : (
-              certifications.map((cert) => (
+          {timelineLoading ? (
+            <div className="flex gap-4 overflow-x-auto pb-2">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex-none h-20 w-72 rounded-xl bg-card border border-card-border/80 animate-pulse" />
+              ))}
+            </div>
+          ) : certifications.length === 0 ? (
+            <p className="text-text-muted text-sm font-mono">No certifications found.</p>
+          ) : (
+            <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scroll-smooth -mx-4 px-4">
+              {certifications.map((cert) => (
                 <a
                   key={cert.id}
-                  href={cert.badge_url || "#"}
+                  href={cert.badge_url || '#'}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group p-5 md:p-6 bg-card border border-card-border hover:border-accent/40 rounded-2xl flex items-center gap-5 transition-all duration-500 shadow-md hover:shadow-lg hover:shadow-accent/5"
+                  className="group snap-start flex-none flex items-center gap-4 px-5 py-4 rounded-xl border border-card-border bg-card hover:border-accent/35 transition-all duration-300 w-72"
                 >
-                  <div className="w-14 h-14 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center shrink-0">
-                    <i className={`${cert.icon || "fa-brands fa-aws text-3xl text-orange-400"} group-hover:scale-105 transition-transform`} />
+                  <div className="w-12 h-12 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center shrink-0">
+                    <i className={`${cert.icon || 'fa-brands fa-aws text-2xl text-orange-400'} group-hover:scale-105 transition-transform`} />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-base font-bold text-foreground group-hover:text-accent transition-colors truncate">
+                    <p className="text-sm font-bold text-foreground group-hover:text-accent transition-colors truncate">
                       {cert.title}
-                    </h3>
-                    <p className="text-xs text-text-muted font-mono mt-1">
+                    </p>
+                    <p className="text-[11px] text-text-muted font-mono mt-0.5 truncate">
                       {cert.issuer}
                     </p>
                   </div>
                 </a>
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
 
-        {/* BIO & PHILOSOPHY */}
-        <section className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-          <div className="md:col-span-4 space-y-2">
-            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-accent">
-              The Philosophy
-            </span>
-            <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">
-              Decisive Execution
-            </h2>
-          </div>
-          <div className="md:col-span-8 bg-card border border-card-border rounded-2xl p-6 md:p-8 space-y-4">
-            <h3 className="text-lg font-bold text-foreground">
-              "Quiet Operations, Zero Drift."
-            </h3>
-            <div className="text-text-muted text-sm md:text-base leading-relaxed space-y-4 font-medium">
+        {/* ── BIO/PHILOSOPHY: Full-width editorial quote ──────────────────── */}
+        <section className="relative">
+          <motion.div
+            {...fadeUp(0)}
+            className="border-l-2 border-accent pl-8 py-2 space-y-4 max-w-3xl"
+          >
+            <p className="text-2xl md:text-3xl font-bold tracking-tight text-foreground leading-[1.2]">
+              "Quiet operations, zero drift."
+            </p>
+            <div className="text-text-muted text-sm md:text-base leading-relaxed space-y-3 max-w-[60ch]">
               <p>
-                I design platform architectures under the principle of minimal noise and maximum stability. In enterprise DevOps, reliable scaling is not loud; it is quiet, predictable, and fully codified.
+                Platform architectures built on minimal noise and maximum stability. In enterprise DevOps, reliable scaling is quiet, predictable, and fully codified.
               </p>
               <p>
-                From hardening container security boundaries to orchestrating secure cross-region VPC gateways, my focus is strictly on engineering deterministic systems that protect access control layers. By pairing declarative infrastructure declarations with live drift tracking, we guarantee clean, reliable environments.
+                From hardening container security boundaries to orchestrating cross-region VPC gateways — deterministic systems, clean environments, every time.
               </p>
             </div>
-          </div>
+            <span className="accent-line" />
+          </motion.div>
         </section>
 
-        {/* TIMELINE EXPERIENCE */}
+        {/* ── EXPERIENCE: Timeline ────────────────────────────────────────── */}
         <section id="experience" className="space-y-10">
-          <div className="space-y-2">
-            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-accent">
-              Career History
-            </span>
-            <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">
-              Professional Timeline
-            </h2>
-          </div>
+          <motion.h2
+            {...fadeUp(0)}
+            className="text-2xl md:text-3xl font-black tracking-tight text-foreground"
+          >
+            Professional Timeline
+          </motion.h2>
 
-          <div className="relative border-l border-card-border pl-6 ml-4 space-y-12">
+          <div className="space-y-10">
             {timelineLoading ? (
-              <div className="space-y-8 animate-pulse pl-6">
+              <div className="space-y-8 animate-pulse">
                 {[1, 2].map((i) => (
-                  <div key={i} className="space-y-2">
-                    <div className="h-6 bg-foreground/10 rounded w-1/3" />
-                    <div className="h-4 bg-foreground/10 rounded w-1/4" />
-                    <div className="h-12 bg-foreground/10 rounded w-full" />
+                  <div key={i} className="flex gap-6">
+                    <div className="w-0.5 bg-foreground/8 rounded self-stretch" />
+                    <div className="flex-1 space-y-2 pb-8">
+                      <div className="h-5 bg-foreground/10 rounded w-1/3" />
+                      <div className="h-3 bg-foreground/10 rounded w-1/4" />
+                      <div className="h-12 bg-foreground/10 rounded w-full" />
+                    </div>
                   </div>
                 ))}
               </div>
             ) : experiences.length === 0 ? (
-              <div className="text-center py-6 text-text-muted text-sm font-mono">
-                No experiences found.
-              </div>
+              <p className="text-text-muted text-sm font-mono">No experiences found.</p>
             ) : (
               experiences.map((exp, idx) => (
-                <div key={exp.id || idx} className="relative group">
-                  {/* Timeline Dot Indicator */}
-                  <div className="absolute -left-[31px] top-1.5 w-4.5 h-4.5 rounded-full border-2 border-accent bg-background transition-colors group-hover:bg-accent" />
+                <motion.div
+                  key={exp.id || idx}
+                  {...fadeUp(idx * 0.08)}
+                  className="group relative pl-6 border-l border-card-border hover:border-accent/30 transition-colors duration-300"
+                >
+                  {/* Dot */}
+                  <div className="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full border-2 border-card-border bg-background group-hover:border-accent transition-colors duration-300" />
 
                   <div className="space-y-1.5">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex flex-wrap items-baseline justify-between gap-2">
                       <h3 className="text-base font-bold text-foreground group-hover:text-accent transition-colors">
                         {exp.role}
                       </h3>
-                      <span className="text-xs font-mono text-accent bg-accent/5 px-2 py-0.5 rounded border border-accent/10">
+                      <span className="text-[11px] font-mono text-accent bg-accent/8 px-2 py-0.5 rounded border border-accent/12">
                         {exp.duration}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-4 text-xs font-mono text-text-muted">
                       <span className="flex items-center gap-1">
-                        <Briefcase className="w-3.5 h-3.5" />
-                        <span>{exp.company}</span>
+                        <Briefcase className="w-3 h-3" />
+                        {exp.company}
                       </span>
                       {exp.location && (
                         <span className="flex items-center gap-1">
-                          <MapPin className="w-3.5 h-3.5" />
-                          <span>{exp.location}</span>
+                          <MapPin className="w-3 h-3" />
+                          {exp.location}
                         </span>
                       )}
                     </div>
 
-                    <p className="text-xs md:text-sm text-text-muted leading-relaxed font-medium pt-1">
+                    <p className="text-sm text-text-muted leading-relaxed max-w-[65ch] pt-1">
                       {exp.description}
                     </p>
                   </div>
-                </div>
+                </motion.div>
               ))
             )}
           </div>
         </section>
 
-        {/* SKILLS MAP GRID */}
+        {/* ── SKILLS: Bento grid (eyebrow 2/3) ───────────────────────────── */}
         <section id="skills" className="space-y-8">
-          <div className="space-y-2">
-            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-accent">
-              Expertise Matrix
+          <motion.div {...fadeUp(0)} className="space-y-1">
+            <span className="text-[11px] font-mono font-semibold uppercase tracking-[0.18em] text-accent">
+              Expertise
             </span>
             <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">
               Technical Skillsets
             </h2>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {SKILL_CATEGORIES.map((category) => (
-              <div key={category.name} className="bg-card border border-card-border rounded-2xl p-6 space-y-4">
-                <h3 className="text-sm font-mono font-semibold text-accent uppercase tracking-wider">
-                  {category.name}
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {category.skills.map((skill) => (
+          {/* Bento: 2-col desktop. Featured cell (Cloud) spans both cols on mobile, half on desktop */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {SKILL_CATEGORIES.map((cat, idx) => (
+              <motion.div
+                key={cat.name}
+                {...fadeUp(idx * 0.07)}
+                className={`bento-cell p-6 space-y-4 relative overflow-hidden ${cat.featured ? 'md:col-span-2' : ''}`}
+              >
+                {/* Background gradient per category */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${cat.color} pointer-events-none`} />
+
+                <div className="relative flex items-center gap-3">
+                  <span className={`text-xl ${cat.accent}`}>
+                    <i className={cat.icon} />
+                  </span>
+                  <h3 className="text-sm font-mono font-semibold text-foreground/80 uppercase tracking-wider">
+                    {cat.name}
+                  </h3>
+                </div>
+
+                <div className="relative flex flex-wrap gap-2">
+                  {cat.skills.map((skill) => (
                     <span
                       key={skill}
-                      className="px-3 py-1 text-xs font-mono rounded-lg bg-foreground/5 text-text-muted border border-foreground/5 hover:border-accent/30 hover:text-accent transition-colors duration-300"
+                      className="px-2.5 py-1 text-[11px] font-mono rounded-md bg-foreground/5 text-text-muted border border-foreground/6 hover:border-accent/25 hover:text-accent transition-all duration-200 cursor-default"
                     >
                       {skill}
                     </span>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </section>
 
-        {/* SELECTED WORKS / PROJECTS GRID */}
+        {/* ── PROJECTS ────────────────────────────────────────────────────── */}
         <section id="projects" className="space-y-8">
-          <div className="space-y-2">
-            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-accent">
-              Case Studies
-            </span>
-            <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">
-              Selected Projects
-            </h2>
-          </div>
+          <motion.h2
+            {...fadeUp(0)}
+            className="text-2xl md:text-3xl font-black tracking-tight text-foreground"
+          >
+            Selected Projects
+          </motion.h2>
 
-          <div className="grid grid-cols-1 gap-8">
+          <div className="grid grid-cols-1 gap-6">
             {projectsLoading ? (
-              <div className="space-y-8 animate-pulse">
+              <div className="space-y-6 animate-pulse">
                 {[1, 2].map((i) => (
-                  <div key={i} className="h-64 rounded-2xl bg-card border border-card-border/80 flex flex-col justify-between p-6 md:p-8">
-                    <div className="space-y-4">
-                      <div className="w-24 h-4 bg-foreground/10 rounded" />
-                      <div className="w-2/3 h-8 bg-foreground/10 rounded" />
-                      <div className="w-full h-4 bg-foreground/10 rounded" />
-                      <div className="w-5/6 h-4 bg-foreground/10 rounded" />
-                    </div>
-                    <div className="flex gap-2">
-                      <div className="w-16 h-6 bg-foreground/15 rounded-lg" />
-                      <div className="w-16 h-6 bg-foreground/15 rounded-lg" />
-                      <div className="w-16 h-6 bg-foreground/15 rounded-lg" />
-                    </div>
-                  </div>
+                  <div key={i} className="h-64 rounded-2xl bg-card border border-card-border/80" />
                 ))}
               </div>
             ) : projects.length === 0 ? (
@@ -323,38 +414,28 @@ export default function Home() {
           </div>
         </section>
 
-        {/* LATEST WRITINGS / BLOGS GRID */}
+        {/* ── BLOGS ───────────────────────────────────────────────────────── */}
         <section id="blogs" className="space-y-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div className="space-y-2">
-              <span className="text-xs font-mono font-semibold uppercase tracking-wider text-accent">
-                Writings
-              </span>
-              <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">
-                Latest Articles
-              </h2>
-            </div>
+          <motion.div
+            {...fadeUp(0)}
+            className="flex flex-col md:flex-row md:items-baseline justify-between gap-4"
+          >
+            <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">
+              Latest Articles
+            </h2>
             <Link
               href="/blogs"
-              className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-accent hover:text-accent-hover transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase tracking-wider text-accent hover:text-accent-hover transition-colors"
             >
-              <span>VIEW ALL ARTICLES</span>
+              All Articles
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {blogsLoading ? (
               [1, 2].map((i) => (
-                <div key={i} className="h-64 rounded-2xl bg-card border border-card-border/80 flex flex-col justify-between p-6 animate-pulse">
-                  <div className="space-y-4">
-                    <div className="w-12 h-12 rounded-xl bg-foreground/10" />
-                    <div className="w-3/4 h-6 bg-foreground/10 rounded" />
-                    <div className="w-full h-4 bg-foreground/10 rounded" />
-                    <div className="w-5/6 h-4 bg-foreground/10 rounded" />
-                  </div>
-                  <div className="w-20 h-4 bg-foreground/10 rounded" />
-                </div>
+                <div key={i} className="h-64 rounded-2xl bg-card border border-card-border/80 animate-pulse" />
               ))
             ) : blogs.length === 0 ? (
               <div className="col-span-full text-center py-12 bg-card border border-card-border rounded-2xl text-text-muted text-sm font-mono">
@@ -368,67 +449,72 @@ export default function Home() {
           </div>
         </section>
 
-        {/* CONTACT SECTION */}
-        <section id="contact" className="space-y-8">
-          <div className="space-y-2 text-center">
-            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-accent">
-              Connect With Me
+        {/* ── CONTACT: split layout, no center (eyebrow 3/3) ─────────────── */}
+        <section id="contact" className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+          {/* Left: text */}
+          <motion.div {...fadeUp(0)} className="space-y-4">
+            <span className="text-[11px] font-mono font-semibold uppercase tracking-[0.18em] text-accent">
+              Contact
             </span>
             <h2 className="text-2xl md:text-3xl font-black tracking-tight text-foreground">
-              Get In Touch
+              Get in Touch
             </h2>
-            <p className="text-text-muted max-w-md mx-auto text-sm md:text-base font-medium">
-              Have an infrastructure design concern, Kubernetes tuning issue, or want to discuss security? Send me a message!
+            <p className="text-text-muted text-sm md:text-base leading-relaxed max-w-[38ch]">
+              Infrastructure questions, Kubernetes tuning, or want to discuss security? I'm available.
             </p>
-          </div>
+            <span className="accent-line block" />
+          </motion.div>
 
-          <div className="max-w-md mx-auto bg-card border border-card-border rounded-2xl p-6 md:p-8 space-y-6">
-            <div className="space-y-4">
+          {/* Right: contact links */}
+          <motion.div {...fadeUp(0.1)} className="space-y-3">
+            {[
+              {
+                icon: <Mail className="w-4 h-4" />,
+                label: 'Email',
+                value: 'kiennguly24@gmail.com',
+                href: 'mailto:kiennguly24@gmail.com',
+              },
+              {
+                icon: <i className="fa-brands fa-github text-base" />,
+                label: 'GitHub',
+                value: '@Kien-devops',
+                href: 'https://github.com/Kien-devops',
+                external: true,
+              },
+              {
+                icon: <i className="fa-brands fa-linkedin text-base" />,
+                label: 'LinkedIn',
+                value: 'Kien Nguyen',
+                href: 'https://www.linkedin.com/in/kien-vpc-peering/',
+                external: true,
+              },
+            ].map((item) => (
               <a
-                href="mailto:kiennguly24@gmail.com"
-                className="flex items-center gap-4 p-4 rounded-xl border border-card-border/80 hover:border-accent/40 bg-foreground/5 hover:bg-foreground/10 text-foreground transition-all duration-300"
+                key={item.label}
+                href={item.href}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noopener noreferrer' : undefined}
+                className="group flex items-center gap-4 p-4 rounded-xl border border-card-border bg-card hover:border-accent/35 transition-all duration-250"
               >
-                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
-                  <Mail className="w-5 h-5" />
+                <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center text-accent shrink-0">
+                  {item.icon}
                 </div>
-                <div>
-                  <span className="block text-xs font-mono text-text-muted uppercase">Email Address</span>
-                  <span className="text-sm font-semibold">kiennguly24@gmail.com</span>
+                <div className="min-w-0 flex-1">
+                  <span className="block text-[10px] font-mono text-text-muted uppercase tracking-wider">
+                    {item.label}
+                  </span>
+                  <span className="text-sm font-semibold text-foreground group-hover:text-accent transition-colors truncate block">
+                    {item.value}
+                  </span>
                 </div>
+                {item.external && (
+                  <ExternalLink className="w-3.5 h-3.5 text-text-muted group-hover:text-accent transition-colors shrink-0" />
+                )}
               </a>
-
-              <a
-                href="https://github.com/Kien-devops"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-4 p-4 rounded-xl border border-card-border/80 hover:border-accent/40 bg-foreground/5 hover:bg-foreground/10 text-foreground transition-all duration-300"
-              >
-                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
-                  <i className="fa-brands fa-github text-xl" />
-                </div>
-                <div>
-                  <span className="block text-xs font-mono text-text-muted uppercase">GitHub Profile</span>
-                  <span className="text-sm font-semibold">@Kien-devops</span>
-                </div>
-              </a>
-
-              <a
-                href="https://www.linkedin.com/in/kien-vpc-peering/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-4 p-4 rounded-xl border border-card-border/80 hover:border-accent/40 bg-foreground/5 hover:bg-foreground/10 text-foreground transition-all duration-300"
-              >
-                <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
-                  <i className="fa-brands fa-linkedin text-xl" />
-                </div>
-                <div>
-                  <span className="block text-xs font-mono text-text-muted uppercase">LinkedIn Profile</span>
-                  <span className="text-sm font-semibold">Kien Devops</span>
-                </div>
-              </a>
-            </div>
-          </div>
+            ))}
+          </motion.div>
         </section>
+
       </main>
 
       <Footer />

@@ -36,6 +36,27 @@ export interface Blog {
   date: string;
 }
 
+export interface Study {
+  id: string;
+  title: string;
+  summary: string;
+  content: string;
+  image_url: string;
+  category: string;
+  lessons_count?: number;
+  date: string;
+}
+
+export interface Lesson {
+  id: string;
+  study_id: string;
+  title: string;
+  video_url: string;
+  duration: string;
+  order_num: number;
+}
+
+
 export interface CommentReply {
   comment_id: string;
   parent_comment_id: string;
@@ -361,3 +382,167 @@ export async function postReply(blogId: string, parentCommentId: string, payload
     return null;
   }
 }
+
+export async function fetchStudies(): Promise<Study[]> {
+  const url = getApiBaseUrl();
+  try {
+    const res = await fetch(`${url}/studies`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const items = Array.isArray(data) ? data : [];
+    return items.map((study: any) => ({
+      id: String(study.id),
+      title: study.title || 'Untitled Study',
+      summary: study.summary || '',
+      content: study.content || '',
+      image_url: study.image_url || 'fa-solid fa-book',
+      category: study.category || 'DevOps',
+      lessons_count: study.lessons_count || 0,
+      date: study.date || ''
+    }));
+  } catch (err) {
+    console.error('Failed to fetch studies:', err);
+    return [];
+  }
+}
+
+export async function fetchStudyDetail(id: string): Promise<Study | null> {
+  const url = getApiBaseUrl();
+  try {
+    const res = await fetch(`${url}/studies/${encodeURIComponent(id)}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const study = data.study || data;
+    if (!study || !study.id) return null;
+    return {
+      id: String(study.id),
+      title: study.title || 'Untitled Study',
+      summary: study.summary || '',
+      content: study.content || '',
+      image_url: study.image_url || 'fa-solid fa-book',
+      category: study.category || 'DevOps',
+      date: study.date || ''
+    };
+  } catch (err) {
+    console.error(`Failed to fetch study detail for ${id}:`, err);
+    return null;
+  }
+}
+
+export async function fetchStudyComments(studyId: string): Promise<Comment[]> {
+  const url = getApiBaseUrl();
+  try {
+    const res = await fetch(`${url}/studies/${encodeURIComponent(studyId)}/comments`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return Array.isArray(data.items) ? data.items : [];
+  } catch (err) {
+    console.error(`Failed to fetch study comments for ${studyId}:`, err);
+    return [];
+  }
+}
+
+export async function postStudyComment(studyId: string, payload: { email: string; author_name: string; content: string }): Promise<Comment | null> {
+  const url = getApiBaseUrl();
+  try {
+    const res = await fetch(`${url}/studies/${encodeURIComponent(studyId)}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return data.comment || null;
+  } catch (err) {
+    console.error('Failed to post study comment:', err);
+    return null;
+  }
+}
+
+export async function postStudyReply(studyId: string, parentCommentId: string, payload: { email: string; author_name: string; content: string }): Promise<CommentReply | null> {
+  const url = getApiBaseUrl();
+  try {
+    const res = await fetch(`${url}/studies/${encodeURIComponent(studyId)}/comments/${encodeURIComponent(parentCommentId)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return data.reply || null;
+  } catch (err) {
+    console.error('Failed to post study reply:', err);
+    return null;
+  }
+}
+
+export async function fetchStudyLessons(studyId: string): Promise<Lesson[]> {
+  const url = getApiBaseUrl();
+  try {
+    const res = await fetch(`${url}/studies/${encodeURIComponent(studyId)}/lessons`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (err) {
+    console.error(`Failed to fetch study lessons for ${studyId}:`, err);
+    return [];
+  }
+}
+
+export async function loginAdmin(payload: any): Promise<{ success: boolean; token?: string; error?: string }> {
+  const url = getApiBaseUrl();
+  try {
+    const res = await fetch(`${url}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok) return { success: false, error: data.error || 'Authentication failed' };
+    return { success: true, token: data.token };
+  } catch (err: any) {
+    console.error('Failed to log in:', err);
+    return { success: false, error: err.message || 'Server error' };
+  }
+}
+
+export async function createCourse(payload: any, token: string): Promise<Study | null> {
+  const url = getApiBaseUrl();
+  try {
+    const res = await fetch(`${url}/studies`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.error('Failed to create course:', err);
+    return null;
+  }
+}
+
+export async function createLesson(studyId: string, payload: any, token: string): Promise<Lesson | null> {
+  const url = getApiBaseUrl();
+  try {
+    const res = await fetch(`${url}/studies/${encodeURIComponent(studyId)}/lessons`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.error('Failed to create lesson:', err);
+    return null;
+  }
+}
+
+
+

@@ -7,7 +7,7 @@ spec:
   parentRefs:
     - name: portfolio-gateway
   hostnames:
-    - portfolio.teamdevops.shop
+    - www.kiendev.site
   rules:
     - matches:
         - path:
