@@ -11,17 +11,20 @@ import ProjectsSection from '@/components/sections/ProjectsSection';
 import BlogSection from '@/components/sections/BlogSection';
 import ContactSection from '@/components/sections/ContactSection';
 
-import { fetchProjects, fetchBlogs, fetchTimeline } from '@/utils/api';
+import { fetchProjectsDirect, fetchBlogsDirect, fetchTimelineDirect } from '@/utils/dbQueries';
+
+export const dynamic = 'force-dynamic';
 
 // ponytail: Replaced 'use client' page with Server Side Data Fetching at page compile time.
 // This reduces bundle size from 7MB+ client side assets significantly since state variables & useEffects are removed.
 export default async function Home() {
-  // Parallel fetch on the server
+  // Parallel fetch on the server directly from DB
   const [projectsData, blogsData, timelineData] = await Promise.all([
-    fetchProjects(),
-    fetchBlogs(),
-    fetchTimeline(),
+    fetchProjectsDirect().catch(() => []),
+    fetchBlogsDirect().catch(() => []),
+    fetchTimelineDirect().catch(() => []),
   ]);
+
 
   const experiences = timelineData.filter((item) => item.type === 'experience');
   const certifications = timelineData.filter((item) => item.type === 'certification');

@@ -207,7 +207,7 @@ const MOCK_TIMELINE: TimelineItem[] = [
 
 export async function fetchTimeline(): Promise<TimelineItem[]> {
   const url = getApiBaseUrl();
-  if (!url) return MOCK_TIMELINE;
+  if (!url || url.startsWith('/api')) return MOCK_TIMELINE;
 
   try {
     const res = await fetch(`${url}/timeline`, { cache: 'no-store' });
@@ -224,7 +224,7 @@ export async function fetchTimeline(): Promise<TimelineItem[]> {
 
 export async function fetchProjects(): Promise<Project[]> {
   const url = getApiBaseUrl();
-  if (!url) return MOCK_PROJECTS;
+  if (!url || url.startsWith('/api')) return MOCK_PROJECTS;
 
   try {
     const res = await fetch(`${url}/projects`, { cache: 'no-store' });
@@ -252,7 +252,7 @@ export async function fetchProjects(): Promise<Project[]> {
 
 export async function fetchBlogs(): Promise<Blog[]> {
   const url = getApiBaseUrl();
-  if (!url) return MOCK_BLOGS;
+  if (!url || url.startsWith('/api')) return MOCK_BLOGS;
 
   try {
     const res = await fetch(`${url}/blogs`, { cache: 'no-store' });
@@ -273,6 +273,8 @@ export async function fetchBlogs(): Promise<Blog[]> {
     return MOCK_BLOGS;
   }
 }
+
+
 
 export async function fetchBlogDetail(id: string): Promise<Blog | null> {
   const url = getApiBaseUrl();

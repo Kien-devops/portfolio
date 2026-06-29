@@ -11,7 +11,7 @@ import { ChevronLeft, Calendar, User, BookOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface BlogDetailClientProps {
-  id: string;
+  blog: Blog;
 }
 
 const isHtmlContent = (content: string) => {
@@ -135,69 +135,11 @@ function renderMarkdown(content: string) {
   return renderedElements;
 }
 
-export default function BlogDetailClient({ id }: BlogDetailClientProps) {
-  const [blog, setBlog] = useState<Blog | null>(null);
-  const [loading, setLoading] = useState(true);
+interface BlogDetailClientProps {
+  blog: Blog;
+}
 
-  useEffect(() => {
-    if (!id) return;
-    fetchBlogDetail(id).then((data) => {
-      setBlog(data);
-      setLoading(false);
-    });
-  }, [id]);
-
-  if (loading) {
-    return (
-      <>
-        <Navbar />
-        <BackgroundGlows />
-        <main className="flex-1 w-full max-w-3xl mx-auto px-4 pt-32 pb-20 space-y-12 animate-pulse">
-          <div>
-            <div className="w-28 h-4 bg-foreground/10 rounded" />
-          </div>
-          <div className="space-y-6">
-            <div className="w-3/4 h-12 bg-foreground/10 rounded" />
-            <div className="flex gap-4">
-              <div className="w-20 h-4 bg-foreground/10 rounded" />
-              <div className="w-20 h-4 bg-foreground/10 rounded" />
-              <div className="w-20 h-4 bg-foreground/10 rounded" />
-            </div>
-            <div className="w-full h-24 bg-foreground/10 rounded-xl" />
-            <div className="space-y-4 pt-6">
-              <div className="w-full h-4 bg-foreground/10 rounded" />
-              <div className="w-5/6 h-4 bg-foreground/10 rounded" />
-              <div className="w-4/5 h-4 bg-foreground/10 rounded" />
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </>
-    );
-  }
-
-  if (!blog) {
-    return (
-      <>
-        <Navbar />
-        <BackgroundGlows />
-        <main className="flex-1 w-full max-w-2xl mx-auto px-4 pt-40 pb-20 text-center space-y-6">
-          <h1 className="text-2xl font-bold text-foreground">Article Not Found</h1>
-          <p className="text-text-muted">The requested article could not be retrieved from the repository.</p>
-          <div className="pt-4">
-            <Link
-              href="/blogs"
-              className="inline-flex items-center gap-1.5 text-sm font-mono text-accent hover:underline"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              <span>Back to Articles</span>
-            </Link>
-          </div>
-        </main>
-        <Footer />
-      </>
-    );
-  }
+export default function BlogDetailClient({ blog }: BlogDetailClientProps) {
 
   return (
     <>
