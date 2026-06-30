@@ -1,10 +1,11 @@
+import { unstable_cache } from 'next/cache';
 import { getDbConnection } from '@/utils/db';
 import { TimelineItem, Project, Blog } from './api';
 
 // ponytail: dedicated server-only database query module
 // This prevents browser compiler from pulling 'tedious' / 'mssql' and causing module dns/net/tls not found.
 
-export async function fetchTimelineDirect(): Promise<TimelineItem[]> {
+async function fetchTimelineFromDb(): Promise<TimelineItem[]> {
   try {
     const pool = await getDbConnection();
     const result = await pool.request().query(
@@ -33,7 +34,7 @@ export async function fetchTimelineDirect(): Promise<TimelineItem[]> {
   }
 }
 
-export async function fetchProjectsDirect(): Promise<Project[]> {
+async function fetchProjectsFromDb(): Promise<Project[]> {
   try {
     const pool = await getDbConnection();
     const projectsResult = await pool.request().query(
@@ -84,7 +85,7 @@ export async function fetchProjectsDirect(): Promise<Project[]> {
   }
 }
 
-export async function fetchBlogsDirect(): Promise<Blog[]> {
+async function fetchBlogsFromDb(): Promise<Blog[]> {
   try {
     const pool = await getDbConnection();
     const result = await pool.request().query(
@@ -111,7 +112,7 @@ export async function fetchBlogsDirect(): Promise<Blog[]> {
   }
 }
 
-export async function fetchBlogDetailDirect(id: string): Promise<Blog | null> {
+async function fetchBlogDetailFromDb(id: string): Promise<Blog | null> {
   try {
     const pool = await getDbConnection();
     const result = await pool.request()
@@ -143,3 +144,26 @@ export async function fetchBlogDetailDirect(id: string): Promise<Blog | null> {
   }
 }
 
+export const fetchTimelineDirect = unstable_cache(
+  fetchTimelineFromDb,
+  ['timeline-direct'],
+  { revalidate: 300 }
+);
+
+export const fetchProjectsDirect = unstable_cache(
+  fetchProjectsFromDb,
+  ['projects-direct'],
+  { revalidate: 300 }
+);
+
+export const fetchBlogsDirect = unstable_cache(
+  fetchBlogsFromDb,
+  ['blogs-direct'],
+  { revalidate: 300 }
+);
+
+export const fetchBlogDetailDirect = unstable_cache(
+  fetchBlogDetailFromDb,
+  ['blog-detail-direct'],
+  { revalidate: 300 }
+);

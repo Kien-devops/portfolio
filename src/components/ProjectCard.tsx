@@ -1,7 +1,4 @@
-'use client';
-
 import { Project } from '@/utils/api';
-import { motion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 
 interface ProjectCardProps {
@@ -11,14 +8,9 @@ interface ProjectCardProps {
 
 export default function ProjectCard({ project, index }: ProjectCardProps) {
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: 0.55, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-      className="group relative flex flex-col gap-5 rounded-2xl border border-card-border bg-card p-7 md:p-8 backdrop-blur-md transition-all duration-400 hover:border-accent/30"
-      style={{ boxShadow: 'none' }}
-      whileHover={{ boxShadow: '0 0 40px -8px rgba(34,211,238,0.12)' }}
+    <article
+      className="group relative flex flex-col gap-5 rounded-2xl border border-card-border bg-card p-7 md:p-8 backdrop-blur-md transition-all duration-400 hover:border-accent/30 hover:shadow-[0_0_40px_-8px_rgba(34,211,238,0.12)] animate-fade-up"
+      style={{ animationDelay: `${index * 100}ms` }}
     >
       {/* Subtle left accent bar */}
       <div className="absolute left-0 top-8 bottom-8 w-[2px] rounded-r bg-accent/0 group-hover:bg-accent/50 transition-all duration-400" />
@@ -91,6 +83,6 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
           ))}
         </div>
       )}
-    </motion.article>
+    </article>
   );
 }

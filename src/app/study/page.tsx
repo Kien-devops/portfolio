@@ -1,22 +1,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import BackgroundGlows from '@/components/BackgroundGlows';
 import StudyCard from '@/components/StudyCard';
-import AdminLoginModal from '@/components/AdminLoginModal';
-import AddCourseModal from '@/components/AddCourseModal';
 import { fetchStudies, Study } from '@/utils/api';
 import { GraduationCap, Lock, Unlock, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+const AdminLoginModal = dynamic(() => import('@/components/AdminLoginModal'), { ssr: false });
+const AddCourseModal = dynamic(() => import('@/components/AddCourseModal'), { ssr: false });
 
 export default function StudyPage() {
   const [studies, setStudies] = useState<Study[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   
-  const [adminToken, setAdminToken] = useState<string | null>(null);
+  const [adminToken, setAdminToken] = useState<string | null>(() =>
+    typeof window === 'undefined' ? null : sessionStorage.getItem('adminToken')
+  );
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isAddCourseOpen, setIsAddCourseOpen] = useState(false);
 
@@ -25,7 +29,6 @@ export default function StudyPage() {
       setStudies(data);
       setLoading(false);
     });
-    setAdminToken(sessionStorage.getItem('adminToken'));
   }, []);
 
   const handleLoginSuccess = (token: string) => {
@@ -169,4 +172,3 @@ export default function StudyPage() {
     </>
   );
 }
-

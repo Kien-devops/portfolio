@@ -1,8 +1,6 @@
-'use client';
-
 import { Blog } from '@/utils/api';
+import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 
 interface BlogCardProps {
@@ -14,21 +12,18 @@ export default function BlogCard({ blog, index }: BlogCardProps) {
   const isUrl = (val: string) => /^https?:\/\//i.test(val?.trim() ?? '');
 
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.5, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
-      className="group flex flex-col rounded-2xl border border-card-border bg-card overflow-hidden transition-all duration-350 hover:border-accent/30"
-      style={{ boxShadow: 'none' }}
-      whileHover={{ boxShadow: '0 0 32px -8px rgba(34,211,238,0.1)' }}
+    <article
+      className="group flex flex-col rounded-2xl border border-card-border bg-card overflow-hidden transition-all duration-350 hover:border-accent/30 hover:shadow-[0_0_32px_-8px_rgba(34,211,238,0.1)] animate-fade-up"
+      style={{ animationDelay: `${index * 80}ms` }}
     >
       {/* Image header */}
       {isUrl(blog.image_url) ? (
         <figure className="aspect-[16/9] overflow-hidden bg-black/30 relative">
-          <img
+          <Image
             src={blog.image_url}
             alt={blog.title}
+            fill
+            sizes="(min-width: 768px) 50vw, 100vw"
             className="w-full h-full object-cover transition-transform duration-600 group-hover:scale-[1.03]"
           />
           {/* Date overlay */}
@@ -74,6 +69,6 @@ export default function BlogCard({ blog, index }: BlogCardProps) {
           <ArrowRight className="w-3 h-3 group-hover/btn:translate-x-0.5 transition-transform" />
         </Link>
       </div>
-    </motion.article>
+    </article>
   );
 }

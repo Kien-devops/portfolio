@@ -1,8 +1,6 @@
-'use client';
-
 import { Study } from '@/utils/api';
+import Image from 'next/image';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { Play, PlayCircle, BookOpen } from 'lucide-react';
 
 interface StudyCardProps {
@@ -14,19 +12,18 @@ export default function StudyCard({ study, index }: StudyCardProps) {
   const isUrl = (val: string) => /^https?:\/\//i.test(val.trim());
 
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-100px' }}
-      transition={{ duration: 0.6, delay: index * 0.1, ease: 'easeOut' }}
-      className="group relative flex flex-col rounded-2xl border border-card-border bg-card overflow-hidden hover:border-accent/40 hover:shadow-[0_0_30px_-5px_rgba(14,165,233,0.15)] transition-all duration-500"
+    <article
+      className="group relative flex flex-col rounded-2xl border border-card-border bg-card overflow-hidden hover:border-accent/40 hover:shadow-[0_0_30px_-5px_rgba(14,165,233,0.15)] transition-all duration-500 animate-fade-up"
+      style={{ animationDelay: `${index * 100}ms` }}
     >
       {/* Course Image / Visual Banner */}
       {isUrl(study.image_url) ? (
         <figure className="aspect-[16/9] overflow-hidden bg-black/40 border-b border-card-border relative">
-          <img
+          <Image
             src={study.image_url}
             alt={study.title}
+            fill
+            sizes="(min-width: 768px) 50vw, 100vw"
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -77,6 +74,6 @@ export default function StudyCard({ study, index }: StudyCardProps) {
           </Link>
         </div>
       </div>
-    </motion.article>
+    </article>
   );
 }
