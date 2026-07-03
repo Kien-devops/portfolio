@@ -40,6 +40,7 @@ export default function Navbar() {
     { name: 'Projects',   href: '#projects' },
     { name: 'Blogs',      href: '#blogs' },
     { name: 'Study',      href: '/study' },
+    { name: 'Vouchers',   href: '/exam-vouchers' },
     { name: 'Contact',    href: '#contact' },
   ];
 
