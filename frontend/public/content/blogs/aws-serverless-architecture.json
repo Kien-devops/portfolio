@@ -9,7 +9,7 @@
     "Architecture"
   ],
   "published": true,
-  "publishedAt": "2026-08-01T11:40:39.652Z",
-  "updatedAt": "2026-08-06T11:40:39.652Z",
+  "publishedAt": "2026-08-01T11:47:21.005Z",
+  "updatedAt": "2026-08-06T11:47:21.007Z",
   "content": "# Deep Dive into AWS Serverless Architecture\n\nServerless architecture has revolutionized the way we build and deploy web applications. By eliminating server management, developers can focus entirely on writing business logic.\n\n## Core Pillars of AWS Serverless\n\nIn this article, we explore the core building blocks of a serverless application:\n\n1. **Amazon API Gateway**: Serves as the entry point, routing HTTP traffic to backend handlers and enforcing security limits.\n2. **AWS Lambda**: The compute plane. Runs functions in response to API requests, scaling horizontally automatically.\n3. **Amazon DynamoDB**: A NoSQL database that offers single-digit millisecond latency at any scale.\n\n## Benefits of Serverless\n\n* **Zero Idle Costs**: You only pay for the exact millisecond your function executes.\n* **Auto-Scaling**: Seamlessly handles traffic spikes without manual scaling groups.\n* **High Availability**: Built-in fault tolerance across multiple Availability Zones.\n\n```javascript\n// Example Lambda Handler\nexport async function handler(event) {\n  return {\n    statusCode: 200,\n    body: JSON.stringify({ message: \"Hello Serverless!\" })\n  };\n}\n```\n\n## Well-Architected Serverless\n\nAlways follow the principle of least privilege in IAM configurations. Make sure each Lambda function only has access to the tables and buckets it absolutely requires.\n"
 }

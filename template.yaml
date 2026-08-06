@@ -477,6 +477,7 @@ Resources:
         Comment: !Sub "CloudFront Distribution for ${ProjectName} ${Environment}"
         Enabled: true
         HttpVersion: http2
+        DefaultRootObject: index.html
         Origins:
           - Id: FrontendS3Origin
             DomainName: !GetAtt FrontendBucket.RegionalDomainName
