@@ -9,7 +9,7 @@
     "Comparison"
   ],
   "published": true,
-  "publishedAt": "2026-07-27T11:29:40.297Z",
-  "updatedAt": "2026-08-06T11:29:40.297Z",
+  "publishedAt": "2026-07-27T11:40:39.652Z",
+  "updatedAt": "2026-08-06T11:40:39.652Z",
   "content": "# Kubernetes vs. Serverless: Choosing the Right Cloud Path\n\nArchitecting modern platforms requires choosing between container orchestrators (like Kubernetes) and serverless function platforms (like AWS Lambda). Both offer distinct advantages.\n\n## Kubernetes (EKS / GKE)\n\nKubernetes is ideal for long-running workloads, complex stateful systems, and enterprises requiring cloud-agnostic portability.\n\n### Pros\n* Direct control over runtime and container OS.\n* Cloud-agnostic (runs on AWS, Azure, GCP, or bare metal).\n* Predictable cost model for high, constant utilization.\n\n### Cons\n* Operational complexity (requires dedicated platform engineers).\n* Higher base infrastructure cost.\n\n## Serverless (AWS Lambda)\n\nServerless excels for event-driven systems, unpredictable traffic flows, and startups focusing on rapid time-to-market.\n\n### Pros\n* Zero server administration.\n* Scales from 0 to thousands of concurrent executions in seconds.\n* Zero base cost.\n\n### Cons\n* Vendor lock-in.\n* Cold start latency.\n* Limit on execution duration (maximum 15 minutes in Lambda).\n"
 }

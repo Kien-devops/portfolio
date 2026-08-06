@@ -7,6 +7,12 @@ export async function handler(
   event: APIGatewayProxyEventV2
 ): Promise<APIGatewayProxyResultV2> {
   try {
+    // Warmup ping handler
+    if ((event as any).source === "serverless-portfolio-warmup") {
+      console.log("Warmup ping received. Keeping container warm.");
+      return { statusCode: 200, body: "warmed" } as any;
+    }
+
     const path = event.rawPath;
     const method = event.requestContext.http.method;
 

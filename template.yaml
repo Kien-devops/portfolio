@@ -209,6 +209,11 @@ Resources:
             Path: /api/education
             Method: GET
             ApiId: !Ref PortfolioHttpApi
+        WarmupSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: "rate(5 minutes)"
+            Input: '{"source": "serverless-portfolio-warmup"}'
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
