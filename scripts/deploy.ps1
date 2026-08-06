@@ -1,7 +1,9 @@
 param (
     [string]$Environment = "dev",
     [string]$ProjectName = "serverless-portfolio",
-    [string]$Region = "us-east-1"
+    [string]$Region = "us-east-1",
+    [string]$CustomDomainName = "",
+    [string]$ACMCertificateArn = ""
 )
 
 $StackName = "$ProjectName-$Environment"
@@ -46,7 +48,7 @@ Write-Host "5. Deploying CloudFormation stack via SAM..." -ForegroundColor Yello
     --region $Region `
     --resolve-s3 `
     --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND `
-    --parameter-overrides "ProjectName=$ProjectName Environment=$Environment" `
+    --parameter-overrides "ProjectName=$ProjectName Environment=$Environment CustomDomainName=$CustomDomainName ACMCertificateArn=$ACMCertificateArn" `
     --no-confirm-changeset
 
 if ($LASTEXITCODE -ne 0) { Write-Error "SAM deploy failed"; exit 1 }

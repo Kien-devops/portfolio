@@ -31,9 +31,18 @@ Parameters:
     Type: String
     Default: INFO
     Description: Log level for Lambda functions.
+  CustomDomainName:
+    Type: String
+    Default: ""
+    Description: Custom domain name (e.g., kiendev.site)
+  ACMCertificateArn:
+    Type: String
+    Default: ""
+    Description: ACM Certificate ARN in us-east-1 (required for custom domain)
 
 Conditions:
   IsPitEnabled: !Equals [!Ref EnablePointInTimeRecovery, "true"]
+  HasCustomDomain: !Not [!Equals [!Ref CustomDomainName, ""]]
 
 Globals:
   Function:
@@ -478,6 +487,19 @@ Resources:
         Enabled: true
         HttpVersion: http2
         DefaultRootObject: index.html
+        Aliases:
+          !If
+            - HasCustomDomain
+            - - !Ref CustomDomainName
+              - !Sub "www.${CustomDomainName}"
+            - !Ref "AWS::NoValue"
+        ViewerCertificate:
+          !If
+            - HasCustomDomain
+            - AcmCertificateArn: !Ref ACMCertificateArn
+              SslSupportMethod: sni-only
+              MinimumProtocolVersion: TLSv1.2_2021
+            - CloudFrontDefaultCertificate: true
         Origins:
           - Id: FrontendS3Origin
             DomainName: !GetAtt FrontendBucket.RegionalDomainName

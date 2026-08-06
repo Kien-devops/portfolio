@@ -4,6 +4,8 @@ set -e
 Environment=${1:-dev}
 ProjectName=${2:-serverless-portfolio}
 Region=${3:-us-east-1}
+CustomDomainName=${4:-""}
+ACMCertificateArn=${5:-""}
 
 StackName="$ProjectName-$Environment"
 echo "Starting deployment for $StackName in region $Region..."
@@ -32,7 +34,7 @@ sam deploy \
     --region "$Region" \
     --resolve-s3 \
     --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND \
-    --parameter-overrides "ProjectName=$ProjectName Environment=$Environment" \
+    --parameter-overrides "ProjectName=$ProjectName Environment=$Environment CustomDomainName=$CustomDomainName ACMCertificateArn=$ACMCertificateArn" \
     --no-confirm-changeset
 
 # 6. Fetch Outputs
