@@ -47,12 +47,12 @@ export default function BlogDetail() {
   if (error || !blog) {
     return (
       <div className="max-w-xl mx-auto px-6 py-20 text-center space-y-6">
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400">
+        <div className="liquid-card p-4 text-red-400">
           <p className="font-semibold text-lg">{error || "Article not found"}</p>
         </div>
         <Link
           to="/"
-          className="inline-flex items-center space-x-2 px-6 py-2.5 rounded-full bg-slate-900 border border-slate-800 text-slate-300 font-semibold hover:border-slate-700 hover:text-slate-100 transition-colors"
+          className="liquid-button-secondary inline-flex items-center space-x-2 px-6 py-2.5 text-slate-300 font-semibold hover:text-slate-100 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Home</span>
@@ -83,7 +83,7 @@ export default function BlogDetail() {
 
       <article className="space-y-8">
         {/* Cover Image */}
-        <div className="h-64 sm:h-96 w-full rounded-3xl overflow-hidden border border-slate-900 shadow-2xl relative">
+        <div className="liquid-card h-64 sm:h-96 w-full overflow-hidden shadow-2xl relative">
           <img
             src={blog.coverImage}
             alt={blog.title}
@@ -99,7 +99,7 @@ export default function BlogDetail() {
             {blog.tags.map((tag) => (
               <span
                 key={tag}
-                className="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-semibold uppercase tracking-wider"
+                className="liquid-chip px-3 py-1 text-xs font-semibold uppercase tracking-wider"
               >
                 {tag}
               </span>

@@ -11,7 +11,7 @@ import {
   Send,
   Loader2,
   CheckCircle,
-  Briefcase,
+  Award,
   GraduationCap,
 } from "lucide-react";
 import confetti from "canvas-confetti";
@@ -135,30 +135,30 @@ export default function Home() {
 
   // Set default profile if none exists in DynamoDB yet
   const displayProfile: Profile = profile || {
-    name: "Alex Dev",
-    headline: "Cloud & DevOps Serverless Architect",
-    bio: "Passionate engineer specializing in designing AWS serverless microservices, highly resilient infrastructures, and responsive frontend applications.",
-    email: "alex@example.com",
-    avatarUrl: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=400&fit=crop",
-    githubUrl: "https://github.com",
-    linkedinUrl: "https://linkedin.com",
+    name: "Nguyễn Trung Kiên",
+    headline: "DevOps & Cloud Engineer",
+    bio: "Kỹ sư DevOps & Cloud đam mê xây dựng hạ tầng tự động hoá, đáng tin cậy và bảo mật cao trên AWS. Chuyên thiết kế CI/CD pipeline, Kubernetes GitOps, AWS SAM serverless và DevSecOps.",
+    email: "kien07493@gmail.com",
+    avatarUrl: "https://avatars.githubusercontent.com/u/180655698?v=4",
+    githubUrl: "https://github.com/Kien-devops",
+    linkedinUrl: "https://linkedin.com/in/trungkien-devops",
   };
 
   return (
     <div className="space-y-32">
       {/* ------------------ HERO SECTION ------------------ */}
       <section id="home" className="max-w-7xl mx-auto px-6 pt-12 md:pt-24 flex flex-col items-center text-center relative">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-3xl pointer-events-none radial-glow"></div>
+        <div className="absolute inset-x-0 top-10 h-72 blur-3xl pointer-events-none radial-glow opacity-80"></div>
         
         {/* Animated Badge */}
-        <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/5 text-indigo-400 text-xs font-semibold mb-8 animate-float">
+        <div className="liquid-chip inline-flex items-center space-x-2 px-4 py-1.5 text-xs font-semibold mb-8 animate-float">
           <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
           <span>Open for Global Opportunities</span>
         </div>
 
         {/* Big Headline */}
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold font-display tracking-tight max-w-4xl leading-tight">
-          Hi, I am <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">{displayProfile.name}</span>
+          Hi, I am <span className="bg-gradient-to-r from-sky-300 via-cyan-300 to-indigo-300 bg-clip-text text-transparent">{displayProfile.name}</span>
         </h1>
         <p className="text-xl sm:text-2xl text-slate-300 dark:text-slate-200 mt-6 max-w-2xl font-medium tracking-wide">
           {displayProfile.headline}
@@ -168,14 +168,14 @@ export default function Home() {
         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mt-10">
           <button
             onClick={() => document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" })}
-            className="flex items-center justify-center space-x-2 px-8 py-3.5 rounded-full bg-indigo-500 text-white font-semibold shadow-lg shadow-indigo-500/20 hover:bg-indigo-600 hover:shadow-indigo-500/30 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
+          className="liquid-button flex items-center justify-center space-x-2 px-8 py-3.5 text-white font-semibold hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
           >
             <span>View Projects</span>
             <ArrowRight className="w-4 h-4" />
           </button>
           <button
             onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" })}
-            className="flex items-center justify-center space-x-2 px-8 py-3.5 rounded-full border border-slate-700 bg-slate-900/40 text-slate-300 font-semibold hover:border-slate-500 hover:text-slate-100 transition-all cursor-pointer"
+            className="liquid-button-secondary flex items-center justify-center space-x-2 px-8 py-3.5 text-slate-700 dark:text-slate-300 font-semibold hover:text-slate-950 dark:hover:text-slate-100 transition-all cursor-pointer"
           >
             <span>Contact Me</span>
           </button>
@@ -205,22 +205,22 @@ export default function Home() {
           {/* Avatar frame */}
           <div className="md:col-span-4 flex justify-center">
             <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl blur opacity-30 group-hover:opacity-60 transition duration-500"></div>
+              <div className="absolute -inset-1 bg-gradient-to-r from-sky-300/45 via-cyan-300/35 to-indigo-300/35 rounded-[10px] blur opacity-50 group-hover:opacity-75 transition duration-500"></div>
               <img
                 src={displayProfile.avatarUrl}
                 alt={displayProfile.name}
-                className="relative w-64 h-64 md:w-80 md:h-80 object-cover rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl"
+                className="relative w-64 h-64 md:w-80 md:h-80 object-cover rounded-[8px] border border-white/20 bg-slate-950 shadow-2xl"
               />
             </div>
           </div>
 
           {/* Biography text */}
           <div className="md:col-span-8 space-y-6">
-            <div className="inline-block px-3 py-1 rounded-md bg-indigo-500/10 text-indigo-400 text-xs font-semibold uppercase tracking-wider">
+            <div className="liquid-section-label">
               About Me
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold font-display">Designing Scalable Architectures</h2>
-            <p className="text-slate-400 text-lg leading-relaxed whitespace-pre-line">
+            <h2 className="text-3xl sm:text-4xl font-bold font-display">DevOps & Cloud Engineer</h2>
+            <p className="text-slate-400 dark:text-slate-400 text-lg leading-relaxed whitespace-pre-line">
               {displayProfile.bio}
             </p>
           </div>
@@ -230,38 +230,37 @@ export default function Home() {
       {/* ------------------ SKILLS SECTION ------------------ */}
       <section id="skills" className="max-w-7xl mx-auto px-6 scroll-mt-24">
         <div className="text-center max-w-xl mx-auto space-y-4 mb-16">
-          <div className="inline-block px-3 py-1 rounded-md bg-indigo-500/10 text-indigo-400 text-xs font-semibold uppercase tracking-wider">
+          <div className="liquid-section-label">
             Expertise
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold font-display">Technical Skillset</h2>
-          <p className="text-slate-400">My toolbelt of technologies across frontend layers, cloud architecture, and database engineering.</p>
+          <p className="text-slate-400">Công nghệ tôi sử dụng hàng ngày trong công việc DevOps & Cloud Engineering.</p>
         </div>
 
         {Object.keys(skillsByCategory).length === 0 ? (
-          <div className="p-8 text-center bg-slate-900/30 border border-slate-900 rounded-2xl text-slate-500">
+          <div className="liquid-card p-8 text-center text-slate-500">
             No skills data available.
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {Object.entries(skillsByCategory).map(([category, items]) => (
-              <div key={category} className="p-6 rounded-2xl glass-panel relative group overflow-hidden">
-                <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-indigo-500 to-transparent"></div>
-                <h3 className="text-lg font-bold font-display mb-6 tracking-wide text-slate-200">{category}</h3>
-                
-                <div className="space-y-5">
+              <div key={category} className="p-6 glass-panel relative group overflow-hidden hover:-translate-y-1 transition-all duration-300">
+                {/* Category accent bar */}
+                <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-sky-400 via-cyan-300 to-transparent"></div>
+
+                <h3 className="text-sm font-bold font-display mb-5 uppercase tracking-widest text-indigo-400">
+                  {category}
+                </h3>
+
+                <div className="flex flex-wrap gap-2">
                   {items.map((skill) => (
-                    <div key={skill.skillId} className="space-y-2">
-                      <div className="flex justify-between items-center text-sm font-medium">
-                        <span className="text-slate-300">{skill.name}</span>
-                        <span className="text-indigo-400">{skill.level}%</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-1000"
-                          style={{ width: `${skill.level}%` }}
-                        ></div>
-                      </div>
-                    </div>
+                    <span
+                      key={skill.skillId}
+                      className="skill-tag skill-tag-dark group/tag"
+                      title={`Proficiency: ${skill.level}%`}
+                    >
+                      {skill.name}
+                    </span>
                   ))}
                 </div>
               </div>
@@ -273,33 +272,37 @@ export default function Home() {
       {/* ------------------ EXPERIENCE SECTION ------------------ */}
       <section id="experience" className="max-w-4xl mx-auto px-6 scroll-mt-24">
         <div className="text-center space-y-4 mb-16">
-          <div className="inline-block px-3 py-1 rounded-md bg-indigo-500/10 text-indigo-400 text-xs font-semibold uppercase tracking-wider">
-            Journey
+          <div className="liquid-section-label">
+            Certifications
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold font-display">Work History</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold font-display">AWS Certifications</h2>
+          <p className="text-slate-400">Chứng chỉ AWS xác nhận năng lực thiết kế và vận hành hệ thống cloud.</p>
         </div>
 
         {experiences.length === 0 ? (
-          <div className="p-8 text-center bg-slate-900/30 border border-slate-900 rounded-2xl text-slate-500">
-            No work experience recorded.
+          <div className="liquid-card p-8 text-center text-slate-500">
+            No certifications recorded.
           </div>
         ) : (
-          <div className="relative border-l border-slate-900 space-y-12 pl-6 ml-4">
+          <div className="relative border-l-2 border-indigo-500/20 space-y-10 pl-8 ml-4">
             {experiences.map((exp) => (
               <div key={exp.experienceId} className="relative group">
                 {/* Timeline Icon */}
-                <div className="absolute -left-[35px] top-1 p-1 bg-slate-950 border-2 border-indigo-500 rounded-full text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-all">
-                  <Briefcase className="w-4 h-4" />
+                <div className="absolute -left-[42px] top-1 p-2 bg-slate-950 dark:bg-slate-950 border-2 border-indigo-500 rounded-full text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300">
+                  <Award className="w-4 h-4" />
                 </div>
 
-                <div className="p-6 rounded-2xl glass-panel hover:border-slate-800 transition-all">
-                  <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-4">
-                    <div>
-                      <h3 className="text-lg font-bold text-slate-200 font-display">{exp.position}</h3>
-                      <p className="text-indigo-400 text-sm font-medium">{exp.company}</p>
+                <div className="p-6 glass-panel hover:border-indigo-500/30 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-indigo-500/5">
+                  <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-3 mb-4">
+                    <div className="space-y-1">
+                      <h3 className="text-lg font-bold text-slate-200 dark:text-slate-200 font-display leading-snug">{exp.position}</h3>
+                      <p className="text-indigo-400 text-sm font-semibold flex items-center gap-1.5">
+                        <span className="w-4 h-4 inline-flex items-center justify-center text-[10px] bg-indigo-500/20 rounded-full">★</span>
+                        {exp.company}
+                      </p>
                     </div>
-                    <span className="inline-flex px-3 py-1 rounded-full bg-slate-900/80 text-slate-400 text-xs font-medium border border-slate-800/60">
-                      {exp.startDate} — {exp.endDate || "Present"}
+                    <span className="inline-flex shrink-0 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-semibold border border-emerald-500/20">
+                      Valid {exp.startDate} – {exp.endDate || "Present"}
                     </span>
                   </div>
                   <p className="text-slate-400 text-sm leading-relaxed whitespace-pre-line">
@@ -315,14 +318,14 @@ export default function Home() {
       {/* ------------------ EDUCATION SECTION ------------------ */}
       <section id="education" className="max-w-4xl mx-auto px-6 scroll-mt-24">
         <div className="text-center space-y-4 mb-16">
-          <div className="inline-block px-3 py-1 rounded-md bg-indigo-500/10 text-indigo-400 text-xs font-semibold uppercase tracking-wider">
+          <div className="liquid-section-label">
             Academics
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold font-display">Education</h2>
         </div>
 
         {education.length === 0 ? (
-          <div className="p-8 text-center bg-slate-900/30 border border-slate-900 rounded-2xl text-slate-500">
+          <div className="liquid-card p-8 text-center text-slate-500">
             No education history recorded.
           </div>
         ) : (
@@ -333,7 +336,7 @@ export default function Home() {
                   <GraduationCap className="w-4 h-4" />
                 </div>
 
-                <div className="p-6 rounded-2xl glass-panel hover:border-slate-800 transition-all">
+                <div className="p-6 glass-panel hover:border-slate-800 transition-all">
                   <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 mb-4">
                     <div>
                       <h3 className="text-lg font-bold text-slate-200 font-display">{edu.major}</h3>
@@ -358,7 +361,7 @@ export default function Home() {
       {/* ------------------ PROJECTS SECTION ------------------ */}
       <section id="projects" className="max-w-7xl mx-auto px-6 scroll-mt-24">
         <div className="text-center max-w-xl mx-auto space-y-4 mb-16">
-          <div className="inline-block px-3 py-1 rounded-md bg-indigo-500/10 text-indigo-400 text-xs font-semibold uppercase tracking-wider">
+          <div className="liquid-section-label">
             Portfolio
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold font-display">Featured Projects</h2>
@@ -366,7 +369,7 @@ export default function Home() {
         </div>
 
         {projects.length === 0 ? (
-          <div className="p-8 text-center bg-slate-900/30 border border-slate-900 rounded-2xl text-slate-500">
+          <div className="liquid-card p-8 text-center text-slate-500">
             No projects available.
           </div>
         ) : (
@@ -374,7 +377,7 @@ export default function Home() {
             {projects.map((proj) => (
               <div
                 key={proj.projectId}
-                className="rounded-2xl glass-panel hover:border-slate-800 overflow-hidden flex flex-col hover:scale-[1.01] transition-all group"
+                className="glass-panel hover:border-slate-800 overflow-hidden flex flex-col hover:-translate-y-1 transition-all duration-300 group"
               >
                 {/* Project Image */}
                 <div className="h-48 overflow-hidden relative">
@@ -396,13 +399,13 @@ export default function Home() {
                     {proj.technologies.slice(0, 4).map((tech) => (
                       <span
                         key={tech}
-                        className="px-2 py-0.5 rounded bg-slate-900 text-slate-400 text-[10px] border border-slate-800"
+                        className="liquid-chip px-2 py-0.5 text-[10px]"
                       >
                         {tech}
                       </span>
                     ))}
                     {proj.technologies.length > 4 && (
-                      <span className="px-2 py-0.5 rounded bg-slate-900 text-slate-400 text-[10px] border border-slate-800">
+                      <span className="liquid-chip px-2 py-0.5 text-[10px]">
                         +{proj.technologies.length - 4} more
                       </span>
                     )}
@@ -415,7 +418,7 @@ export default function Home() {
                         href={proj.demoUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center space-x-1.5 px-4 py-2 rounded-lg bg-indigo-500 text-white font-semibold text-xs hover:bg-indigo-600 transition-colors cursor-pointer"
+                        className="liquid-button flex items-center space-x-1.5 px-4 py-2 text-white font-semibold text-xs transition-colors cursor-pointer"
                       >
                         <span>Live Demo</span>
                         <ExternalLink className="w-3 h-3" />
@@ -426,7 +429,7 @@ export default function Home() {
                         href={proj.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center space-x-1.5 px-4 py-2 rounded-lg border border-slate-800 text-slate-400 hover:text-slate-100 hover:border-slate-700 transition-colors text-xs cursor-pointer"
+                        className="liquid-button-secondary flex items-center space-x-1.5 px-4 py-2 text-slate-500 dark:text-slate-300 hover:text-slate-950 dark:hover:text-slate-100 transition-colors text-xs cursor-pointer"
                       >
                         <span>Codebase</span>
                         <Github className="w-3 h-3" />
@@ -443,7 +446,7 @@ export default function Home() {
       {/* ------------------ BLOG LIST SECTION ------------------ */}
       <section id="blog" className="max-w-7xl mx-auto px-6 scroll-mt-24">
         <div className="text-center max-w-xl mx-auto space-y-4 mb-16">
-          <div className="inline-block px-3 py-1 rounded-md bg-indigo-500/10 text-indigo-400 text-xs font-semibold uppercase tracking-wider">
+          <div className="liquid-section-label">
             Insights
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold font-display">Technical Writing</h2>
@@ -451,7 +454,7 @@ export default function Home() {
         </div>
 
         {blogs.length === 0 ? (
-          <div className="p-8 text-center bg-slate-900/30 border border-slate-900 rounded-2xl text-slate-500">
+          <div className="liquid-card p-8 text-center text-slate-500">
             No blog posts published yet.
           </div>
         ) : (
@@ -459,7 +462,7 @@ export default function Home() {
             {blogs.map((blog) => (
               <article
                 key={blog.slug}
-                className="rounded-2xl glass-panel hover:border-slate-800 overflow-hidden flex flex-col hover:scale-[1.01] transition-all group"
+                className="glass-panel hover:border-slate-800 overflow-hidden flex flex-col hover:-translate-y-1 transition-all duration-300 group"
               >
                 {/* Image */}
                 <div className="h-44 overflow-hidden relative">
@@ -514,13 +517,13 @@ export default function Home() {
 
       {/* ------------------ CONTACT SECTION ------------------ */}
       <section id="contact" className="max-w-5xl mx-auto px-6 scroll-mt-24">
-        <div className="grid md:grid-cols-12 gap-12 bg-slate-900/10 border border-slate-900/50 backdrop-blur-sm rounded-3xl p-8 md:p-12 relative overflow-hidden">
+        <div className="liquid-card grid md:grid-cols-12 gap-12 p-8 md:p-12 relative overflow-hidden">
           {/* Background Glow */}
-          <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="absolute inset-x-0 top-0 h-40 radial-glow-cyan blur-3xl pointer-events-none opacity-60"></div>
 
           {/* Prompt Left */}
           <div className="md:col-span-5 space-y-6 relative z-10">
-            <div className="inline-block px-3 py-1 rounded-md bg-indigo-500/10 text-indigo-400 text-xs font-semibold uppercase tracking-wider">
+            <div className="liquid-section-label">
               Connect
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold font-display">Get in touch</h2>
@@ -563,7 +566,7 @@ export default function Home() {
                     placeholder="Jane Doe"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl focus:border-indigo-500/50 text-slate-100 placeholder-slate-600 focus:outline-none text-sm"
+                    className="liquid-input w-full px-4 py-2.5 focus:border-indigo-500/50 text-slate-100 placeholder-slate-600 focus:outline-none text-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -576,7 +579,7 @@ export default function Home() {
                     placeholder="jane@example.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl focus:border-indigo-500/50 text-slate-100 placeholder-slate-600 focus:outline-none text-sm"
+                    className="liquid-input w-full px-4 py-2.5 focus:border-indigo-500/50 text-slate-100 placeholder-slate-600 focus:outline-none text-sm"
                   />
                 </div>
               </div>
@@ -591,7 +594,7 @@ export default function Home() {
                   placeholder="Collaborating on serverless project"
                   value={formData.subject}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl focus:border-indigo-500/50 text-slate-100 placeholder-slate-600 focus:outline-none text-sm"
+                  className="liquid-input w-full px-4 py-2.5 focus:border-indigo-500/50 text-slate-100 placeholder-slate-600 focus:outline-none text-sm"
                 />
               </div>
 
@@ -605,7 +608,7 @@ export default function Home() {
                   placeholder="Write your request details here..."
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl focus:border-indigo-500/50 text-slate-100 placeholder-slate-600 focus:outline-none text-sm resize-none"
+                  className="liquid-input w-full px-4 py-2.5 focus:border-indigo-500/50 text-slate-100 placeholder-slate-600 focus:outline-none text-sm resize-none"
                 ></textarea>
               </div>
 
@@ -626,7 +629,7 @@ export default function Home() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-indigo-500 text-white font-semibold text-sm hover:bg-indigo-600 transition-colors disabled:opacity-50 cursor-pointer"
+                className="liquid-button w-full flex items-center justify-center space-x-2 px-6 py-3 text-white font-semibold text-sm transition-colors disabled:opacity-50 cursor-pointer"
                 id="submit-contact-btn"
               >
                 {submitting ? (

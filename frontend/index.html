@@ -1,17 +1,35 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="vi" class="scroll-smooth dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Portfolio | Cloud & DevOps Serverless Architect</title>
-    <meta name="description" content="Welcome to my premium serverless portfolio. Explore my skills, project case studies, experiences, and technical blog posts." />
+    <title>Nguyễn Trung Kiên | DevOps & Cloud Engineer</title>
+    <meta name="description" content="Portfolio của Nguyễn Trung Kiên – DevOps & Cloud Engineer chuyên AWS, Kubernetes, Terraform, CI/CD và DevSecOps." />
     
     <!-- Open Graph Metadata -->
-    <meta property="og:title" content="Serverless Architect Portfolio" />
-    <meta property="og:description" content="Explore projects, skills, education, and blogs on this high-performance serverless website." />
+    <meta property="og:title" content="Nguyễn Trung Kiên | DevOps & Cloud Engineer" />
+    <meta property="og:description" content="Portfolio kỹ sư DevOps & Cloud: AWS Certified, Kubernetes GitOps, AWS SAM Serverless, CI/CD pipeline automation." />
     <meta property="og:type" content="website" />
     
+    <!-- Prevent flash of wrong theme (must run before React) -->
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var isDark = saved === 'dark' || (!saved && prefersDark) || saved === null;
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = 'dark';
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = 'light';
+          }
+        } catch(e) {}
+      })();
+    </script>
+
     <!-- Premium Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

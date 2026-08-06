@@ -49,3 +49,6 @@ next-env.d.ts
 
 # agent skills (local only)
 .agents/
+
+# deployment scripts (contain sensitive data, local only)
+scripts/
