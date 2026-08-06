@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -19,10 +20,16 @@
 
 # production
 /build
+/dist
+dist/
+frontend/dist/
 
 # misc
 .DS_Store
 *.pem
+.aws-sam/
+.code-review-graph/
+.codebase-memory/
 
 # debug
 npm-debug.log*

@@ -1,0 +1,582 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  AWS SAM Template for serverless portfolio website.
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: serverless-portfolio
+    Description: Name of the project, used as prefix for resources.
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+    Description: Environment stage (dev, staging, prod).
+  EnablePointInTimeRecovery:
+    Type: String
+    Default: "false"
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: Enable DynamoDB Point-in-Time Recovery.
+  AllowedOrigins:
+    Type: String
+    Default: "*"
+    Description: Allowed origins for API Gateway CORS.
+  LogLevel:
+    Type: String
+    Default: INFO
+    Description: Log level for Lambda functions.
+
+Conditions:
+  IsPitEnabled: !Equals [!Ref EnablePointInTimeRecovery, "true"]
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 512
+    Runtime: nodejs20.x
+    Environment:
+      Variables:
+        PORTFOLIO_TABLE: !Ref PortfolioDataTable
+        CONTENT_BUCKET: !Ref ContentBucket
+        LOG_LEVEL: !Ref LogLevel
+
+Resources:
+  # -------------------------------------------------------------
+  # DynamoDB Single Table
+  # -------------------------------------------------------------
+  PortfolioDataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${ProjectName}-${Environment}-data"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: !If [IsPitEnabled, true, false]
+      SSESpecification:
+        SSEEnabled: true
+
+  # -------------------------------------------------------------
+  # S3 Buckets
+  # -------------------------------------------------------------
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${ProjectName}-${Environment}-frontend-${AWS::AccountId}-${AWS::Region}"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+  ContentBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${ProjectName}-${Environment}-content-${AWS::AccountId}-${AWS::Region}"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+  # -------------------------------------------------------------
+  # Cognito User Pool (Admin Auth)
+  # -------------------------------------------------------------
+  AdminUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub "${ProjectName}-${Environment}-AdminUserPool"
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+          RequireUppercase: true
+
+  AdminUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub "${ProjectName}-${Environment}-AdminUserPoolClient"
+      UserPoolId: !Ref AdminUserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+
+  # -------------------------------------------------------------
+  # API Gateway (HTTP API)
+  # -------------------------------------------------------------
+  PortfolioHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Name: !Sub "${ProjectName}-${Environment}-api"
+      CorsConfiguration:
+        AllowOrigins:
+          - !Ref AllowedOrigins
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+        AllowMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+      Auth:
+        Authorizers:
+          CognitoAuthorizer:
+            JwtConfiguration:
+              issuer: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${AdminUserPool}"
+              audience:
+                - !Ref AdminUserPoolClient
+            IdentitySource: "$request.header.Authorization"
+
+  # -------------------------------------------------------------
+  # Lambda Functions
+  # -------------------------------------------------------------
+  PortfolioReadFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: functions/portfolio-read/app.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PortfolioDataTable
+      Events:
+        GetProfile:
+          Type: HttpApi
+          Properties:
+            Path: /api/profile
+            Method: GET
+            ApiId: !Ref PortfolioHttpApi
+        GetProjects:
+          Type: HttpApi
+          Properties:
+            Path: /api/projects
+            Method: GET
+            ApiId: !Ref PortfolioHttpApi
+        GetProjectById:
+          Type: HttpApi
+          Properties:
+            Path: /api/projects/{id}
+            Method: GET
+            ApiId: !Ref PortfolioHttpApi
+        GetSkills:
+          Type: HttpApi
+          Properties:
+            Path: /api/skills
+            Method: GET
+            ApiId: !Ref PortfolioHttpApi
+        GetExperiences:
+          Type: HttpApi
+          Properties:
+            Path: /api/experiences
+            Method: GET
+            ApiId: !Ref PortfolioHttpApi
+        GetEducation:
+          Type: HttpApi
+          Properties:
+            Path: /api/education
+            Method: GET
+            ApiId: !Ref PortfolioHttpApi
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "node20"
+        EntryPoints:
+          - functions/portfolio-read/app.ts
+        External:
+          - "@aws-sdk/*"
+
+  ContactFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: functions/contact/app.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PortfolioDataTable
+      Events:
+        PostContact:
+          Type: HttpApi
+          Properties:
+            Path: /api/contacts
+            Method: POST
+            ApiId: !Ref PortfolioHttpApi
+        GetContacts:
+          Type: HttpApi
+          Properties:
+            Path: /api/admin/contacts
+            Method: GET
+            ApiId: !Ref PortfolioHttpApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+        PutContact:
+          Type: HttpApi
+          Properties:
+            Path: /api/admin/contacts/{id}
+            Method: PUT
+            ApiId: !Ref PortfolioHttpApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+        DeleteContact:
+          Type: HttpApi
+          Properties:
+            Path: /api/admin/contacts/{id}
+            Method: DELETE
+            ApiId: !Ref PortfolioHttpApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "node20"
+        EntryPoints:
+          - functions/contact/app.ts
+        External:
+          - "@aws-sdk/*"
+
+  PortfolioAdminFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: functions/portfolio-admin/app.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PortfolioDataTable
+      Events:
+        PutProfile:
+          Type: HttpApi
+          Properties:
+            Path: /api/admin/profile
+            Method: PUT
+            ApiId: !Ref PortfolioHttpApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+        PostProject:
+          Type: HttpApi
+          Properties:
+            Path: /api/admin/projects
+            Method: POST
+            ApiId: !Ref PortfolioHttpApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+        PutProject:
+          Type: HttpApi
+          Properties:
+            Path: /api/admin/projects/{id}
+            Method: PUT
+            ApiId: !Ref PortfolioHttpApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+        DeleteProject:
+          Type: HttpApi
+          Properties:
+            Path: /api/admin/projects/{id}
+            Method: DELETE
+            ApiId: !Ref PortfolioHttpApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+        PostSkill:
+          Type: HttpApi
+          Properties:
+            Path: /api/admin/skills
+            Method: POST
+            ApiId: !Ref PortfolioHttpApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+        PutSkill:
+          Type: HttpApi
+          Properties:
+            Path: /api/admin/skills/{id}
+            Method: PUT
+            ApiId: !Ref PortfolioHttpApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+        DeleteSkill:
+          Type: HttpApi
+          Properties:
+            Path: /api/admin/skills/{id}
+            Method: DELETE
+            ApiId: !Ref PortfolioHttpApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+        PostExperience:
+          Type: HttpApi
+          Properties:
+            Path: /api/admin/experiences
+            Method: POST
+            ApiId: !Ref PortfolioHttpApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+        PutExperience:
+          Type: HttpApi
+          Properties:
+            Path: /api/admin/experiences/{id}
+            Method: PUT
+            ApiId: !Ref PortfolioHttpApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+        DeleteExperience:
+          Type: HttpApi
+          Properties:
+            Path: /api/admin/experiences/{id}
+            Method: DELETE
+            ApiId: !Ref PortfolioHttpApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+        PostEducation:
+          Type: HttpApi
+          Properties:
+            Path: /api/admin/education
+            Method: POST
+            ApiId: !Ref PortfolioHttpApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+        PutEducation:
+          Type: HttpApi
+          Properties:
+            Path: /api/admin/education/{id}
+            Method: PUT
+            ApiId: !Ref PortfolioHttpApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+        DeleteEducation:
+          Type: HttpApi
+          Properties:
+            Path: /api/admin/education/{id}
+            Method: DELETE
+            ApiId: !Ref PortfolioHttpApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "node20"
+        EntryPoints:
+          - functions/portfolio-admin/app.ts
+        External:
+          - "@aws-sdk/*"
+
+  BlogAdminFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: functions/blog-admin/app.handler
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref ContentBucket
+      Events:
+        PostBlog:
+          Type: HttpApi
+          Properties:
+            Path: /api/admin/blogs
+            Method: POST
+            ApiId: !Ref PortfolioHttpApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+        PutBlog:
+          Type: HttpApi
+          Properties:
+            Path: /api/admin/blogs/{slug}
+            Method: PUT
+            ApiId: !Ref PortfolioHttpApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+        DeleteBlog:
+          Type: HttpApi
+          Properties:
+            Path: /api/admin/blogs/{slug}
+            Method: DELETE
+            ApiId: !Ref PortfolioHttpApi
+            Auth:
+              Authorizer: CognitoAuthorizer
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: true
+        Target: "node20"
+        EntryPoints:
+          - functions/blog-admin/app.ts
+        External:
+          - "@aws-sdk/*"
+
+  # -------------------------------------------------------------
+  # CloudFront Distribution & Origins
+  # -------------------------------------------------------------
+  CloudFrontOac:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Description: "Origin Access Control for S3 origins"
+        Name: !Sub "${ProjectName}-${Environment}-oac"
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  ContentRewriteFunction:
+    Type: AWS::CloudFront::Function
+    Properties:
+      Name: !Sub "${ProjectName}-${Environment}-ContentRewrite"
+      FunctionConfig:
+        Comment: "Strips /content prefix from URIs"
+        Runtime: cloudfront-js-2.0
+      FunctionCode: |
+        function handler(event) {
+          var request = event.request;
+          var uri = request.uri;
+          if (uri.startsWith('/content/')) {
+            request.uri = uri.replace(/^\/content/, '');
+          }
+          return request;
+        }
+      AutoPublish: true
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: !Sub "CloudFront Distribution for ${ProjectName} ${Environment}"
+        Enabled: true
+        HttpVersion: http2
+        Origins:
+          - Id: FrontendS3Origin
+            DomainName: !GetAtt FrontendBucket.RegionalDomainName
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+            OriginAccessControlId: !GetAtt CloudFrontOac.Id
+          - Id: ContentS3Origin
+            DomainName: !GetAtt ContentBucket.RegionalDomainName
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+            OriginAccessControlId: !GetAtt CloudFrontOac.Id
+          - Id: ApiOrigin
+            DomainName: !Sub "${PortfolioHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+            CustomOriginConfig:
+              HTTPSPort: 443
+              OriginProtocolPolicy: https-only
+        DefaultCacheBehavior:
+          TargetOriginId: FrontendS3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          Compress: true
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # CachingOptimized
+        CacheBehaviors:
+          - PathPattern: /content/*
+            TargetOriginId: ContentS3Origin
+            ViewerProtocolPolicy: redirect-to-https
+            Compress: true
+            CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6 # CachingOptimized
+            FunctionAssociations:
+              - EventType: viewer-request
+                FunctionARN: !GetAtt ContentRewriteFunction.FunctionMetadata.FunctionARN
+          - PathPattern: /api/*
+            TargetOriginId: ApiOrigin
+            ViewerProtocolPolicy: redirect-to-https
+            Compress: true
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # CachingDisabled
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac # AllViewerExceptHostHeader (to forward auth headers)
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 0
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 0
+
+  # -------------------------------------------------------------
+  # S3 Bucket Policies to allow OAC Read
+  # -------------------------------------------------------------
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowCloudFrontOACRead
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "arn:aws:s3:::${FrontendBucket}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}"
+
+  ContentBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ContentBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowCloudFrontOACRead
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub "arn:aws:s3:::${ContentBucket}/*"
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}"
+
+Outputs:
+  CloudFrontURL:
+    Description: "CloudFront Distribution URL"
+    Value: !Sub "https://${CloudFrontDistribution.DomainName}"
+  APIURL:
+    Description: "API Gateway Endpoint"
+    Value: !Sub "https://${PortfolioHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+  FrontendBucketName:
+    Description: "Frontend S3 Bucket Name"
+    Value: !Ref FrontendBucket
+  ContentBucketName:
+    Description: "Content S3 Bucket Name"
+    Value: !Ref ContentBucket
+  DynamoDBTableName:
+    Description: "DynamoDB Table Name"
+    Value: !Ref PortfolioDataTable
+  CognitoUserPoolId:
+    Description: "Cognito User Pool ID"
+    Value: !Ref AdminUserPool
+  CognitoClientId:
+    Description: "Cognito App Client ID"
+    Value: !Ref AdminUserPoolClient
+  CloudFrontDistributionId:
+    Description: "CloudFront Distribution ID"
+    Value: !Ref CloudFrontDistribution

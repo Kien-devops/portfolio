@@ -1,31 +1,24 @@
 {
-  "name": "portfolio",
-  "version": "0.1.0",
+  "name": "serverless-portfolio-root",
+  "version": "1.0.0",
   "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
-  "dependencies": {
-    "framer-motion": "^12.40.0",
-    "lucide-react": "^1.17.0",
-    "mssql": "^12.6.0",
-    "next": "16.2.9",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "tedious": "^19.2.1"
+    "install:all": "npm install",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "build:frontend": "npm run build --workspace=frontend",
+    "build:backend": "npm run build --workspace=backend",
+    "test:backend": "npm run test --workspace=backend",
+    "lint:frontend": "npm run lint --workspace=frontend",
+    "lint:backend": "npm run lint --workspace=backend",
+    "format:all": "prettier --write \"**/*.{ts,tsx,json,md,yaml,yml}\""
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/mssql": "^12.3.0",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.9",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "esbuild": "^0.28.1",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
   }
 }

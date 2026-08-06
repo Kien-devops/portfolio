@@ -1,0 +1,15 @@
+{
+  "slug": "dynamodb-single-table-design",
+  "title": "The Magic of DynamoDB Single-Table Design",
+  "summary": "How to model complex relational structures in a single DynamoDB NoSQL table.",
+  "coverImage": "/content/images/blogs/dynamodb-modeling.webp",
+  "tags": [
+    "DynamoDB",
+    "NoSQL",
+    "Database Design"
+  ],
+  "published": true,
+  "publishedAt": "2026-07-22T11:29:40.297Z",
+  "updatedAt": "2026-08-06T11:29:40.297Z",
+  "content": "# The Magic of DynamoDB Single-Table Design\n\nModeling relational data in a NoSQL database requires a shift in mindset. Single-table design is a pattern where all application entities are stored in a single table, using generic primary key names (like `PK` and `SK`).\n\n## Why Single-Table?\n\nIn SQL databases, joining tables is a common operation. However, joins degrade in performance as database size grows. In DynamoDB, we pre-join our data by organizing related entities adjacent to each other. This allows fetching related data in a single `Query` operation rather than joining.\n\n## Modeling our Portfolio Table\n\nOur portfolio uses this single table design to store multiple entities:\n\n* **Profile**: `PK = PROFILE`, `SK = PROFILE`\n* **Skill**: `PK = SKILL`, `SK = SKILL#<skillId>`\n* **Projects**: `PK = PROJECT`, `SK = PROJECT#<projectId>`\n\nUsing this structure, we can query all skills by requesting `PK = SKILL`, or query a specific project by requesting `PK = PROJECT` and `SK = PROJECT#proj-1`.\n\n## Rules to Remember\n\n1. **Understand your Access Patterns first**: You cannot design a NoSQL table without knowing all queries first.\n2. **Never scan**: Scan operations are expensive and slow. Always design keys to support Query operations.\n3. **Use secondary indexes (GSIs)**: If you need to query items by other attributes, use global secondary indexes.\n"
+}

@@ -1,0 +1,44 @@
+[
+  {
+    "slug": "aws-serverless-architecture",
+    "title": "Deep Dive into AWS Serverless Architecture",
+    "summary": "Learn how to build high-performance, cost-optimized backend APIs using AWS Lambda, API Gateway, and DynamoDB.",
+    "coverImage": "/content/images/blogs/serverless-architecture.webp",
+    "tags": [
+      "AWS",
+      "Serverless",
+      "Architecture"
+    ],
+    "published": true,
+    "publishedAt": "2026-08-01T11:29:40.297Z",
+    "updatedAt": "2026-08-06T11:29:40.297Z"
+  },
+  {
+    "slug": "kubernetes-vs-serverless",
+    "title": "Kubernetes vs. Serverless: Choosing the Right Cloud Path",
+    "summary": "An objective comparison of EKS containers vs. AWS Lambda for modern microservices.",
+    "coverImage": "/content/images/blogs/kubernetes-deployment.webp",
+    "tags": [
+      "Kubernetes",
+      "Serverless",
+      "Comparison"
+    ],
+    "published": true,
+    "publishedAt": "2026-07-27T11:29:40.297Z",
+    "updatedAt": "2026-08-06T11:29:40.297Z"
+  },
+  {
+    "slug": "dynamodb-single-table-design",
+    "title": "The Magic of DynamoDB Single-Table Design",
+    "summary": "How to model complex relational structures in a single DynamoDB NoSQL table.",
+    "coverImage": "/content/images/blogs/dynamodb-modeling.webp",
+    "tags": [
+      "DynamoDB",
+      "NoSQL",
+      "Database Design"
+    ],
+    "published": true,
+    "publishedAt": "2026-07-22T11:29:40.297Z",
+    "updatedAt": "2026-08-06T11:29:40.297Z"
+  }
+]
