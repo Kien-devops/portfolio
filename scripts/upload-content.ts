@@ -54,136 +54,84 @@ function syncLocalContentToFrontend(dir: string) {
 }
 
 
-// 1. Sample Blogs Content
-const blogs = [
-  {
-    slug: "aws-serverless-architecture",
-    title: "Deep Dive into AWS Serverless Architecture",
-    summary: "Learn how to build high-performance, cost-optimized backend APIs using AWS Lambda, API Gateway, and DynamoDB.",
-    coverImage: "/content/images/blogs/serverless-architecture.webp",
-    tags: ["AWS", "Serverless", "Architecture"],
-    published: true,
-    publishedAt: new Date(Date.now() - 3600 * 1000 * 24 * 5).toISOString(), // 5 days ago
-    updatedAt: new Date().toISOString(),
-    content: `# Deep Dive into AWS Serverless Architecture
+// 1. Dynamic Blogs Content Loader & Converter
+const blogsDir = path.join(localContentDir, "blogs");
+const blogItems: any[] = [];
 
-Serverless architecture has revolutionized the way we build and deploy web applications. By eliminating server management, developers can focus entirely on writing business logic.
+if (fs.existsSync(blogsDir)) {
+  // First, convert any standalone .md files that don't have matching .json
+  const files = fs.readdirSync(blogsDir);
+  for (const file of files) {
+    if (file.endsWith(".md")) {
+      const slug = file.replace(/\.md$/, "");
+      const jsonPath = path.join(blogsDir, `${slug}.json`);
+      const mdPath = path.join(blogsDir, file);
+      const mdContent = fs.readFileSync(mdPath, "utf-8");
 
-## Core Pillars of AWS Serverless
+      let title = slug.replace(/-/g, " ");
+      const titleMatch = mdContent.match(/^#\s+(.+)$/m);
+      if (titleMatch) {
+        title = titleMatch[1].trim();
+      }
 
-In this article, we explore the core building blocks of a serverless application:
+      if (!fs.existsSync(jsonPath)) {
+        const newBlogObj = {
+          slug,
+          title,
+          summary: mdContent.split("\n\n")[1] || title,
+          coverImage: `/content/images/blogs/placeholder.webp`,
+          tags: ["AWS", "DevOps"],
+          published: true,
+          publishedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          content: mdContent,
+        };
+        fs.writeFileSync(jsonPath, JSON.stringify(newBlogObj, null, 2), "utf-8");
+        console.log(`Auto-generated JSON metadata for new blog markdown file: ${slug}.json`);
+      }
+    }
+  }
 
-1. **Amazon API Gateway**: Serves as the entry point, routing HTTP traffic to backend handlers and enforcing security limits.
-2. **AWS Lambda**: The compute plane. Runs functions in response to API requests, scaling horizontally automatically.
-3. **Amazon DynamoDB**: A NoSQL database that offers single-digit millisecond latency at any scale.
+  // Now load all .json files under content/blogs
+  const jsonFiles = fs.readdirSync(blogsDir);
+  for (const filename of jsonFiles) {
+    if (filename === "index.json" || !filename.endsWith(".json")) continue;
+    const filePath = path.join(blogsDir, filename);
+    try {
+      const raw = fs.readFileSync(filePath, "utf-8");
+      const data = JSON.parse(raw);
+      const slug = data.slug || filename.replace(/\.json$/, "");
 
-## Benefits of Serverless
+      // If a matching .md file exists, keep content in sync
+      const mdPath = path.join(blogsDir, `${slug}.md`);
+      let content = data.content || "";
+      if (fs.existsSync(mdPath)) {
+        content = fs.readFileSync(mdPath, "utf-8");
+      }
 
-* **Zero Idle Costs**: You only pay for the exact millisecond your function executes.
-* **Auto-Scaling**: Seamlessly handles traffic spikes without manual scaling groups.
-* **High Availability**: Built-in fault tolerance across multiple Availability Zones.
+      const blogObj = {
+        slug,
+        title: data.title || slug,
+        summary: data.summary || "",
+        coverImage: data.coverImage || "/content/images/blogs/placeholder.webp",
+        tags: data.tags || [],
+        published: data.published !== false,
+        publishedAt: data.publishedAt || new Date().toISOString(),
+        updatedAt: data.updatedAt || new Date().toISOString(),
+        content,
+      };
 
-\`\`\`javascript
-// Example Lambda Handler
-export async function handler(event) {
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ message: "Hello Serverless!" })
-  };
-}
-\`\`\`
-
-## Well-Architected Serverless
-
-Always follow the principle of least privilege in IAM configurations. Make sure each Lambda function only has access to the tables and buckets it absolutely requires.
-`,
-  },
-  {
-    slug: "kubernetes-vs-serverless",
-    title: "Kubernetes vs. Serverless: Choosing the Right Cloud Path",
-    summary: "An objective comparison of EKS containers vs. AWS Lambda for modern microservices.",
-    coverImage: "/content/images/blogs/kubernetes-deployment.webp",
-    tags: ["Kubernetes", "Serverless", "Comparison"],
-    published: true,
-    publishedAt: new Date(Date.now() - 3600 * 1000 * 24 * 10).toISOString(), // 10 days ago
-    updatedAt: new Date().toISOString(),
-    content: `# Kubernetes vs. Serverless: Choosing the Right Cloud Path
-
-Architecting modern platforms requires choosing between container orchestrators (like Kubernetes) and serverless function platforms (like AWS Lambda). Both offer distinct advantages.
-
-## Kubernetes (EKS / GKE)
-
-Kubernetes is ideal for long-running workloads, complex stateful systems, and enterprises requiring cloud-agnostic portability.
-
-### Pros
-* Direct control over runtime and container OS.
-* Cloud-agnostic (runs on AWS, Azure, GCP, or bare metal).
-* Predictable cost model for high, constant utilization.
-
-### Cons
-* Operational complexity (requires dedicated platform engineers).
-* Higher base infrastructure cost.
-
-## Serverless (AWS Lambda)
-
-Serverless excels for event-driven systems, unpredictable traffic flows, and startups focusing on rapid time-to-market.
-
-### Pros
-* Zero server administration.
-* Scales from 0 to thousands of concurrent executions in seconds.
-* Zero base cost.
-
-### Cons
-* Vendor lock-in.
-* Cold start latency.
-* Limit on execution duration (maximum 15 minutes in Lambda).
-`,
-  },
-  {
-    slug: "dynamodb-single-table-design",
-    title: "The Magic of DynamoDB Single-Table Design",
-    summary: "How to model complex relational structures in a single DynamoDB NoSQL table.",
-    coverImage: "/content/images/blogs/dynamodb-modeling.webp",
-    tags: ["DynamoDB", "NoSQL", "Database Design"],
-    published: true,
-    publishedAt: new Date(Date.now() - 3600 * 1000 * 24 * 15).toISOString(), // 15 days ago
-    updatedAt: new Date().toISOString(),
-    content: `# The Magic of DynamoDB Single-Table Design
-
-Modeling relational data in a NoSQL database requires a shift in mindset. Single-table design is a pattern where all application entities are stored in a single table, using generic primary key names (like \`PK\` and \`SK\`).
-
-## Why Single-Table?
-
-In SQL databases, joining tables is a common operation. However, joins degrade in performance as database size grows. In DynamoDB, we pre-join our data by organizing related entities adjacent to each other. This allows fetching related data in a single \`Query\` operation rather than joining.
-
-## Modeling our Portfolio Table
-
-Our portfolio uses this single table design to store multiple entities:
-
-* **Profile**: \`PK = PROFILE\`, \`SK = PROFILE\`
-* **Skill**: \`PK = SKILL\`, \`SK = SKILL#<skillId>\`
-* **Projects**: \`PK = PROJECT\`, \`SK = PROJECT#<projectId>\`
-
-Using this structure, we can query all skills by requesting \`PK = SKILL\`, or query a specific project by requesting \`PK = PROJECT\` and \`SK = PROJECT#proj-1\`.
-
-## Rules to Remember
-
-1. **Understand your Access Patterns first**: You cannot design a NoSQL table without knowing all queries first.
-2. **Never scan**: Scan operations are expensive and slow. Always design keys to support Query operations.
-3. **Use secondary indexes (GSIs)**: If you need to query items by other attributes, use global secondary indexes.
-`,
-  },
-];
-
-// Write Blog JSONs
-for (const blog of blogs) {
-  const jsonContent = JSON.stringify(blog, null, 2);
-  fs.writeFileSync(path.join(localContentDir, "blogs", `${blog.slug}.json`), jsonContent);
-  fs.writeFileSync(path.join(frontendContentDir, "blogs", `${blog.slug}.json`), jsonContent);
+      // Write updated JSON back to ensure consistency
+      fs.writeFileSync(filePath, JSON.stringify(blogObj, null, 2), "utf-8");
+      blogItems.push(blogObj);
+    } catch (e) {
+      console.warn(`Could not parse JSON blog ${filename}:`, e);
+    }
+  }
 }
 
-// Generate Blog index.json locally
-const blogIndex = blogs.map((b) => ({
+// Generate Blog index.json locally from dynamically scanned blogs
+const blogIndex = blogItems.map((b) => ({
   slug: b.slug,
   title: b.title,
   summary: b.summary,

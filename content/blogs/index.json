@@ -14,20 +14,6 @@
     "updatedAt": "2026-08-08T11:35:24.932Z"
   },
   {
-    "slug": "kubernetes-vs-serverless",
-    "title": "Kubernetes vs. Serverless: Choosing the Right Cloud Path",
-    "summary": "An objective comparison of EKS containers vs. AWS Lambda for modern microservices.",
-    "coverImage": "/content/images/blogs/kubernetes-deployment.webp",
-    "tags": [
-      "Kubernetes",
-      "Serverless",
-      "Comparison"
-    ],
-    "published": true,
-    "publishedAt": "2026-07-29T11:35:24.932Z",
-    "updatedAt": "2026-08-08T11:35:24.932Z"
-  },
-  {
     "slug": "dynamodb-single-table-design",
     "title": "The Magic of DynamoDB Single-Table Design",
     "summary": "How to model complex relational structures in a single DynamoDB NoSQL table.",
@@ -39,6 +25,20 @@
     ],
     "published": true,
     "publishedAt": "2026-07-24T11:35:24.932Z",
+    "updatedAt": "2026-08-08T11:35:24.932Z"
+  },
+  {
+    "slug": "kubernetes-vs-serverless",
+    "title": "Kubernetes vs. Serverless: Choosing the Right Cloud Path",
+    "summary": "An objective comparison of EKS containers vs. AWS Lambda for modern microservices.",
+    "coverImage": "/content/images/blogs/kubernetes-deployment.webp",
+    "tags": [
+      "Kubernetes",
+      "Serverless",
+      "Comparison"
+    ],
+    "published": true,
+    "publishedAt": "2026-07-29T11:35:24.932Z",
     "updatedAt": "2026-08-08T11:35:24.932Z"
   }
 ]
