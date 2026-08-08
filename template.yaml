@@ -52,12 +52,14 @@ Globals:
     Environment:
       Variables:
         PORTFOLIO_TABLE: !Ref PortfolioDataTable
+        HANDSON_TABLE: !Ref HandsonTable
+        BLOGS_TABLE: !Ref BlogsTable
         CONTENT_BUCKET: !Ref ContentBucket
         LOG_LEVEL: !Ref LogLevel
 
 Resources:
   # -------------------------------------------------------------
-  # DynamoDB Single Table
+  # DynamoDB Tables
   # -------------------------------------------------------------
   PortfolioDataTable:
     Type: AWS::DynamoDB::Table
@@ -74,6 +76,38 @@ Resources:
           KeyType: HASH
         - AttributeName: SK
           KeyType: RANGE
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: !If [IsPitEnabled, true, false]
+      SSESpecification:
+        SSEEnabled: true
+
+  HandsonTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${ProjectName}-${Environment}-handson"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: slug
+          AttributeType: S
+      KeySchema:
+        - AttributeName: slug
+          KeyType: HASH
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: !If [IsPitEnabled, true, false]
+      SSESpecification:
+        SSEEnabled: true
+
+  BlogsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${ProjectName}-${Environment}-blogs"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: slug
+          AttributeType: S
+      KeySchema:
+        - AttributeName: slug
+          KeyType: HASH
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: !If [IsPitEnabled, true, false]
       SSESpecification:
@@ -181,6 +215,10 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref PortfolioDataTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref HandsonTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref BlogsTable
       Events:
         GetProfile:
           Type: HttpApi
@@ -216,6 +254,30 @@ Resources:
           Type: HttpApi
           Properties:
             Path: /api/education
+            Method: GET
+            ApiId: !Ref PortfolioHttpApi
+        GetHandsonList:
+          Type: HttpApi
+          Properties:
+            Path: /api/handson
+            Method: GET
+            ApiId: !Ref PortfolioHttpApi
+        GetHandsonBySlug:
+          Type: HttpApi
+          Properties:
+            Path: /api/handson/{slug}
+            Method: GET
+            ApiId: !Ref PortfolioHttpApi
+        GetBlogs:
+          Type: HttpApi
+          Properties:
+            Path: /api/blogs
+            Method: GET
+            ApiId: !Ref PortfolioHttpApi
+        GetBlogBySlug:
+          Type: HttpApi
+          Properties:
+            Path: /api/blogs/{slug}
             Method: GET
             ApiId: !Ref PortfolioHttpApi
         WarmupSchedule:
@@ -413,6 +475,8 @@ Resources:
       Policies:
         - S3CrudPolicy:
             BucketName: !Ref ContentBucket
+        - DynamoDBCrudPolicy:
+            TableName: !Ref BlogsTable
       Events:
         PostBlog:
           Type: HttpApi
@@ -599,6 +663,9 @@ Outputs:
   DynamoDBTableName:
     Description: "DynamoDB Table Name"
     Value: !Ref PortfolioDataTable
+  BlogsTableName:
+    Description: "Blogs DynamoDB Table Name"
+    Value: !Ref BlogsTable
   CognitoUserPoolId:
     Description: "Cognito User Pool ID"
     Value: !Ref AdminUserPool

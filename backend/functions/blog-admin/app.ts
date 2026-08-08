@@ -1,8 +1,9 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda";
-import { putS3Object, getS3Object, deleteS3Object, rebuildBlogIndex } from "../../shared/s3.js";
+import { putS3Object, getS3Object, deleteS3Object } from "../../shared/s3.js";
+import { getBlogItem, putBlogItem, deleteBlogItem } from "../../shared/dynamodb.js";
 import { successResponse, errorResponse } from "../../shared/response.js";
 import { validateBlog } from "../../shared/validation.js";
-import { BlogContent } from "../../shared/types.js";
+import { BlogContent, BlogMetadata } from "../../shared/types.js";
 
 export async function handler(
   event: APIGatewayProxyEventV2
@@ -36,16 +37,9 @@ export async function handler(
       const slug = data.slug.toLowerCase().trim();
       const s3Key = `blogs/${slug}.json`;
 
-      // Check if blog already exists to prevent overwrite
-      let exists = false;
-      try {
-        await getS3Object(s3Key);
-        exists = true;
-      } catch {
-        // Doesn't exist, which is what we want
-      }
-
-      if (exists) {
+      // Check if blog already exists in DynamoDB or S3
+      const existingInDdb = await getBlogItem(slug);
+      if (existingInDdb) {
         return errorResponse(409, "ALREADY_EXISTS", `Blog with slug '${slug}' already exists`);
       }
 
@@ -62,8 +56,19 @@ export async function handler(
         updatedAt: now,
       };
 
+      const blogMetadata: BlogMetadata = {
+        slug: newBlog.slug,
+        title: newBlog.title,
+        summary: newBlog.summary,
+        coverImage: newBlog.coverImage,
+        tags: newBlog.tags,
+        published: newBlog.published,
+        publishedAt: newBlog.publishedAt,
+        updatedAt: newBlog.updatedAt,
+      };
+
       await putS3Object(s3Key, JSON.stringify(newBlog, null, 2));
-      await rebuildBlogIndex();
+      await putBlogItem(blogMetadata);
 
       return successResponse(newBlog, 201, "Blog post created successfully");
     }
@@ -75,11 +80,18 @@ export async function handler(
       const s3Key = `blogs/${paramSlug}.json`;
 
       // Verify the blog exists
-      let existingBlog: BlogContent;
+      let existingBlog: BlogContent | null = null;
       try {
         const contentStr = await getS3Object(s3Key);
         existingBlog = JSON.parse(contentStr);
       } catch (err) {
+        const ddbBlog = await getBlogItem<BlogMetadata>(paramSlug);
+        if (ddbBlog) {
+          existingBlog = { ...ddbBlog, content: "" };
+        }
+      }
+
+      if (!existingBlog) {
         return errorResponse(404, "NOT_FOUND", `Blog with slug '${paramSlug}' not found`);
       }
 
@@ -110,32 +122,41 @@ export async function handler(
           updatedAt: now,
         };
 
-        // If the slug changes, we must delete the old object and write the new one
+        const updatedMetadata: BlogMetadata = {
+          slug: updatedBlog.slug,
+          title: updatedBlog.title,
+          summary: updatedBlog.summary,
+          coverImage: updatedBlog.coverImage,
+          tags: updatedBlog.tags,
+          published: updatedBlog.published,
+          publishedAt: updatedBlog.publishedAt,
+          updatedAt: updatedBlog.updatedAt,
+        };
+
+        // If the slug changes, we must delete the old object/item
         if (newSlug !== paramSlug) {
-          // Check if new slug already exists
-          let newSlugExists = false;
-          try {
-            await getS3Object(`blogs/${newSlug}.json`);
-            newSlugExists = true;
-          } catch {
-            // Safe to write
-          }
+          const newSlugExists = await getBlogItem(newSlug);
           if (newSlugExists) {
             return errorResponse(409, "ALREADY_EXISTS", `Cannot rename blog. Slug '${newSlug}' already exists`);
           }
 
           await deleteS3Object(s3Key);
+          await deleteBlogItem(paramSlug);
         }
 
         await putS3Object(`blogs/${newSlug}.json`, JSON.stringify(updatedBlog, null, 2));
-        await rebuildBlogIndex();
+        await putBlogItem(updatedMetadata);
 
         return successResponse(updatedBlog, 200, "Blog post updated successfully");
       }
 
       if (method === "DELETE") {
-        await deleteS3Object(s3Key);
-        await rebuildBlogIndex();
+        try {
+          await deleteS3Object(s3Key);
+        } catch (e) {
+          // ignore if S3 object missing
+        }
+        await deleteBlogItem(paramSlug);
         return successResponse({ deleted: true }, 200, "Blog post deleted successfully");
       }
     }
@@ -146,3 +167,4 @@ export async function handler(
     return errorResponse(500, "INTERNAL_SERVER_ERROR", "An unexpected error occurred");
   }
 }
+

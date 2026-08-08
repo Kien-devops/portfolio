@@ -7,7 +7,7 @@ import { rebuildBlogIndex } from "../backend/shared/s3.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const region = process.env.AWS_REGION || "us-east-1";
+const region = process.env.AWS_REGION || "ap-southeast-1";
 const bucketName = process.env.CONTENT_BUCKET;
 
 console.log("Setting up local content assets...");
@@ -22,17 +22,37 @@ const frontendContentDir = path.join(rootDir, "frontend", "public", "content");
 
 const directories = [
   "blogs",
+  "handson",
   "images",
   "images/profile",
   "images/projects",
   "images/blogs",
 ];
 
-// Ensure directories exist locally
+// Ensure directories exist locally and sync all files from localContentDir to frontendContentDir
 for (const dir of directories) {
   fs.mkdirSync(path.join(localContentDir, dir), { recursive: true });
   fs.mkdirSync(path.join(frontendContentDir, dir), { recursive: true });
 }
+
+// Helper to copy local content to frontend public folder for Vite dev mode
+function syncLocalContentToFrontend(dir: string) {
+  if (!fs.existsSync(dir)) return;
+  const list = fs.readdirSync(dir);
+  for (const item of list) {
+    const srcPath = path.join(dir, item);
+    const relPath = path.relative(localContentDir, srcPath);
+    const destPath = path.join(frontendContentDir, relPath);
+    const stat = fs.statSync(srcPath);
+    if (stat.isDirectory()) {
+      fs.mkdirSync(destPath, { recursive: true });
+      syncLocalContentToFrontend(srcPath);
+    } else {
+      fs.copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
 
 // 1. Sample Blogs Content
 const blogs = [
@@ -195,7 +215,9 @@ for (const imgPath of imagePaths) {
   fs.writeFileSync(path.join(frontendContentDir, imgPath), imageBuffer);
 }
 
-console.log("Local static assets generated successfully!");
+// Copy all files in local content directory to frontend public content directory
+syncLocalContentToFrontend(localContentDir);
+console.log("Local static assets generated and synced to frontend/public successfully!");
 
 // 3. Optional S3 Upload
 async function uploadToS3() {
@@ -232,9 +254,12 @@ async function uploadToS3() {
     const fileContent = fs.readFileSync(filePath);
     const contentType = relativePath.endsWith(".json")
       ? "application/json"
+      : relativePath.endsWith(".md")
+      ? "text/markdown; charset=utf-8"
       : relativePath.endsWith(".webp")
       ? "image/webp"
       : "application/octet-stream";
+
 
     try {
       await s3Client.send(

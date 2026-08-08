@@ -78,9 +78,13 @@ aws s3 sync frontend/dist/ "s3://$FrontendBucket" --delete
 # 10. Seed DynamoDB and upload content
 echo "10. Seeding database and uploading blogs..."
 export PORTFOLIO_TABLE=$TableName
+export HANDSON_TABLE="$ProjectName-$Environment-handson"
+export BLOGS_TABLE="$ProjectName-$Environment-blogs"
 export CONTENT_BUCKET=$ContentBucket
 export AWS_REGION=$Region
 npx tsx scripts/seed-data.ts
+npx tsx scripts/seed-handson-dynamodb.ts
+npx tsx scripts/seed-blogs-dynamodb.ts
 npx tsx scripts/upload-content.ts
 
 # 11. Invalidate CloudFront Cache

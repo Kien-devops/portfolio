@@ -15,7 +15,7 @@ node_modules/
 /coverage
 
 # next.js
-/.next/
+.next/
 /out/
 
 # production
@@ -52,3 +52,8 @@ next-env.d.ts
 
 # deployment scripts (contain sensitive data, local only)
 scripts/
+
+# markdown content and assets (managed locally / uploaded to S3/DynamoDB)
+content/
+frontend/public/content/
+

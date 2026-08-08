@@ -1,7 +1,7 @@
 param (
     [string]$Environment = "dev",
     [string]$ProjectName = "serverless-portfolio",
-    [string]$Region = "us-east-1",
+    [string]$Region = "ap-southeast-1",
     [string]$CustomDomainName = "",
     [string]$ACMCertificateArn = ""
 )
@@ -99,9 +99,13 @@ if ($LASTEXITCODE -ne 0) { Write-Error "Frontend S3 sync failed"; exit 1 }
 # 10. Seed DynamoDB and upload content
 Write-Host "10. Seeding database and uploading blogs..." -ForegroundColor Yellow
 $env:PORTFOLIO_TABLE = $TableName
+$env:HANDSON_TABLE = "$ProjectName-$Environment-handson"
+$env:BLOGS_TABLE = "$ProjectName-$Environment-blogs"
 $env:CONTENT_BUCKET = $ContentBucket
 $env:AWS_REGION = $Region
 npx.cmd tsx scripts/seed-data.ts
+npx.cmd tsx scripts/seed-handson-dynamodb.ts
+npx.cmd tsx scripts/seed-blogs-dynamodb.ts
 npx.cmd tsx scripts/upload-content.ts
 
 # 11. Invalidate CloudFront Cache

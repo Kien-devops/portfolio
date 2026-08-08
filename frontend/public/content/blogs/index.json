@@ -10,8 +10,8 @@
       "Architecture"
     ],
     "published": true,
-    "publishedAt": "2026-08-01T12:00:53.983Z",
-    "updatedAt": "2026-08-06T12:00:53.983Z"
+    "publishedAt": "2026-08-03T11:35:24.931Z",
+    "updatedAt": "2026-08-08T11:35:24.932Z"
   },
   {
     "slug": "kubernetes-vs-serverless",
@@ -24,8 +24,8 @@
       "Comparison"
     ],
     "published": true,
-    "publishedAt": "2026-07-27T12:00:53.984Z",
-    "updatedAt": "2026-08-06T12:00:53.984Z"
+    "publishedAt": "2026-07-29T11:35:24.932Z",
+    "updatedAt": "2026-08-08T11:35:24.932Z"
   },
   {
     "slug": "dynamodb-single-table-design",
@@ -38,7 +38,7 @@
       "Database Design"
     ],
     "published": true,
-    "publishedAt": "2026-07-22T12:00:53.984Z",
-    "updatedAt": "2026-08-06T12:00:53.984Z"
+    "publishedAt": "2026-07-24T11:35:24.932Z",
+    "updatedAt": "2026-08-08T11:35:24.932Z"
   }
 ]

@@ -13,7 +13,7 @@ export default function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -35,53 +35,67 @@ export default function Header() {
 
   const navLinks = [
     { name: "About", id: "about" },
-    { name: "Skills", id: "skills" },
-    { name: "Experience", id: "experience" },
-    { name: "Education", id: "education" },
-    { name: "Projects", id: "projects" },
-    { name: "Blog", id: "blog" },
-    { name: "Contact", id: "contact" },
+    { name: "Work", id: "projects" },
+    { name: "Certifications", id: "experience" },
+    { name: "Stack", id: "stack" },
+    { name: "Hands-on", id: "handson", isRoute: true, route: "/handson" },
+    { name: "Blogs", id: "blog" },
   ];
 
   return (
     <header
       id="main-header"
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        isScrolled
-          ? "py-3"
-          : "py-5"
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-200 border-b border-[#e5e5e5] bg-[#ffffff]/92 backdrop-blur-md h-[68px] flex items-center ${
+        isScrolled ? "shadow-sm" : ""
       }`}
     >
-      <div className={`max-w-7xl mx-auto px-4 sm:px-6 flex justify-between items-center transition-all duration-300 ${
-        isScrolled ? "liquid-nav rounded-full py-2" : "py-0"
-      }`}>
-        {/* Logo */}
+      <div className="max-w-5xl mx-auto w-full px-6 flex justify-between items-center">
+        {/* Brand Logo */}
         <Link
           to="/"
           onClick={() => handleNavClick("home")}
-          className="text-2xl font-bold font-display tracking-tight bg-gradient-to-r from-sky-300 via-cyan-300 to-indigo-300 bg-clip-text text-transparent hover:opacity-90 transition-opacity"
+          className="font-mono text-base font-bold tracking-wider text-[#111111] hover:text-[#2563eb] transition-colors"
         >
-          K.DevOps
+          KIEN.DEV
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-7">
-          {navLinks.map((link) => (
-            <button
-              key={link.id}
-              onClick={() => handleNavClick(link.id)}
-              className="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-            >
-              {link.name}
-            </button>
-          ))}
-          
-          <div className="flex items-center space-x-4 border-l border-white/10 pl-6">
+        <nav className="hidden md:flex items-center space-x-7 font-sans text-sm">
+          {navLinks.map((link) =>
+            link.isRoute ? (
+              <Link
+                key={link.id}
+                to={link.route || "/"}
+                className="text-[#666666] hover:text-[#111111] font-semibold transition-colors"
+              >
+                {link.name}
+              </Link>
+            ) : (
+              <button
+                key={link.id}
+                onClick={() => handleNavClick(link.id)}
+                className="text-[#666666] hover:text-[#111111] transition-colors cursor-pointer"
+              >
+                {link.name}
+              </button>
+            )
+          )}
+
+          <a
+            href="https://github.com/Kien-devops"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-[#111111] hover:text-[#2563eb] transition-colors"
+          >
+            GitHub ↗
+          </a>
+
+          <div className="flex items-center space-x-3 border-l border-[#e5e5e5] pl-5">
             <ThemeToggle />
             {isAdmin ? (
               <Link
                 to="/admin/dashboard"
-                className="liquid-link-button flex items-center space-x-1.5 px-3.5 py-1.5 text-xs font-semibold text-indigo-300 hover:text-white transition-all"
+                className="font-mono text-xs text-[#2563eb] hover:underline flex items-center gap-1"
                 id="admin-dashboard-link"
               >
                 <ShieldAlert className="w-3.5 h-3.5" />
@@ -90,7 +104,7 @@ export default function Header() {
             ) : (
               <Link
                 to="/admin/login"
-                className="text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-slate-200 transition-colors"
+                className="font-mono text-xs text-[#666666] hover:text-[#111111] transition-colors"
                 id="admin-login-link"
               >
                 Admin
@@ -99,38 +113,58 @@ export default function Header() {
           </div>
         </nav>
 
-        {/* Mobile Menu Actions */}
-        <div className="md:hidden flex items-center space-x-4">
+        {/* Mobile Actions */}
+        <div className="md:hidden flex items-center space-x-3">
           <ThemeToggle />
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="liquid-link-button p-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+            className="p-1.5 text-[#666666] hover:text-[#111111]"
             aria-label="Toggle Menu"
             id="mobile-menu-btn"
           >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
       {/* Mobile Drawer */}
       {isOpen && (
-        <div className="md:hidden absolute top-full left-4 right-4 mt-2 liquid-card px-6 py-8 flex flex-col space-y-6">
-          {navLinks.map((link) => (
-            <button
-              key={link.id}
-              onClick={() => handleNavClick(link.id)}
-              className="text-lg font-medium text-left text-slate-700 dark:text-slate-300 hover:text-indigo-500 transition-colors"
-            >
-              {link.name}
-            </button>
-          ))}
-          <div className="border-t border-white/10 pt-6 flex flex-col space-y-4">
+        <div className="md:hidden absolute top-[68px] left-0 right-0 bg-[#ffffff] border-b border-[#e5e5e5] px-6 py-6 flex flex-col space-y-4 font-sans text-sm shadow-md">
+          {navLinks.map((link) =>
+            link.isRoute ? (
+              <Link
+                key={link.id}
+                to={link.route || "/"}
+                onClick={() => setIsOpen(false)}
+                className="text-[#2563eb] font-semibold text-left transition-colors"
+              >
+                {link.name}
+              </Link>
+            ) : (
+              <button
+                key={link.id}
+                onClick={() => handleNavClick(link.id)}
+                className="text-[#666666] hover:text-[#111111] text-left transition-colors"
+              >
+                {link.name}
+              </button>
+            )
+          )}
+
+          <a
+            href="https://github.com/Kien-devops"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-[#2563eb] text-left"
+          >
+            GitHub ↗
+          </a>
+          <div className="border-t border-[#e5e5e5] pt-4">
             {isAdmin ? (
               <Link
                 to="/admin/dashboard"
                 onClick={() => setIsOpen(false)}
-                className="liquid-button flex items-center justify-center space-x-2 px-4 py-2.5 text-white font-semibold text-sm transition-all"
+                className="font-mono text-xs text-[#2563eb] hover:underline flex items-center gap-1.5"
               >
                 <ShieldAlert className="w-4 h-4" />
                 <span>Admin Dashboard</span>
@@ -139,7 +173,7 @@ export default function Header() {
               <Link
                 to="/admin/login"
                 onClick={() => setIsOpen(false)}
-                className="liquid-button-secondary text-center text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-indigo-500 transition-colors py-2"
+                className="font-mono text-xs text-[#666666] hover:text-[#111111]"
               >
                 Sign In As Admin
               </Link>

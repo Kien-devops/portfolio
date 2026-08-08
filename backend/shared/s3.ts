@@ -7,7 +7,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { BlogMetadata, BlogContent } from "./types.js";
 
-const region = process.env.AWS_REGION || "us-east-1";
+const region = process.env.AWS_REGION || "ap-southeast-1";
 const isLocal = process.env.AWS_SAM_LOCAL === "true" || process.env.NODE_ENV === "test";
 
 const s3ClientConfig: any = { region };

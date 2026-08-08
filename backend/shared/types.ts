@@ -87,3 +87,22 @@ export interface BlogMetadata {
 export interface BlogContent extends BlogMetadata {
   content: string; // Markdown text
 }
+
+export interface HandsonMetadata {
+  slug: string;
+  title: string;
+  summary: string;
+  category: string;
+  difficulty: "Beginner" | "Intermediate" | "Advanced";
+  estimatedTime: string;
+  tags: string[];
+  published: boolean;
+  publishedAt: string;
+  updatedAt: string;
+  prerequisites?: string[];
+}
+
+export interface HandsonDetail {
+  metadata: HandsonMetadata;
+  content: string;
+}

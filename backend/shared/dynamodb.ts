@@ -27,6 +27,8 @@ export const ddbClient = DynamoDBDocumentClient.from(ddbRawClient, {
 });
 
 export const TABLE_NAME = process.env.PORTFOLIO_TABLE || "PortfolioDataTable";
+export const HANDSON_TABLE_NAME = process.env.HANDSON_TABLE || "HandsonTable";
+export const BLOGS_TABLE_NAME = process.env.BLOGS_TABLE || "BlogsTable";
 
 export async function getItem<T>(pk: string, sk: string): Promise<T | null> {
   const result = await ddbClient.send(
@@ -90,3 +92,61 @@ export async function scanItems<T>(): Promise<T[]> {
   );
   return (result.Items as T[]) || [];
 }
+
+export async function scanHandsonItems<T>(): Promise<T[]> {
+  const result = await ddbClient.send(
+    new ScanCommand({
+      TableName: HANDSON_TABLE_NAME,
+    })
+  );
+  return (result.Items as T[]) || [];
+}
+
+export async function getHandsonItem<T>(slug: string): Promise<T | null> {
+  const result = await ddbClient.send(
+    new GetCommand({
+      TableName: HANDSON_TABLE_NAME,
+      Key: { slug },
+    })
+  );
+  return (result.Item as T) || null;
+}
+
+export async function scanBlogItems<T>(): Promise<T[]> {
+  const result = await ddbClient.send(
+    new ScanCommand({
+      TableName: BLOGS_TABLE_NAME,
+    })
+  );
+  return (result.Items as T[]) || [];
+}
+
+export async function getBlogItem<T>(slug: string): Promise<T | null> {
+  const result = await ddbClient.send(
+    new GetCommand({
+      TableName: BLOGS_TABLE_NAME,
+      Key: { slug },
+    })
+  );
+  return (result.Item as T) || null;
+}
+
+export async function putBlogItem<T>(item: T): Promise<T> {
+  await ddbClient.send(
+    new PutCommand({
+      TableName: BLOGS_TABLE_NAME,
+      Item: item as any,
+    })
+  );
+  return item;
+}
+
+export async function deleteBlogItem(slug: string): Promise<void> {
+  await ddbClient.send(
+    new DeleteCommand({
+      TableName: BLOGS_TABLE_NAME,
+      Key: { slug },
+    })
+  );
+}
+
