@@ -189,6 +189,16 @@ export default function Home() {
       description: "Nền tảng hiểu biết toàn diện về dịch vụ đám mây, mô hình định giá, bảo mật và kiến trúc AWS. Xác nhận thành thạo các dịch vụ core: EC2, S3, IAM, VPC, RDS và CloudWatch.",
       credlyUrl: "https://www.credly.com/badges/74d3175c-1eda-4ee4-ac65-dfb0cc552706",
       displayOrder: 3
+    },
+    {
+      experienceId: "cert-soa",
+      company: "Amazon Web Services (AWS)",
+      position: "AWS Certified SysOps Administrator – Associate",
+      startDate: "2026",
+      endDate: "2029",
+      description: "Xác nhận khả năng triển khai, quản lý và vận hành workload trên AWS. Có kiến thức về monitoring, logging, networking, security, high availability, backup, automation và troubleshooting với các dịch vụ như EC2, S3, IAM, VPC, CloudWatch, CloudFormation và Systems Manager.",
+      credlyUrl: "https://www.credly.com/badges/bd2c6f2c-da53-4fe3-87bb-ec2e22c155ad",
+      displayOrder: 4
     }
   ];
 
@@ -392,6 +402,21 @@ export default function Home() {
                   </div>
                   <a
                     href="https://www.credly.com/badges/74d3175c-1eda-4ee4-ac65-dfb0cc552706"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#2563eb] hover:underline font-semibold flex items-center gap-1"
+                  >
+                    Verify ↗
+                  </a>
+                </div>
+
+                <div className="border-b border-[#e5e5e5] pb-4 flex items-center justify-between font-mono text-xs">
+                  <div>
+                    <div className="text-[#111111] font-semibold">AWS Certified SysOps Administrator — Associate</div>
+                    <div className="text-[#8a8a8a] text-[11px] pt-0.5">Issued 2026 · Credly Verified</div>
+                  </div>
+                  <a
+                    href="https://www.credly.com/badges/bd2c6f2c-da53-4fe3-87bb-ec2e22c155ad"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-[#2563eb] hover:underline font-semibold flex items-center gap-1"
