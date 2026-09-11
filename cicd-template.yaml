@@ -207,6 +207,10 @@ Resources:
                 Resource: "*"
               - Effect: Allow
                 Action:
+                  - cloudformation:CreateChangeSet
+                Resource: !Sub "arn:aws:cloudformation:${AWS::Region}:aws:transform/Serverless-2016-10-31"
+              - Effect: Allow
+                Action:
                   - iam:CreateRole
                   - iam:DeleteRole
                   - iam:GetRole
@@ -354,6 +358,7 @@ Resources:
                   - cloudformation:ExecuteChangeSet
                   - cloudformation:DeleteChangeSet
                   - cloudformation:DescribeChangeSet
+                  - cloudformation:DescribeStackEvents
                   - cloudformation:SetStackPolicy
                   - cloudformation:ValidateTemplate
                 Resource: !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${AppStackName}/*"
