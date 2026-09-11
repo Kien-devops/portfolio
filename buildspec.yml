@@ -1,0 +1,40 @@
+version: 0.2
+
+env:
+  shell: bash
+  variables:
+    SAM_BUILD_DIR: .aws-sam/build
+    SAM_ARTIFACT_PREFIX: sam-artifacts
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 20
+    commands:
+      - node --version
+      - npm --version
+      - sam --version
+      - npm ci
+  pre_build:
+    commands:
+      - npm run test:backend
+      - npm run build:backend
+  build:
+    commands:
+      - npm run build:frontend
+      - sam build --template-file template.yaml --build-dir "$SAM_BUILD_DIR"
+      - sam package --template-file "$SAM_BUILD_DIR/template.yaml" --s3-bucket "$ARTIFACT_BUCKET" --s3-prefix "$SAM_ARTIFACT_PREFIX/$CODEBUILD_RESOLVED_SOURCE_VERSION" --region "$AWS_DEFAULT_REGION" --output-template-file packaged.yaml
+  post_build:
+    commands:
+      - test -f packaged.yaml
+      - test -d frontend/dist
+
+artifacts:
+  files:
+    - packaged.yaml
+    - frontend/dist/**/*
+  discard-paths: no
+
+cache:
+  paths:
+    - /root/.npm/**/*

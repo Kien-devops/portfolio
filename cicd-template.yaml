@@ -1,0 +1,499 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CI/CD pipeline for the serverless portfolio project.
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: serverless-portfolio
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+  RepositoryId:
+    Type: String
+    Default: Kien-devops/portfolio
+    Description: Git provider repository id in owner/repo format.
+  BranchName:
+    Type: String
+    Default: main
+  CodeConnectionName:
+    Type: String
+    Default: serverless-portfolio-github
+  AppStackName:
+    Type: String
+    Default: serverless-portfolio-dev
+  AppCustomDomainName:
+    Type: String
+    Default: kiendev.site
+  AppACMCertificateArn:
+    Type: String
+    Default: ""
+    NoEcho: true
+  AllowedOrigins:
+    Type: String
+    Default: "*"
+  EnablePointInTimeRecovery:
+    Type: String
+    Default: "false"
+    AllowedValues:
+      - "true"
+      - "false"
+  DeploymentPreferenceType:
+    Type: String
+    Default: Canary10Percent5Minutes
+    AllowedValues:
+      - AllAtOnce
+      - Canary10Percent5Minutes
+      - Canary10Percent10Minutes
+      - Linear10PercentEvery1Minute
+      - Linear10PercentEvery2Minutes
+
+Resources:
+  PipelineArtifactBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${ProjectName}-${Environment}-pipe-art-${AWS::AccountId}-${AWS::Region}"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+
+  PipelineArtifactBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref PipelineArtifactBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: DenyInsecureTransport
+            Effect: Deny
+            Principal: "*"
+            Action: "s3:*"
+            Resource:
+              - !GetAtt PipelineArtifactBucket.Arn
+              - !Sub "${PipelineArtifactBucket.Arn}/*"
+            Condition:
+              Bool:
+                aws:SecureTransport: "false"
+
+  SourceConnection:
+    Type: AWS::CodeStarConnections::Connection
+    Properties:
+      ConnectionName: !Ref CodeConnectionName
+      ProviderType: GitHub
+
+  BuildProjectRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ProjectName}-${Environment}-codebuild-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: codebuild-portfolio
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${ProjectName}-${Environment}-*"
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:PutObject
+                  - s3:DeleteObject
+                Resource:
+                  - !Sub "${PipelineArtifactBucket.Arn}/*"
+                  - !Sub "arn:aws:s3:::${ProjectName}-${Environment}-frontend-${AWS::AccountId}-${AWS::Region}/*"
+                  - !Sub "arn:aws:s3:::${ProjectName}-${Environment}-content-${AWS::AccountId}-${AWS::Region}/*"
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                  - s3:GetBucketLocation
+                Resource:
+                  - !GetAtt PipelineArtifactBucket.Arn
+                  - !Sub "arn:aws:s3:::${ProjectName}-${Environment}-frontend-${AWS::AccountId}-${AWS::Region}"
+                  - !Sub "arn:aws:s3:::${ProjectName}-${Environment}-content-${AWS::AccountId}-${AWS::Region}"
+
+  BuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Sub "${ProjectName}-${Environment}-build-package"
+      ServiceRole: !GetAtt BuildProjectRole.Arn
+      Artifacts:
+        Type: CODEPIPELINE
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: buildspec.yml
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:5.0
+        EnvironmentVariables:
+          - Name: ARTIFACT_BUCKET
+            Type: PLAINTEXT
+            Value: !Ref PipelineArtifactBucket
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+          GroupName: !Sub "/aws/codebuild/${ProjectName}-${Environment}-build-package"
+      TimeoutInMinutes: 30
+
+  FrontendDeployProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Sub "${ProjectName}-${Environment}-frontend-deploy"
+      ServiceRole: !GetAtt BuildProjectRole.Arn
+      Artifacts:
+        Type: CODEPIPELINE
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: buildspec-frontend-deploy.yml
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:5.0
+      LogsConfig:
+        CloudWatchLogs:
+          Status: ENABLED
+          GroupName: !Sub "/aws/codebuild/${ProjectName}-${Environment}-frontend-deploy"
+      TimeoutInMinutes: 15
+
+  CloudFormationDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ProjectName}-${Environment}-cfn-deploy-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: cloudformation.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: cfn-serverless-portfolio-deploy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - apigateway:*
+                  - cloudfront:*
+                  - codedeploy:*
+                  - cognito-idp:*
+                  - dynamodb:*
+                  - events:*
+                  - lambda:*
+                  - logs:*
+                  - s3:*
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - iam:CreateRole
+                  - iam:DeleteRole
+                  - iam:GetRole
+                  - iam:PassRole
+                  - iam:PutRolePolicy
+                  - iam:DeleteRolePolicy
+                  - iam:AttachRolePolicy
+                  - iam:DetachRolePolicy
+                  - iam:GetRolePolicy
+                  - iam:TagRole
+                  - iam:UntagRole
+                Resource: "*"
+
+  InvalidationFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ProjectName}-${Environment}-invalidate-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: invalidate-cloudfront
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${ProjectName}-${Environment}-cloudfront-invalidate*"
+              - Effect: Allow
+                Action:
+                  - cloudfront:CreateInvalidation
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - codepipeline:PutJobSuccessResult
+                  - codepipeline:PutJobFailureResult
+                Resource: "*"
+
+  InvalidationFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "${ProjectName}-${Environment}-cloudfront-invalidate"
+      Runtime: python3.12
+      Handler: index.handler
+      Role: !GetAtt InvalidationFunctionRole.Arn
+      Timeout: 60
+      Code:
+        ZipFile: |
+          import boto3
+          import json
+          import time
+          import traceback
+
+          cloudfront = boto3.client("cloudfront")
+          codepipeline = boto3.client("codepipeline")
+
+          def _put_success(job_id, output=None):
+              payload = {"jobId": job_id}
+              if output:
+                  payload["outputVariables"] = output
+              codepipeline.put_job_success_result(**payload)
+
+          def _put_failure(job_id, message):
+              codepipeline.put_job_failure_result(
+                  jobId=job_id,
+                  failureDetails={"type": "JobFailed", "message": message[:5000]},
+              )
+
+          def handler(event, context):
+              job_id = event.get("CodePipeline.job", {}).get("id")
+              try:
+                  user_params = (
+                      event["CodePipeline.job"]["data"]["actionConfiguration"]["configuration"]
+                      .get("UserParameters", "{}")
+                  )
+                  params = json.loads(user_params)
+                  distribution_id = params["DistributionId"]
+                  paths = params.get("Paths", ["/*"])
+                  if isinstance(paths, str):
+                      paths = [paths]
+
+                  result = cloudfront.create_invalidation(
+                      DistributionId=distribution_id,
+                      InvalidationBatch={
+                          "Paths": {"Quantity": len(paths), "Items": paths},
+                          "CallerReference": f"{int(time.time())}-{context.aws_request_id}",
+                      },
+                  )
+
+                  if job_id:
+                      _put_success(job_id, {"InvalidationId": result["Invalidation"]["Id"]})
+                  return {"status": "ok", "invalidationId": result["Invalidation"]["Id"]}
+              except Exception as exc:
+                  message = f"{exc}\n{traceback.format_exc()}"
+                  if job_id:
+                      _put_failure(job_id, message)
+                      return {"status": "failed", "message": str(exc)}
+                  raise
+
+  PipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ProjectName}-${Environment}-codepipeline-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: codepipeline-portfolio
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:GetBucketVersioning
+                  - s3:PutObject
+                Resource:
+                  - !Sub "${PipelineArtifactBucket.Arn}/*"
+                  - !GetAtt PipelineArtifactBucket.Arn
+              - Effect: Allow
+                Action:
+                  - codebuild:BatchGetBuilds
+                  - codebuild:StartBuild
+                Resource:
+                  - !GetAtt BuildProject.Arn
+                  - !GetAtt FrontendDeployProject.Arn
+              - Effect: Allow
+                Action:
+                  - cloudformation:CreateStack
+                  - cloudformation:DescribeStacks
+                  - cloudformation:UpdateStack
+                  - cloudformation:CreateChangeSet
+                  - cloudformation:ExecuteChangeSet
+                  - cloudformation:DeleteChangeSet
+                  - cloudformation:DescribeChangeSet
+                  - cloudformation:SetStackPolicy
+                  - cloudformation:ValidateTemplate
+                Resource: !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/${AppStackName}/*"
+              - Effect: Allow
+                Action: iam:PassRole
+                Resource: !GetAtt CloudFormationDeployRole.Arn
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !GetAtt InvalidationFunction.Arn
+              - Effect: Allow
+                Action:
+                  - codeconnections:UseConnection
+                  - codestar-connections:UseConnection
+                Resource: !Ref SourceConnection
+                Condition:
+                  StringEquals:
+                    codeconnections:FullRepositoryId: !Ref RepositoryId
+                    codeconnections:BranchName: !Ref BranchName
+
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: !Sub "${ProjectName}-${Environment}-pipeline"
+      PipelineType: V2
+      ExecutionMode: QUEUED
+      RoleArn: !GetAtt PipelineRole.Arn
+      ArtifactStore:
+        Type: S3
+        Location: !Ref PipelineArtifactBucket
+      Triggers:
+        - ProviderType: CodeStarSourceConnection
+          GitConfiguration:
+            SourceActionName: Source
+            Push:
+              - Branches:
+                  Includes:
+                    - !Ref BranchName
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: Source
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeStarSourceConnection
+                Version: "1"
+              Configuration:
+                ConnectionArn: !Ref SourceConnection
+                FullRepositoryId: !Ref RepositoryId
+                BranchName: !Ref BranchName
+                OutputArtifactFormat: CODE_ZIP
+              OutputArtifacts:
+                - Name: SourceOutput
+              RunOrder: 1
+              Namespace: SourceVariables
+        - Name: Build
+          Actions:
+            - Name: BuildAndPackage
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: "1"
+              Configuration:
+                ProjectName: !Ref BuildProject
+              InputArtifacts:
+                - Name: SourceOutput
+              OutputArtifacts:
+                - Name: BuildOutput
+              RunOrder: 1
+              Namespace: BuildVariables
+        - Name: DeployBackend
+          Actions:
+            - Name: DeploySamStack
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: "1"
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                StackName: !Ref AppStackName
+                TemplatePath: BuildOutput::packaged.yaml
+                Capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn: !GetAtt CloudFormationDeployRole.Arn
+                ParameterOverrides: !Sub |
+                  {
+                    "ProjectName": "${ProjectName}",
+                    "Environment": "${Environment}",
+                    "AllowedOrigins": "${AllowedOrigins}",
+                    "EnablePointInTimeRecovery": "${EnablePointInTimeRecovery}",
+                    "CustomDomainName": "${AppCustomDomainName}",
+                    "ACMCertificateArn": "${AppACMCertificateArn}",
+                    "DeploymentPreferenceType": "${DeploymentPreferenceType}"
+                  }
+              InputArtifacts:
+                - Name: BuildOutput
+              RunOrder: 1
+              Namespace: AppStack
+        - Name: DeployFrontend
+          Actions:
+            - Name: SyncFrontendS3
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: "1"
+              Configuration:
+                ProjectName: !Ref FrontendDeployProject
+                EnvironmentVariables: !Sub |
+                  [
+                    {"name":"FRONTEND_BUCKET","value":"#{AppStack.FrontendBucketName}","type":"PLAINTEXT"}
+                  ]
+              InputArtifacts:
+                - Name: BuildOutput
+              RunOrder: 1
+        - Name: InvalidateCloudFront
+          Actions:
+            - Name: InvalidatePaths
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Provider: Lambda
+                Version: "1"
+              Configuration:
+                FunctionName: !Ref InvalidationFunction
+                UserParameters: |
+                  {
+                    "DistributionId": "#{AppStack.CloudFrontDistributionId}",
+                    "Paths": ["/*"]
+                  }
+              RunOrder: 1
+
+Outputs:
+  PipelineName:
+    Value: !Ref Pipeline
+  ConnectionArn:
+    Value: !Ref SourceConnection
+  ConnectionSetup:
+    Value: "Open AWS Console > Developer Tools > Settings > Connections and update the pending GitHub connection."
+  ArtifactBucket:
+    Value: !Ref PipelineArtifactBucket

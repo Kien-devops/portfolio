@@ -39,6 +39,16 @@ Parameters:
     Type: String
     Default: ""
     Description: ACM Certificate ARN in us-east-1 (required for custom domain)
+  DeploymentPreferenceType:
+    Type: String
+    Default: Canary10Percent5Minutes
+    AllowedValues:
+      - AllAtOnce
+      - Canary10Percent5Minutes
+      - Canary10Percent10Minutes
+      - Linear10PercentEvery1Minute
+      - Linear10PercentEvery2Minutes
+    Description: Lambda traffic shifting strategy managed by CodeDeploy.
 
 Conditions:
   IsPitEnabled: !Equals [!Ref EnablePointInTimeRecovery, "true"]
@@ -212,6 +222,9 @@ Resources:
     Properties:
       CodeUri: backend/
       Handler: functions/portfolio-read/app.handler
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: !Ref DeploymentPreferenceType
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref PortfolioDataTable
@@ -300,6 +313,9 @@ Resources:
     Properties:
       CodeUri: backend/
       Handler: functions/contact/app.handler
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: !Ref DeploymentPreferenceType
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref PortfolioDataTable
@@ -349,6 +365,9 @@ Resources:
     Properties:
       CodeUri: backend/
       Handler: functions/portfolio-admin/app.handler
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: !Ref DeploymentPreferenceType
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref PortfolioDataTable
@@ -472,6 +491,9 @@ Resources:
     Properties:
       CodeUri: backend/
       Handler: functions/blog-admin/app.handler
+      AutoPublishAlias: live
+      DeploymentPreference:
+        Type: !Ref DeploymentPreferenceType
       Policies:
         - S3CrudPolicy:
             BucketName: !Ref ContentBucket
