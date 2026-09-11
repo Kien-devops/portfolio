@@ -15,6 +15,8 @@ phases:
       - npm --version
       - sam --version
       - npm ci
+      - export PATH="$CODEBUILD_SRC_DIR/node_modules/.bin:$PATH"
+      - esbuild --version
   pre_build:
     commands:
       - npm run test:backend
@@ -22,6 +24,7 @@ phases:
   build:
     commands:
       - npm run build:frontend
+      - export PATH="$CODEBUILD_SRC_DIR/node_modules/.bin:$PATH"
       - sam build --template-file template.yaml --build-dir "$SAM_BUILD_DIR"
       - sam package --template-file "$SAM_BUILD_DIR/template.yaml" --s3-bucket "$ARTIFACT_BUCKET" --s3-prefix "$SAM_ARTIFACT_PREFIX/$CODEBUILD_RESOLVED_SOURCE_VERSION" --region "$AWS_DEFAULT_REGION" --output-template-file packaged.yaml
   post_build:
