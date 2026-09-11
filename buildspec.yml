@@ -35,6 +35,7 @@ phases:
 artifacts:
   files:
     - packaged.yaml
+    - buildspec-frontend-deploy.yml
     - frontend/dist/**/*
   discard-paths: no
 
