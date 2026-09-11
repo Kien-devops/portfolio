@@ -369,10 +369,6 @@ Resources:
                   - codeconnections:UseConnection
                   - codestar-connections:UseConnection
                 Resource: !Ref SourceConnection
-                Condition:
-                  StringEquals:
-                    codeconnections:FullRepositoryId: !Ref RepositoryId
-                    codeconnections:BranchName: !Ref BranchName
 
   Pipeline:
     Type: AWS::CodePipeline::Pipeline
