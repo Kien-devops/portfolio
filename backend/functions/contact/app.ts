@@ -1,5 +1,5 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda";
-import { getItem, putItem, queryItems, deleteItem } from "../../shared/dynamodb.js";
+import { putItem } from "../../shared/dynamodb.js";
 import { successResponse, errorResponse } from "../../shared/response.js";
 import { validateContact } from "../../shared/validation.js";
 import { Contact } from "../../shared/types.js";
@@ -75,65 +75,6 @@ export async function handler(
 
       await putItem(newContact);
       return successResponse({ contactId }, 201, "Message sent successfully");
-    }
-
-    // Admin endpoints (Cognito JWT authorization required)
-    // Validate request route is admin path
-    if (path.startsWith("/api/admin/contacts")) {
-      // GET /api/admin/contacts (List contacts)
-      if (method === "GET" && path === "/api/admin/contacts") {
-        const contacts = await queryItems<Contact>("CONTACT");
-        // Sort by createdAt descending
-        const sortedContacts = contacts.sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        return successResponse(sortedContacts);
-      }
-
-      const id = event.pathParameters?.id;
-      if (!id) {
-        return errorResponse(400, "BAD_REQUEST", "Contact ID parameter is required");
-      }
-
-      // Find the existing contact to resolve its SK (since SK has createdAt timestamp)
-      const contacts = await queryItems<Contact>("CONTACT");
-      const contact = contacts.find((c) => c.contactId === id);
-      if (!contact) {
-        return errorResponse(404, "NOT_FOUND", `Contact message with ID ${id} not found`);
-      }
-
-      // PUT /api/admin/contacts/{id} (Update contact status)
-      if (method === "PUT") {
-        if (!event.body) {
-          return errorResponse(400, "BAD_REQUEST", "Request body is empty");
-        }
-        
-        let body: any;
-        try {
-          body = JSON.parse(event.body);
-        } catch {
-          return errorResponse(400, "INVALID_JSON", "Request body is not a valid JSON");
-        }
-
-        const { status } = body;
-        if (!status || !["NEW", "READ", "ARCHIVED"].includes(status)) {
-          return errorResponse(400, "VALIDATION_ERROR", "Status must be NEW, READ, or ARCHIVED");
-        }
-
-        const updatedContact: Contact = {
-          ...contact,
-          status,
-        };
-
-        await putItem(updatedContact);
-        return successResponse(updatedContact, 200, "Contact status updated successfully");
-      }
-
-      // DELETE /api/admin/contacts/{id} (Delete contact)
-      if (method === "DELETE") {
-        await deleteItem(contact.PK, contact.SK);
-        return successResponse({ deleted: true }, 200, "Contact message deleted successfully");
-      }
     }
 
     return errorResponse(404, "NOT_FOUND", `Requested route ${method} ${path} not found`);

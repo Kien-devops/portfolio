@@ -22,7 +22,6 @@ const frontendContentDir = path.join(rootDir, "frontend", "public", "content");
 
 const directories = [
   "blogs",
-  "handson",
   "images",
   "images/profile",
   "images/projects",

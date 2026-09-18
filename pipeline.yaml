@@ -1,0 +1,250 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  AWS CloudFormation template for Serverless Portfolio CI/CD Pipeline
+  using AWS CodePipeline, AWS CodeBuild, and GitHub CodeStarConnection.
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: serverless-portfolio
+    Description: Name of the project, used as prefix for resources.
+
+  Environment:
+    Type: String
+    Default: prod
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+    Description: Target deployment environment.
+
+  GitHubRepo:
+    Type: String
+    Default: Kien-devops/portfolio
+    Description: GitHub repository in format owner/repo.
+
+  GitHubBranch:
+    Type: String
+    Default: main
+    Description: GitHub branch to monitor for changes.
+
+  CustomDomainName:
+    Type: String
+    Default: kiendev.site
+    Description: Custom domain for CloudFront.
+
+  ACMCertificateArn:
+    Type: String
+    Default: arn:aws:acm:us-east-1:404063515739:certificate/7f84066e-d34c-4959-bcde-6849565c8c90
+    Description: ACM Certificate ARN in us-east-1.
+
+Resources:
+  # -------------------------------------------------------------
+  # 1. GitHub Connection via CodeStar
+  # -------------------------------------------------------------
+  GitHubConnection:
+    Type: AWS::CodeStarConnections::Connection
+    Properties:
+      ConnectionName: !Sub "${ProjectName}-github-conn"
+      ProviderType: GitHub
+
+  # -------------------------------------------------------------
+  # 2. S3 Artifact Bucket for Pipeline
+  # -------------------------------------------------------------
+  PipelineArtifactBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${ProjectName}-${Environment}-pipeline-${AWS::AccountId}-${AWS::Region}"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+  # -------------------------------------------------------------
+  # 3. IAM Role for CodeBuild
+  # -------------------------------------------------------------
+  CodeBuildServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ProjectName}-${Environment}-codebuild-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CodeBuildExecutionPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+              - Effect: Allow
+                Action:
+                  - s3:*
+                  - cloudformation:*
+                  - lambda:*
+                  - apigateway:*
+                  - dynamodb:*
+                  - iam:*
+                  - cloudfront:*
+                  - route53:*
+                Resource: "*"
+
+  # -------------------------------------------------------------
+  # 4. IAM Role for CodePipeline
+  # -------------------------------------------------------------
+  CodePipelineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ProjectName}-${Environment}-codepipeline-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: CodePipelineExecutionPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:*
+                Resource:
+                  - !Sub "arn:aws:s3:::${PipelineArtifactBucket}"
+                  - !Sub "arn:aws:s3:::${PipelineArtifactBucket}/*"
+              - Effect: Allow
+                Action:
+                  - codestar-connections:UseConnection
+                Resource: !GetAtt GitHubConnection.ConnectionArn
+              - Effect: Allow
+                Action:
+                  - codebuild:BatchGetBuilds
+                  - codebuild:StartBuild
+                Resource: !GetAtt CodeBuildProject.Arn
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${ProjectName}-${Environment}-invalidate-cache"
+
+  # -------------------------------------------------------------
+  # 5. CodeBuild Project
+  # -------------------------------------------------------------
+  CodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Sub "${ProjectName}-${Environment}-build"
+      Description: !Sub "SAM Build and Deploy Project for ${ProjectName}"
+      ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+      Artifacts:
+        Type: CODEPIPELINE
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:5.0
+        PrivilegedMode: false
+        EnvironmentVariables:
+          - Name: STACK_NAME
+            Value: !Sub "${ProjectName}-${Environment}"
+          - Name: PROJECT_NAME
+            Value: !Ref ProjectName
+          - Name: ENVIRONMENT
+            Value: !Ref Environment
+          - Name: REGION
+            Value: !Ref "AWS::Region"
+          - Name: CUSTOM_DOMAIN
+            Value: !Ref CustomDomainName
+          - Name: ACM_CERT_ARN
+            Value: !Ref ACMCertificateArn
+          - Name: DEPLOYMENT_PREFERENCE_TYPE
+            Value: AllAtOnce
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: buildspec.yml
+      TimeoutInMinutes: 25
+
+  # -------------------------------------------------------------
+  # 6. CodePipeline
+  # -------------------------------------------------------------
+  AppPipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      Name: !Sub "${ProjectName}-${Environment}-pipeline"
+      RoleArn: !GetAtt CodePipelineServiceRole.Arn
+      ArtifactStore:
+        Type: S3
+        Location: !Ref PipelineArtifactBucket
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: GitHubSource
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Provider: CodeStarSourceConnection
+                Version: "1"
+              Configuration:
+                ConnectionArn: !GetAtt GitHubConnection.ConnectionArn
+                FullRepositoryId: !Ref GitHubRepo
+                BranchName: !Ref GitHubBranch
+                OutputArtifactFormat: CODE_ZIP
+              OutputArtifacts:
+                - Name: SourceOutput
+        - Name: BuildAndDeploy
+          Actions:
+            - Name: SAMBuildAndDeploy
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: "1"
+              Configuration:
+                ProjectName: !Ref CodeBuildProject
+              InputArtifacts:
+                - Name: SourceOutput
+              OutputArtifacts:
+                - Name: BuildOutput
+        - Name: InvalidateCache
+          Actions:
+            - Name: InvalidateCloudFront
+              ActionTypeId:
+                Category: Invoke
+                Owner: AWS
+                Provider: Lambda
+                Version: "1"
+              Configuration:
+                FunctionName: !Sub "${ProjectName}-${Environment}-invalidate-cache"
+                UserParameters: '{"paths": ["/*"]}'
+              RunOrder: 1
+
+
+Outputs:
+  PipelineName:
+    Description: "CodePipeline Name"
+    Value: !Ref AppPipeline
+
+  PipelineUrl:
+    Description: "AWS CodePipeline Console URL"
+    Value: !Sub "https://${AWS::Region}.console.aws.amazon.com/codesuite/codepipeline/pipelines/${AppPipeline}/view?region=${AWS::Region}"
+
+  GitHubConnectionArn:
+    Description: "CodeStar GitHub Connection ARN"
+    Value: !GetAtt GitHubConnection.ConnectionArn
+
+  GitHubConnectionStatus:
+    Description: "CodeStar GitHub Connection Status"
+    Value: !GetAtt GitHubConnection.ConnectionStatus

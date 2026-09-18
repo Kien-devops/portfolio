@@ -42,8 +42,6 @@ echo "6. Fetching outputs from CloudFormation..."
 OutputsJson=$(aws cloudformation describe-stacks --stack-name "$StackName" --region "$Region" --query "Stacks[0].Outputs" --output json)
 
 ApiUrl=$(echo "$OutputsJson" | grep -A 2 '"OutputKey": "APIURL"' | grep "OutputValue" | cut -d '"' -f 4)
-UserPoolId=$(echo "$OutputsJson" | grep -A 2 '"OutputKey": "CognitoUserPoolId"' | grep "OutputValue" | cut -d '"' -f 4)
-ClientId=$(echo "$OutputsJson" | grep -A 2 '"OutputKey": "CognitoClientId"' | grep "OutputValue" | cut -d '"' -f 4)
 FrontendBucket=$(echo "$OutputsJson" | grep -A 2 '"OutputKey": "FrontendBucketName"' | grep "OutputValue" | cut -d '"' -f 4)
 ContentBucket=$(echo "$OutputsJson" | grep -A 2 '"OutputKey": "ContentBucketName"' | grep "OutputValue" | cut -d '"' -f 4)
 TableName=$(echo "$OutputsJson" | grep -A 2 '"OutputKey": "DynamoDBTableName"' | grep "OutputValue" | cut -d '"' -f 4)
@@ -56,15 +54,11 @@ echo "API Endpoint: $ApiUrl"
 echo "Frontend Bucket: $FrontendBucket"
 echo "Content Bucket: $ContentBucket"
 echo "Table Name: $TableName"
-echo "User Pool: $UserPoolId"
 
 # 7. Generate Frontend .env
 echo "7. Creating frontend environment variables..."
 cat <<EOF > frontend/.env.production
 VITE_API_URL=
-VITE_COGNITO_USER_POOL_ID=$UserPoolId
-VITE_COGNITO_CLIENT_ID=$ClientId
-VITE_COGNITO_REGION=$Region
 EOF
 
 # 8. Build Frontend
@@ -78,26 +72,19 @@ aws s3 sync frontend/dist/ "s3://$FrontendBucket" --delete
 # 10. Seed DynamoDB and upload content
 echo "10. Seeding database and uploading blogs..."
 export PORTFOLIO_TABLE=$TableName
-export HANDSON_TABLE="$ProjectName-$Environment-handson"
 export BLOGS_TABLE="$ProjectName-$Environment-blogs"
 export CONTENT_BUCKET=$ContentBucket
 export AWS_REGION=$Region
 npx tsx scripts/seed-data.ts
-npx tsx scripts/seed-handson-dynamodb.ts
-npx tsx scripts/seed-blogs-dynamodb.ts
 npx tsx scripts/upload-content.ts
 
 # 11. Invalidate CloudFront Cache
-echo "11. Invalidating CloudFront cache..."
+echo "11. Invalidating CloudFront cache via Lambda..."
+aws lambda invoke --function-name "$ProjectName-$Environment-invalidate-cache" --region "$Region" /tmp/inv-result.json || \
 aws cloudfront create-invalidation --distribution-id "$CFDistributionId" --paths "/*" || echo "Warning: CF invalidation failed"
 
 echo ""
 echo "=================================================="
 echo "DEPLOYMENT COMPLETE!"
 echo "Portfolio Website URL: $CloudFrontUrl"
-echo "Admin Panel Login:     $CloudFrontUrl/admin/login"
-echo "Cognito User Pool ID:  $UserPoolId"
-echo "Cognito Client ID:     $ClientId"
-echo "To create an admin account, run:"
-echo "./scripts/create-admin-user.sh $UserPoolId your-email@example.com YourPassword123!"
 echo "=================================================="

@@ -41,14 +41,14 @@ Parameters:
     Description: ACM Certificate ARN in us-east-1 (required for custom domain)
   DeploymentPreferenceType:
     Type: String
-    Default: Canary10Percent5Minutes
+    Default: AllAtOnce
     AllowedValues:
       - AllAtOnce
       - Canary10Percent5Minutes
       - Canary10Percent10Minutes
       - Linear10PercentEvery1Minute
       - Linear10PercentEvery2Minutes
-    Description: Lambda traffic shifting strategy managed by CodeDeploy.
+    Description: CodeDeploy deployment preference for Lambda functions.
 
 Conditions:
   IsPitEnabled: !Equals [!Ref EnablePointInTimeRecovery, "true"]
@@ -62,7 +62,6 @@ Globals:
     Environment:
       Variables:
         PORTFOLIO_TABLE: !Ref PortfolioDataTable
-        HANDSON_TABLE: !Ref HandsonTable
         BLOGS_TABLE: !Ref BlogsTable
         CONTENT_BUCKET: !Ref ContentBucket
         LOG_LEVEL: !Ref LogLevel
@@ -91,21 +90,6 @@ Resources:
       SSESpecification:
         SSEEnabled: true
 
-  HandsonTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      TableName: !Sub "${ProjectName}-${Environment}-handson"
-      BillingMode: PAY_PER_REQUEST
-      AttributeDefinitions:
-        - AttributeName: slug
-          AttributeType: S
-      KeySchema:
-        - AttributeName: slug
-          KeyType: HASH
-      PointInTimeRecoverySpecification:
-        PointInTimeRecoveryEnabled: !If [IsPitEnabled, true, false]
-      SSESpecification:
-        SSEEnabled: true
 
   BlogsTable:
     Type: AWS::DynamoDB::Table
@@ -155,38 +139,6 @@ Resources:
               SSEAlgorithm: AES256
 
   # -------------------------------------------------------------
-  # Cognito User Pool (Admin Auth)
-  # -------------------------------------------------------------
-  AdminUserPool:
-    Type: AWS::Cognito::UserPool
-    Properties:
-      UserPoolName: !Sub "${ProjectName}-${Environment}-AdminUserPool"
-      AdminCreateUserConfig:
-        AllowAdminCreateUserOnly: true
-      UsernameAttributes:
-        - email
-      AutoVerifiedAttributes:
-        - email
-      Policies:
-        PasswordPolicy:
-          MinimumLength: 8
-          RequireLowercase: true
-          RequireNumbers: true
-          RequireSymbols: true
-          RequireUppercase: true
-
-  AdminUserPoolClient:
-    Type: AWS::Cognito::UserPoolClient
-    Properties:
-      ClientName: !Sub "${ProjectName}-${Environment}-AdminUserPoolClient"
-      UserPoolId: !Ref AdminUserPool
-      GenerateSecret: false
-      ExplicitAuthFlows:
-        - ALLOW_USER_SRP_AUTH
-        - ALLOW_USER_PASSWORD_AUTH
-        - ALLOW_REFRESH_TOKEN_AUTH
-
-  # -------------------------------------------------------------
   # API Gateway (HTTP API)
   # -------------------------------------------------------------
   PortfolioHttpApi:
@@ -205,14 +157,6 @@ Resources:
           - PUT
           - DELETE
           - OPTIONS
-      Auth:
-        Authorizers:
-          CognitoAuthorizer:
-            JwtConfiguration:
-              issuer: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${AdminUserPool}"
-              audience:
-                - !Ref AdminUserPoolClient
-            IdentitySource: "$request.header.Authorization"
 
   # -------------------------------------------------------------
   # Lambda Functions
@@ -228,8 +172,6 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref PortfolioDataTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref HandsonTable
         - DynamoDBCrudPolicy:
             TableName: !Ref BlogsTable
       Events:
@@ -267,18 +209,6 @@ Resources:
           Type: HttpApi
           Properties:
             Path: /api/education
-            Method: GET
-            ApiId: !Ref PortfolioHttpApi
-        GetHandsonList:
-          Type: HttpApi
-          Properties:
-            Path: /api/handson
-            Method: GET
-            ApiId: !Ref PortfolioHttpApi
-        GetHandsonBySlug:
-          Type: HttpApi
-          Properties:
-            Path: /api/handson/{slug}
             Method: GET
             ApiId: !Ref PortfolioHttpApi
         GetBlogs:
@@ -326,30 +256,6 @@ Resources:
             Path: /api/contacts
             Method: POST
             ApiId: !Ref PortfolioHttpApi
-        GetContacts:
-          Type: HttpApi
-          Properties:
-            Path: /api/admin/contacts
-            Method: GET
-            ApiId: !Ref PortfolioHttpApi
-            Auth:
-              Authorizer: CognitoAuthorizer
-        PutContact:
-          Type: HttpApi
-          Properties:
-            Path: /api/admin/contacts/{id}
-            Method: PUT
-            ApiId: !Ref PortfolioHttpApi
-            Auth:
-              Authorizer: CognitoAuthorizer
-        DeleteContact:
-          Type: HttpApi
-          Properties:
-            Path: /api/admin/contacts/{id}
-            Method: DELETE
-            ApiId: !Ref PortfolioHttpApi
-            Auth:
-              Authorizer: CognitoAuthorizer
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -360,177 +266,35 @@ Resources:
         External:
           - "@aws-sdk/*"
 
-  PortfolioAdminFunction:
+  CloudFrontInvalidationFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub "${ProjectName}-${Environment}-invalidate-cache"
+      Description: "Invalidates CloudFront distribution paths (directly or via CodePipeline)"
       CodeUri: backend/
-      Handler: functions/portfolio-admin/app.handler
-      AutoPublishAlias: live
-      DeploymentPreference:
-        Type: !Ref DeploymentPreferenceType
+      Handler: functions/invalidate-cache/app.handler
+      Environment:
+        Variables:
+          DISTRIBUTION_ID: !Ref CloudFrontDistribution
       Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref PortfolioDataTable
-      Events:
-        PutProfile:
-          Type: HttpApi
-          Properties:
-            Path: /api/admin/profile
-            Method: PUT
-            ApiId: !Ref PortfolioHttpApi
-            Auth:
-              Authorizer: CognitoAuthorizer
-        PostProject:
-          Type: HttpApi
-          Properties:
-            Path: /api/admin/projects
-            Method: POST
-            ApiId: !Ref PortfolioHttpApi
-            Auth:
-              Authorizer: CognitoAuthorizer
-        PutProject:
-          Type: HttpApi
-          Properties:
-            Path: /api/admin/projects/{id}
-            Method: PUT
-            ApiId: !Ref PortfolioHttpApi
-            Auth:
-              Authorizer: CognitoAuthorizer
-        DeleteProject:
-          Type: HttpApi
-          Properties:
-            Path: /api/admin/projects/{id}
-            Method: DELETE
-            ApiId: !Ref PortfolioHttpApi
-            Auth:
-              Authorizer: CognitoAuthorizer
-        PostSkill:
-          Type: HttpApi
-          Properties:
-            Path: /api/admin/skills
-            Method: POST
-            ApiId: !Ref PortfolioHttpApi
-            Auth:
-              Authorizer: CognitoAuthorizer
-        PutSkill:
-          Type: HttpApi
-          Properties:
-            Path: /api/admin/skills/{id}
-            Method: PUT
-            ApiId: !Ref PortfolioHttpApi
-            Auth:
-              Authorizer: CognitoAuthorizer
-        DeleteSkill:
-          Type: HttpApi
-          Properties:
-            Path: /api/admin/skills/{id}
-            Method: DELETE
-            ApiId: !Ref PortfolioHttpApi
-            Auth:
-              Authorizer: CognitoAuthorizer
-        PostExperience:
-          Type: HttpApi
-          Properties:
-            Path: /api/admin/experiences
-            Method: POST
-            ApiId: !Ref PortfolioHttpApi
-            Auth:
-              Authorizer: CognitoAuthorizer
-        PutExperience:
-          Type: HttpApi
-          Properties:
-            Path: /api/admin/experiences/{id}
-            Method: PUT
-            ApiId: !Ref PortfolioHttpApi
-            Auth:
-              Authorizer: CognitoAuthorizer
-        DeleteExperience:
-          Type: HttpApi
-          Properties:
-            Path: /api/admin/experiences/{id}
-            Method: DELETE
-            ApiId: !Ref PortfolioHttpApi
-            Auth:
-              Authorizer: CognitoAuthorizer
-        PostEducation:
-          Type: HttpApi
-          Properties:
-            Path: /api/admin/education
-            Method: POST
-            ApiId: !Ref PortfolioHttpApi
-            Auth:
-              Authorizer: CognitoAuthorizer
-        PutEducation:
-          Type: HttpApi
-          Properties:
-            Path: /api/admin/education/{id}
-            Method: PUT
-            ApiId: !Ref PortfolioHttpApi
-            Auth:
-              Authorizer: CognitoAuthorizer
-        DeleteEducation:
-          Type: HttpApi
-          Properties:
-            Path: /api/admin/education/{id}
-            Method: DELETE
-            ApiId: !Ref PortfolioHttpApi
-            Auth:
-              Authorizer: CognitoAuthorizer
+        - Statement:
+            - Effect: Allow
+              Action:
+                - cloudfront:CreateInvalidation
+                - cloudfront:GetInvalidation
+              Resource: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}"
+            - Effect: Allow
+              Action:
+                - codepipeline:PutJobSuccessResult
+                - codepipeline:PutJobFailureResult
+              Resource: "*"
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
         Minify: true
         Target: "node20"
         EntryPoints:
-          - functions/portfolio-admin/app.ts
-        External:
-          - "@aws-sdk/*"
-
-  BlogAdminFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: backend/
-      Handler: functions/blog-admin/app.handler
-      AutoPublishAlias: live
-      DeploymentPreference:
-        Type: !Ref DeploymentPreferenceType
-      Policies:
-        - S3CrudPolicy:
-            BucketName: !Ref ContentBucket
-        - DynamoDBCrudPolicy:
-            TableName: !Ref BlogsTable
-      Events:
-        PostBlog:
-          Type: HttpApi
-          Properties:
-            Path: /api/admin/blogs
-            Method: POST
-            ApiId: !Ref PortfolioHttpApi
-            Auth:
-              Authorizer: CognitoAuthorizer
-        PutBlog:
-          Type: HttpApi
-          Properties:
-            Path: /api/admin/blogs/{slug}
-            Method: PUT
-            ApiId: !Ref PortfolioHttpApi
-            Auth:
-              Authorizer: CognitoAuthorizer
-        DeleteBlog:
-          Type: HttpApi
-          Properties:
-            Path: /api/admin/blogs/{slug}
-            Method: DELETE
-            ApiId: !Ref PortfolioHttpApi
-            Auth:
-              Authorizer: CognitoAuthorizer
-    Metadata:
-      BuildMethod: esbuild
-      BuildProperties:
-        Minify: true
-        Target: "node20"
-        EntryPoints:
-          - functions/blog-admin/app.ts
+          - functions/invalidate-cache/app.ts
         External:
           - "@aws-sdk/*"
 
@@ -688,12 +452,9 @@ Outputs:
   BlogsTableName:
     Description: "Blogs DynamoDB Table Name"
     Value: !Ref BlogsTable
-  CognitoUserPoolId:
-    Description: "Cognito User Pool ID"
-    Value: !Ref AdminUserPool
-  CognitoClientId:
-    Description: "Cognito App Client ID"
-    Value: !Ref AdminUserPoolClient
   CloudFrontDistributionId:
     Description: "CloudFront Distribution ID"
     Value: !Ref CloudFrontDistribution
+  CloudFrontInvalidationFunctionName:
+    Description: "CloudFront Invalidation Lambda Function Name"
+    Value: !Ref CloudFrontInvalidationFunction

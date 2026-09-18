@@ -1,7 +1,7 @@
 import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from "aws-lambda";
-import { getItem, queryItems, scanHandsonItems, getHandsonItem, scanBlogItems, getBlogItem } from "../../shared/dynamodb.js";
+import { getItem, queryItems, scanBlogItems, getBlogItem } from "../../shared/dynamodb.js";
 import { successResponse, errorResponse } from "../../shared/response.js";
-import { Profile, Project, Skill, Experience, Education, HandsonMetadata, BlogMetadata } from "../../shared/types.js";
+import { Profile, Project, Skill, Experience, Education, BlogMetadata } from "../../shared/types.js";
 
 export async function handler(
   event: APIGatewayProxyEventV2
@@ -102,38 +102,6 @@ export async function handler(
       return successResponse(publishedBlogs);
     }
 
-    // GET /api/handson/{slug}
-    if (path.startsWith("/api/handson/") && event.pathParameters?.slug) {
-      const slug = event.pathParameters.slug;
-      let handson = await getHandsonItem<HandsonMetadata>(slug);
-      if (!handson) {
-        // Fallback to PortfolioDataTable PK: HANDSON
-        handson = await getItem<HandsonMetadata>("HANDSON", `HANDSON#${slug}`);
-      }
-      if (!handson || !handson.published) {
-        return errorResponse(404, "NOT_FOUND", `Hands-on lab with slug ${slug} not found`);
-      }
-      return successResponse(handson);
-    }
-
-    // GET /api/handson
-    if (path === "/api/handson") {
-      let handsonList = await scanHandsonItems<HandsonMetadata>();
-      if (handsonList.length === 0) {
-        // Fallback to PortfolioDataTable PK: HANDSON
-        handsonList = await queryItems<HandsonMetadata>("HANDSON");
-      }
-      
-      const publishedHandson = handsonList
-        .filter((h) => h.published)
-        .sort((a, b) => {
-          const numA = parseInt(a.slug.match(/\d+/)?.[0] || "0", 10);
-          const numB = parseInt(b.slug.match(/\d+/)?.[0] || "0", 10);
-          return numA - numB;
-        });
-
-      return successResponse(publishedHandson);
-    }
 
     return errorResponse(404, "NOT_FOUND", `Requested route ${path} not found`);
   } catch (error: any) {

@@ -149,6 +149,18 @@ const sampleData = [
   },
   {
     "PK": "EXPERIENCE",
+    "SK": "EXPERIENCE#2025-04#cert-cloudops",
+    "experienceId": "cert-cloudops",
+    "company": "Amazon Web Services (AWS)",
+    "position": "AWS Certified CloudOps Engineer – Associate",
+    "startDate": "2026",
+    "endDate": "2029",
+    "description": "Đạt chứng chỉ AWS Certified CloudOps Engineer Associate – xác nhận năng lực triển khai, quản lý, vận hành và bảo mật hạ tầng trên AWS Cloud. Kỹ năng bao gồm giám sát hệ thống với CloudWatch, tự động hoá CI/CD & IaC, tối ưu hoá hiệu năng, chi phí và áp dụng best practices vận hành đám mây.",
+    "credlyUrl": "https://www.credly.com/badges/bd2c6f2c-da53-4fe3-87bb-ec2e22c155ad",
+    "displayOrder": 3
+  },
+  {
+    "PK": "EXPERIENCE",
     "SK": "EXPERIENCE#2025-01#cert-ccp",
     "experienceId": "cert-ccp",
     "company": "Amazon Web Services (AWS)",
@@ -157,7 +169,7 @@ const sampleData = [
     "endDate": "2029",
     "description": "Đạt chứng chỉ AWS Certified Cloud Practitioner – nền tảng hiểu biết toàn diện về dịch vụ đám mây, mô hình định giá, bảo mật và kiến trúc AWS. Xác nhận thành thạo các dịch vụ core: EC2, S3, IAM, VPC, RDS và CloudWatch.",
     "credlyUrl": "https://www.credly.com/badges/74d3175c-1eda-4ee4-ac65-dfb0cc552706",
-    "displayOrder": 3
+    "displayOrder": 4
   },
   {
     "PK": "EDUCATION",

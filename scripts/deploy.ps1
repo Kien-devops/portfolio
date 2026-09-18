@@ -12,13 +12,22 @@ Write-Host "Starting deployment for $StackName in region $Region..." -Foreground
 $SamCommand = "sam"
 if (-not (Get-Command $SamCommand -ErrorAction SilentlyContinue)) {
     $DefaultSamPath = "C:\Program Files\Amazon\AWSSAMCLI\bin\sam.cmd"
+    $UserSamPath = "$env:LOCALAPPDATA\AWSSAMCLI\PFiles64\Amazon\AWSSAMCLI\bin\sam.cmd"
     if (Test-Path $DefaultSamPath) {
         $SamCommand = $DefaultSamPath
+    } elseif (Test-Path $UserSamPath) {
+        $SamCommand = $UserSamPath
+    } elseif (Test-Path "C:\Users\ADMIN\AppData\Local\AWSSAMCLI\PFiles64\Amazon\AWSSAMCLI\bin\sam.cmd") {
+        $SamCommand = "C:\Users\ADMIN\AppData\Local\AWSSAMCLI\PFiles64\Amazon\AWSSAMCLI\bin\sam.cmd"
     } else {
         Write-Error "AWS SAM CLI was not found. Install SAM CLI or add sam to PATH."
         exit 1
     }
 }
+
+$env:Path = "C:\Users\ADMIN\AppData\Local\AWSSAMCLI\PFiles64\Amazon\AWSSAMCLI\bin;E:\repo\portfolio\node_modules\.bin;C:\Users\ADMIN\AppData\Roaming\npm;$env:Path"
+$env:PYTHONUTF8 = "1"
+$env:SAM_CLI_TELEMETRY = "0"
 
 # 1. Install dependencies
 Write-Host "1. Installing workspace dependencies..." -ForegroundColor Yellow
@@ -60,8 +69,6 @@ if ($LASTEXITCODE -ne 0) { Write-Error "Failed to fetch CloudFormation outputs";
 
 $Outputs = $OutputsJson | ConvertFrom-Json
 $ApiUrl = ($Outputs | Where-Object { $_.OutputKey -eq "APIURL" }).OutputValue
-$UserPoolId = ($Outputs | Where-Object { $_.OutputKey -eq "CognitoUserPoolId" }).OutputValue
-$ClientId = ($Outputs | Where-Object { $_.OutputKey -eq "CognitoClientId" }).OutputValue
 $FrontendBucket = ($Outputs | Where-Object { $_.OutputKey -eq "FrontendBucketName" }).OutputValue
 $ContentBucket = ($Outputs | Where-Object { $_.OutputKey -eq "ContentBucketName" }).OutputValue
 $TableName = ($Outputs | Where-Object { $_.OutputKey -eq "DynamoDBTableName" }).OutputValue
@@ -74,15 +81,11 @@ Write-Host "API Endpoint: $ApiUrl"
 Write-Host "Frontend Bucket: $FrontendBucket"
 Write-Host "Content Bucket: $ContentBucket"
 Write-Host "Table Name: $TableName"
-Write-Host "User Pool: $UserPoolId"
 
 # 7. Generate Frontend .env
 Write-Host "7. Creating frontend environment variables..." -ForegroundColor Yellow
 $EnvContent = @"
 VITE_API_URL=
-VITE_COGNITO_USER_POOL_ID=$UserPoolId
-VITE_COGNITO_CLIENT_ID=$ClientId
-VITE_COGNITO_REGION=$Region
 "@
 $EnvContent | Out-File -FilePath "frontend/.env.production" -Encoding utf8 -NoNewline
 
@@ -99,26 +102,90 @@ if ($LASTEXITCODE -ne 0) { Write-Error "Frontend S3 sync failed"; exit 1 }
 # 10. Seed DynamoDB and upload content
 Write-Host "10. Seeding database and uploading blogs..." -ForegroundColor Yellow
 $env:PORTFOLIO_TABLE = $TableName
-$env:HANDSON_TABLE = "$ProjectName-$Environment-handson"
 $env:BLOGS_TABLE = "$ProjectName-$Environment-blogs"
 $env:CONTENT_BUCKET = $ContentBucket
 $env:AWS_REGION = $Region
 npx.cmd tsx scripts/seed-data.ts
-npx.cmd tsx scripts/seed-handson-dynamodb.ts
-npx.cmd tsx scripts/seed-blogs-dynamodb.ts
 npx.cmd tsx scripts/upload-content.ts
 
 # 11. Invalidate CloudFront Cache
-Write-Host "11. Invalidating CloudFront cache..." -ForegroundColor Yellow
-aws cloudfront create-invalidation --distribution-id $CFDistributionId --paths "/*"
-if ($LASTEXITCODE -ne 0) { Write-Warning "CloudFront cache invalidation failed" }
+Write-Host "11. Invalidating CloudFront cache via Lambda..." -ForegroundColor Yellow
+$InvalidationFn = "$ProjectName-$Environment-invalidate-cache"
+aws lambda invoke --function-name $InvalidationFn --region $Region /tmp/inv-result.json 2>$null
+if ($LASTEXITCODE -ne 0) {
+    aws cloudfront create-invalidation --distribution-id $CFDistributionId --paths "/*"
+}
+
+# 12. Update Route 53 if CustomDomainName is provided
+if ($CustomDomainName) {
+    Write-Host "12. Updating Route 53 Alias records for $CustomDomainName..." -ForegroundColor Yellow
+    $CFDomain = $CloudFrontUrl.Replace("https://", "").TrimEnd("/")
+    $HostedZoneId = (aws route53 list-hosted-zones --query "HostedZones[?Name=='$CustomDomainName.'].Id" --output text).Replace("/hostedzone/", "").Trim()
+    if ($HostedZoneId) {
+        $R53Batch = @"
+{
+  "Changes": [
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "$CustomDomainName.",
+        "Type": "A",
+        "AliasTarget": {
+          "HostedZoneId": "Z2FDTNDATAQYW2",
+          "DNSName": "$CFDomain",
+          "EvaluateTargetHealth": false
+        }
+      }
+    },
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "$CustomDomainName.",
+        "Type": "AAAA",
+        "AliasTarget": {
+          "HostedZoneId": "Z2FDTNDATAQYW2",
+          "DNSName": "$CFDomain",
+          "EvaluateTargetHealth": false
+        }
+      }
+    },
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "www.$CustomDomainName.",
+        "Type": "A",
+        "AliasTarget": {
+          "HostedZoneId": "Z2FDTNDATAQYW2",
+          "DNSName": "$CFDomain",
+          "EvaluateTargetHealth": false
+        }
+      }
+    },
+    {
+      "Action": "UPSERT",
+      "ResourceRecordSet": {
+        "Name": "www.$CustomDomainName.",
+        "Type": "AAAA",
+        "AliasTarget": {
+          "HostedZoneId": "Z2FDTNDATAQYW2",
+          "DNSName": "$CFDomain",
+          "EvaluateTargetHealth": false
+        }
+      }
+    }
+  ]
+}
+"@
+        $R53File = "$env:TEMP\r53-cf-alias.json"
+        $R53Batch | Out-File -FilePath $R53File -Encoding ascii
+        aws route53 change-resource-record-sets --hosted-zone-id $HostedZoneId --change-batch "file://$R53File"
+        Write-Host "Route 53 Alias records updated successfully!" -ForegroundColor Green
+    } else {
+        Write-Warning "Hosted zone for $CustomDomainName not found in Route 53. Skipping DNS update."
+    }
+}
 
 Write-Host "`n==================================================" -ForegroundColor Green
 Write-Host "DEPLOYMENT COMPLETE!" -ForegroundColor Green
 Write-Host "Portfolio Website URL: $CloudFrontUrl" -ForegroundColor Green
-Write-Host "Admin Panel Login:     $CloudFrontUrl/admin/login" -ForegroundColor Green
-Write-Host "Cognito User Pool ID:  $UserPoolId" -ForegroundColor Green
-Write-Host "Cognito Client ID:     $ClientId" -ForegroundColor Green
-Write-Host "To create an admin account, run:" -ForegroundColor Green
-Write-Host ".\scripts\create-admin-user.ps1 -UserPoolId $UserPoolId -Email your-email@example.com -Password YourPassword123!" -ForegroundColor Green
 Write-Host "==================================================" -ForegroundColor Green

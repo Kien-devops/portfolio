@@ -7,12 +7,10 @@ import {
   ExternalLink,
   GitBranch,
   Terminal as TerminalIcon,
-  Clock,
-  ArrowRight,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { api } from "../services/api.js";
-import { Profile, Project, Skill, Experience, Education, BlogMetadata, HandsonMetadata } from "../types/index.js";
+import { Profile, Project, Skill, Experience, Education, BlogMetadata } from "../types/index.js";
 
 export default function Home() {
   // State for data
@@ -22,7 +20,6 @@ export default function Home() {
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [education, setEducation] = useState<Education[]>([]);
   const [blogs, setBlogs] = useState<BlogMetadata[]>([]);
-  const [handsonLabs, setHandsonLabs] = useState<HandsonMetadata[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
 
@@ -47,14 +44,13 @@ export default function Home() {
     const fetchAllData = async () => {
       try {
         setLoading(true);
-        const [profRes, projRes, skillRes, expRes, eduRes, blogRes, handsonRes] = await Promise.all([
+        const [profRes, projRes, skillRes, expRes, eduRes, blogRes] = await Promise.all([
           api.getProfile().catch(() => null),
           api.getProjects().catch(() => []),
           api.getSkills().catch(() => []),
           api.getExperiences().catch(() => []),
           api.getEducation().catch(() => []),
           api.getBlogList().catch(() => []),
-          api.getHandsonList().catch(() => []),
         ]);
 
         if (profRes) setProfile(profRes);
@@ -63,7 +59,6 @@ export default function Home() {
         setExperiences(expRes);
         setEducation(eduRes);
         setBlogs(blogRes);
-        setHandsonLabs(handsonRes);
 
       } catch (err: any) {
         console.error("Error loading portfolio data:", err);
@@ -181,6 +176,16 @@ export default function Home() {
       displayOrder: 2
     },
     {
+      experienceId: "cert-cloudops",
+      company: "Amazon Web Services (AWS)",
+      position: "AWS Certified SysOps Administrator – Associate",
+      startDate: "2026",
+      endDate: "2029",
+      description: "Xác nhận khả năng triển khai, quản lý và vận hành workload trên AWS. Có kiến thức chuyên sâu về monitoring, logging, networking, security, high availability, backup, automation và troubleshooting với các dịch vụ như EC2, S3, IAM, VPC, CloudWatch, CloudFormation và Systems Manager.",
+      credlyUrl: "https://www.credly.com/badges/bd2c6f2c-da53-4fe3-87bb-ec2e22c155ad",
+      displayOrder: 3
+    },
+    {
       experienceId: "cert-ccp",
       company: "Amazon Web Services (AWS)",
       position: "AWS Certified Cloud Practitioner",
@@ -188,16 +193,6 @@ export default function Home() {
       endDate: "2029",
       description: "Nền tảng hiểu biết toàn diện về dịch vụ đám mây, mô hình định giá, bảo mật và kiến trúc AWS. Xác nhận thành thạo các dịch vụ core: EC2, S3, IAM, VPC, RDS và CloudWatch.",
       credlyUrl: "https://www.credly.com/badges/74d3175c-1eda-4ee4-ac65-dfb0cc552706",
-      displayOrder: 3
-    },
-    {
-      experienceId: "cert-soa",
-      company: "Amazon Web Services (AWS)",
-      position: "AWS Certified SysOps Administrator – Associate",
-      startDate: "2026",
-      endDate: "2029",
-      description: "Xác nhận khả năng triển khai, quản lý và vận hành workload trên AWS. Có kiến thức về monitoring, logging, networking, security, high availability, backup, automation và troubleshooting với các dịch vụ như EC2, S3, IAM, VPC, CloudWatch, CloudFormation và Systems Manager.",
-      credlyUrl: "https://www.credly.com/badges/bd2c6f2c-da53-4fe3-87bb-ec2e22c155ad",
       displayOrder: 4
     }
   ];
@@ -397,6 +392,21 @@ export default function Home() {
 
                 <div className="border-b border-[#e5e5e5] pb-4 flex items-center justify-between font-mono text-xs">
                   <div>
+                    <div className="text-[#111111] font-semibold">AWS Certified CloudOps Engineer — Associate</div>
+                    <div className="text-[#8a8a8a] text-[11px] pt-0.5">Issued 2026 · Credly Verified</div>
+                  </div>
+                  <a
+                    href="https://www.credly.com/badges/bd2c6f2c-da53-4fe3-87bb-ec2e22c155ad"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#2563eb] hover:underline font-semibold flex items-center gap-1"
+                  >
+                    Verify ↗
+                  </a>
+                </div>
+
+                <div className="border-b border-[#e5e5e5] pb-4 flex items-center justify-between font-mono text-xs">
+                  <div>
                     <div className="text-[#111111] font-semibold">AWS Certified Cloud Practitioner</div>
                     <div className="text-[#8a8a8a] text-[11px] pt-0.5">Issued 2026 · Credly Verified</div>
                   </div>
@@ -578,68 +588,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ------------------ 05 / HANDS-ON LABS (#FAFAFA) ------------------ */}
-      <section id="handson" className="bg-[#fafafa] py-20 border-b border-[#e5e5e5] scroll-mt-16">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="flex items-center justify-between mb-10">
-            <h2 className="font-mono text-xs uppercase tracking-widest font-bold text-[#111111]">
-              <span className="text-[#2563eb] mr-2">05 /</span>HANDS-ON LABS
-            </h2>
-            <Link
-              to="/handson"
-              className="font-mono text-xs text-[#2563eb] hover:underline font-semibold flex items-center gap-1"
-            >
-              <span>Xem tất cả Guides</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {handsonLabs.slice(0, 3).map((lab) => (
-              <div
-                key={lab.slug}
-                className="bg-[#ffffff] border border-[#e5e5e5] rounded-lg p-6 flex flex-col justify-between hover:border-[#2563eb]/50 hover:shadow-sm transition-all group"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between font-mono text-[11px]">
-                    <span className="bg-[#2563eb] text-white px-2 py-0.5 rounded font-semibold uppercase">
-                      {lab.category}
-                    </span>
-                    <div className="flex items-center space-x-1 text-[#666666]">
-                      <Clock className="w-3 h-3 text-[#2563eb]" />
-                      <span>{lab.estimatedTime}</span>
-                    </div>
-                  </div>
-
-                  <h3 className="text-base font-bold text-[#111111] group-hover:text-[#2563eb] transition-colors font-sans line-clamp-2">
-                    {lab.title}
-                  </h3>
-
-                  <p className="text-xs text-[#666666] line-clamp-3 font-sans leading-relaxed">
-                    {lab.summary}
-                  </p>
-                </div>
-
-                <div className="pt-4 mt-4 border-t border-[#f0f0f0]">
-                  <Link
-                    to={`/handson/${lab.slug}`}
-                    className="w-full inline-flex items-center justify-between font-mono text-xs font-semibold text-[#111111] group-hover:text-[#2563eb] transition-colors"
-                  >
-                    <span>Làm Theo Guide</span>
-                    <span>→</span>
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ------------------ 06 / BLOGS (#FFFFFF) ------------------ */}
+      {/* ------------------ 05 / BLOGS (#FFFFFF) ------------------ */}
       <section id="blog" className="bg-[#ffffff] py-20 border-b border-[#e5e5e5] scroll-mt-16">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="font-mono text-xs uppercase tracking-widest font-bold text-[#111111] mb-10">
-            <span className="text-[#2563eb] mr-2">06 /</span>BLOGS
+            <span className="text-[#2563eb] mr-2">05 /</span>BLOGS
           </h2>
 
 

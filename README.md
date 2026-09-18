@@ -64,31 +64,26 @@ portfolio/
 ├── frontend/                     # React Single Page App (Vite + TS + Tailwind v4)
 │   ├── src/
 │   │   ├── components/           # ThemeToggle, Header, Footer
-│   │   ├── layouts/              # Main Layout, Protected Admin Layout
-│   │   ├── pages/                # Home, BlogDetail, HandsonList, HandsonDetail, AdminLogin, AdminDashboard
-│   │   ├── services/             # API client, Cognito Authentication client
+│   │   ├── layouts/              # Main Layout
+│   │   ├── pages/                # Home, BlogDetail
+│   │   ├── services/             # API client
 │   │   ├── types/                # Shared TypeScript structures
 │   │   └── App.tsx               # Client router setup
 │   └── package.json
 ├── backend/                      # Lambda Handlers (TypeScript)
 │   ├── functions/
-│   │   ├── portfolio-read/       # Public GET endpoints (profile, projects, skills, handson, etc.)
-│   │   ├── portfolio-admin/      # Admin CRUD endpoints (secured by Cognito)
-│   │   ├── contact/              # Public contact form submission & Admin inbox management
-│   │   └── blog-admin/           # Admin S3 blog CRUD (writes JSON and updates index.json)
+│   │   ├── portfolio-read/       # Public GET endpoints (profile, projects, skills, blogs)
+│   │   └── contact/              # Public contact form submission
 │   ├── shared/                   # Shared DB client, S3 client, responses, validations
 │   └── package.json
 ├── content/                      # Source of truth for local mock content & S3 seeding
 │   ├── blogs/                    # Blog posts (.json)
-│   ├── handson/                  # Hands-on lab markdown content
 │   └── images/                   # Profile, project, and blog pictures
-└── scripts/                      # Deployment and admin utility scripts
+└── scripts/                      # Deployment utility scripts
     ├── seed-data.ts              # Seeds DynamoDB tables
-    ├── seed-handson-dynamodb.ts  # Seeds Hands-on lab table
     ├── upload-content.ts         # Generates mock assets and uploads to S3 Content bucket
     ├── deploy.ps1                # Windows: build, SAM deploy, S3 upload, cache invalidation
-    ├── deploy.sh                 # Linux/macOS: same as above
-    └── create-admin-user.ps1     # Creates Cognito Admin User via AWS CLI
+    └── deploy.sh                 # Linux/macOS: same as above
 ```
 
 ---

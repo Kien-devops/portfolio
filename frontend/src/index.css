@@ -147,21 +147,6 @@ svg {
   height: auto;
 }
 
-/* Hands-on Container System */
-.handson-container {
-  width: min(100% - 32px, 1200px);
-  margin-inline: auto;
-}
-
-@media (min-width: 1280px) {
-  .handson-container {
-    width: min(100% - 64px, 1200px);
-  }
-}
-
-.handson-header {
-  max-width: 720px;
-}
 
 /* Toolbar & Filters */
 .toolbar {

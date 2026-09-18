@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, ShieldAlert } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import ThemeToggle from "./ThemeToggle.js";
-import { isAuthenticated } from "../services/auth.js";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const isAdmin = isAuthenticated();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,12 +31,11 @@ export default function Header() {
     }
   };
 
-  const navLinks = [
+  const navLinks: { name: string; id: string; isRoute?: boolean; route?: string }[] = [
     { name: "About", id: "about" },
     { name: "Work", id: "projects" },
     { name: "Certifications", id: "experience" },
     { name: "Stack", id: "stack" },
-    { name: "Hands-on", id: "handson", isRoute: true, route: "/handson" },
     { name: "Blogs", id: "blog" },
   ];
 
@@ -92,24 +89,6 @@ export default function Header() {
 
           <div className="flex items-center space-x-3 border-l border-[#e5e5e5] pl-5">
             <ThemeToggle />
-            {isAdmin ? (
-              <Link
-                to="/admin/dashboard"
-                className="font-mono text-xs text-[#2563eb] hover:underline flex items-center gap-1"
-                id="admin-dashboard-link"
-              >
-                <ShieldAlert className="w-3.5 h-3.5" />
-                <span>Dashboard</span>
-              </Link>
-            ) : (
-              <Link
-                to="/admin/login"
-                className="font-mono text-xs text-[#666666] hover:text-[#111111] transition-colors"
-                id="admin-login-link"
-              >
-                Admin
-              </Link>
-            )}
           </div>
         </nav>
 
@@ -159,26 +138,6 @@ export default function Header() {
           >
             GitHub ↗
           </a>
-          <div className="border-t border-[#e5e5e5] pt-4">
-            {isAdmin ? (
-              <Link
-                to="/admin/dashboard"
-                onClick={() => setIsOpen(false)}
-                className="font-mono text-xs text-[#2563eb] hover:underline flex items-center gap-1.5"
-              >
-                <ShieldAlert className="w-4 h-4" />
-                <span>Admin Dashboard</span>
-              </Link>
-            ) : (
-              <Link
-                to="/admin/login"
-                onClick={() => setIsOpen(false)}
-                className="font-mono text-xs text-[#666666] hover:text-[#111111]"
-              >
-                Sign In As Admin
-              </Link>
-            )}
-          </div>
         </div>
       )}
     </header>
