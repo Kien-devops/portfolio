@@ -13,19 +13,19 @@ phases:
     runtime-versions:
       nodejs: 20
     commands:
-      - echo "=== 1. Checking Tooling Versions ==="
+      - echo "=== 1. Tooling Versions ==="
       - node --version
       - npm --version
       - sam --version
       - aws --version
-      - echo "=== 2. Installing Project Dependencies ==="
+      - echo "=== 2. Installing Dependencies ==="
       - npm ci
       - export PATH="$CODEBUILD_SRC_DIR/node_modules/.bin:$PATH"
       - esbuild --version
 
   pre_build:
     commands:
-      - echo "=== 3. Testing Backend ==="
+      - echo "=== 3. Running Backend Tests ==="
       - npm run test:backend
       - echo "=== 4. Building Backend Artifacts ==="
       - npm run build:backend
@@ -38,39 +38,19 @@ phases:
       - export PATH="$CODEBUILD_SRC_DIR/node_modules/.bin:$PATH"
       - sam build --template-file template.yaml
 
-      - echo "=== 7. Deploying Serverless Infrastructure ==="
+      - echo "=== 7. Deploying Backend Infrastructure via SAM ==="
       - sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name "$STACK_NAME" --region "$AWS_DEFAULT_REGION" --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND --resolve-s3 --parameter-overrides ProjectName=serverless-portfolio Environment=prod CustomDomainName="$CUSTOM_DOMAIN" ACMCertificateArn="$ACM_CERTIFICATE_ARN" DeploymentPreferenceType=AllAtOnce
 
   post_build:
     commands:
-      - echo "=== 8. Syncing Frontend Bundle to S3 ==="
-      - FRONTEND_BUCKET=$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --region "$AWS_DEFAULT_REGION" --query "Stacks[0].Outputs[?OutputKey=='FrontendBucketName'].OutputValue" --output text)
-      - echo "Frontend Bucket: $FRONTEND_BUCKET"
-      - aws s3 sync frontend/dist "s3://${FRONTEND_BUCKET}" --delete
-
-      - echo "=== 9. Uploading Content / Blogs to S3 ==="
+      - echo "=== 8. Uploading Content & Blogs to S3 ==="
       - npm run upload-content || true
-
-      - echo "=== 10. Invoking CloudFront Invalidation Lambda ==="
-      - INVALIDATION_FN=$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --region "$AWS_DEFAULT_REGION" --query "Stacks[0].Outputs[?OutputKey=='CloudFrontInvalidationFunctionName'].OutputValue" --output text)
-      - |
-        if [ -n "$INVALIDATION_FN" ] && [ "$INVALIDATION_FN" != "None" ]; then
-          echo "Invoking Lambda Invalidator: $INVALIDATION_FN"
-          aws lambda invoke --function-name "$INVALIDATION_FN" --payload '{"paths":["/*"]}' /tmp/invalidation-response.json
-          cat /tmp/invalidation-response.json
-        else
-          echo "Warning: Invalidation Lambda not found, falling back to direct CloudFront invalidation"
-          DISTRIBUTION_ID=$(aws cloudformation describe-stacks --stack-name "$STACK_NAME" --region "$AWS_DEFAULT_REGION" --query "Stacks[0].Outputs[?OutputKey=='CloudFrontDistributionId'].OutputValue" --output text)
-          aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*"
-        fi
-
-      - echo "=== Deployment & Invalidation Complete ==="
+      - echo "=== Backend Build & Deploy Complete. Frontend artifact prepared for S3 Deploy stage ==="
 
 artifacts:
+  base-directory: frontend/dist
   files:
-    - template.yaml
-    - buildspec.yml
-  discard-paths: yes
+    - '**/*'
 
 cache:
   paths:
