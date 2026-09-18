@@ -133,6 +133,7 @@ const sampleData = [
     "endDate": "2029",
     "description": "Đạt chứng chỉ AWS Certified Solutions Architect Associate – chứng nhận năng lực thiết kế kiến trúc hệ thống phân tán, có tính khả dụng cao và bảo mật trên AWS. Bao gồm thiết kế Well-Architected Framework: VPC multi-AZ, Auto Scaling, EKS/ECS, RDS Multi-AZ, CloudFront, Route 53 và IAM Least Privilege.",
     "credlyUrl": "https://www.credly.com/badges/fb64362a-24b4-4006-bc6d-d7fd1428a9e1",
+    "badgeUrl": "/images/certs/aws-certified-solutions-architect-associate.png",
     "displayOrder": 1
   },
   {
@@ -145,6 +146,7 @@ const sampleData = [
     "endDate": "2029",
     "description": "Đạt chứng chỉ AWS Certified Developer Associate – xác nhận kỹ năng phát triển, deploy và debug ứng dụng cloud-native trên AWS. Kỹ năng bao gồm AWS SDKs/APIs, Lambda, API Gateway, DynamoDB, SQS/SNS, Cognito và AWS SAM framework.",
     "credlyUrl": "https://www.credly.com/badges/e3fdcd6b-e0b5-420e-9dde-993c89617e19",
+    "badgeUrl": "/images/certs/aws-certified-developer-associate.png",
     "displayOrder": 2
   },
   {
@@ -157,6 +159,7 @@ const sampleData = [
     "endDate": "2029",
     "description": "Đạt chứng chỉ AWS Certified CloudOps Engineer Associate – xác nhận năng lực triển khai, quản lý, vận hành và bảo mật hạ tầng trên AWS Cloud. Kỹ năng bao gồm giám sát hệ thống với CloudWatch, tự động hoá CI/CD & IaC, tối ưu hoá hiệu năng, chi phí và áp dụng best practices vận hành đám mây.",
     "credlyUrl": "https://www.credly.com/badges/bd2c6f2c-da53-4fe3-87bb-ec2e22c155ad",
+    "badgeUrl": "/images/certs/aws-certified-cloudops-engineer-associate.png",
     "displayOrder": 3
   },
   {
@@ -169,6 +172,7 @@ const sampleData = [
     "endDate": "2029",
     "description": "Đạt chứng chỉ AWS Certified Cloud Practitioner – nền tảng hiểu biết toàn diện về dịch vụ đám mây, mô hình định giá, bảo mật và kiến trúc AWS. Xác nhận thành thạo các dịch vụ core: EC2, S3, IAM, VPC, RDS và CloudWatch.",
     "credlyUrl": "https://www.credly.com/badges/74d3175c-1eda-4ee4-ac65-dfb0cc552706",
+    "badgeUrl": "/images/certs/aws-certified-cloud-practitioner.png",
     "displayOrder": 4
   },
   {

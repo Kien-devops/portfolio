@@ -163,6 +163,7 @@ export default function Home() {
       endDate: "2029",
       description: "Chứng nhận năng lực thiết kế kiến trúc hệ thống phân tán, có tính khả dụng cao và bảo mật trên AWS. Thiết kế Well-Architected Framework: VPC multi-AZ, Auto Scaling, EKS/ECS, RDS Multi-AZ, CloudFront, Route 53 và IAM Least Privilege.",
       credlyUrl: "https://www.credly.com/badges/fb64362a-24b4-4006-bc6d-d7fd1428a9e1",
+      badgeUrl: "/images/certs/aws-certified-solutions-architect-associate.png",
       displayOrder: 1
     },
     {
@@ -173,16 +174,18 @@ export default function Home() {
       endDate: "2029",
       description: "Xác nhận kỹ năng phát triển, deploy và debug ứng dụng cloud-native trên AWS. Kỹ năng bao gồm AWS SDKs/APIs, Lambda, API Gateway, DynamoDB, SQS/SNS, Cognito và AWS SAM framework.",
       credlyUrl: "https://www.credly.com/badges/e3fdcd6b-e0b5-420e-9dde-993c89617e19",
+      badgeUrl: "/images/certs/aws-certified-developer-associate.png",
       displayOrder: 2
     },
     {
       experienceId: "cert-cloudops",
       company: "Amazon Web Services (AWS)",
-      position: "AWS Certified SysOps Administrator – Associate",
+      position: "AWS Certified CloudOps Engineer – Associate",
       startDate: "2026",
       endDate: "2029",
-      description: "Xác nhận khả năng triển khai, quản lý và vận hành workload trên AWS. Có kiến thức chuyên sâu về monitoring, logging, networking, security, high availability, backup, automation và troubleshooting với các dịch vụ như EC2, S3, IAM, VPC, CloudWatch, CloudFormation và Systems Manager.",
+      description: "Xác nhận năng lực triển khai, quản lý, vận hành và bảo mật hạ tầng trên AWS Cloud. Kỹ năng bao gồm giám sát hệ thống với CloudWatch, tự động hoá CI/CD & IaC, tối ưu hoá hiệu năng, chi phí và áp dụng best practices vận hành đám mây.",
       credlyUrl: "https://www.credly.com/badges/bd2c6f2c-da53-4fe3-87bb-ec2e22c155ad",
+      badgeUrl: "/images/certs/aws-certified-cloudops-engineer-associate.png",
       displayOrder: 3
     },
     {
@@ -193,6 +196,7 @@ export default function Home() {
       endDate: "2029",
       description: "Nền tảng hiểu biết toàn diện về dịch vụ đám mây, mô hình định giá, bảo mật và kiến trúc AWS. Xác nhận thành thạo các dịch vụ core: EC2, S3, IAM, VPC, RDS và CloudWatch.",
       credlyUrl: "https://www.credly.com/badges/74d3175c-1eda-4ee4-ac65-dfb0cc552706",
+      badgeUrl: "/images/certs/aws-certified-cloud-practitioner.png",
       displayOrder: 4
     }
   ];
@@ -360,76 +364,89 @@ export default function Home() {
               </h2>
 
               <div className="space-y-4 border-t border-[#e5e5e5] pt-4">
-                <div className="border-b border-[#e5e5e5] pb-4 flex items-center justify-between font-mono text-xs">
-                  <div>
-                    <div className="text-[#111111] font-semibold">AWS Certified Solutions Architect — Associate</div>
-                    <div className="text-[#8a8a8a] text-[11px] pt-0.5">Issued 2026 · Credly Verified</div>
+                <div className="border-b border-[#e5e5e5] pb-4 flex items-center justify-between font-mono text-xs gap-3">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src="/images/certs/aws-certified-solutions-architect-associate.png"
+                      alt="AWS SAA Badge"
+                      className="w-10 h-10 object-contain shrink-0"
+                    />
+                    <div>
+                      <div className="text-[#111111] font-semibold">AWS Certified Solutions Architect — Associate</div>
+                      <div className="text-[#8a8a8a] text-[11px] pt-0.5">Issued 2026 · Credly Verified</div>
+                    </div>
                   </div>
                   <a
                     href="https://www.credly.com/badges/fb64362a-24b4-4006-bc6d-d7fd1428a9e1"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#2563eb] hover:underline font-semibold flex items-center gap-1"
+                    className="text-[#2563eb] hover:underline font-semibold flex items-center gap-1 shrink-0"
                   >
                     Verify ↗
                   </a>
                 </div>
 
-                <div className="border-b border-[#e5e5e5] pb-4 flex items-center justify-between font-mono text-xs">
-                  <div>
-                    <div className="text-[#111111] font-semibold">AWS Certified Developer — Associate</div>
-                    <div className="text-[#8a8a8a] text-[11px] pt-0.5">Issued 2026 · Credly Verified</div>
+                <div className="border-b border-[#e5e5e5] pb-4 flex items-center justify-between font-mono text-xs gap-3">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src="/images/certs/aws-certified-developer-associate.png"
+                      alt="AWS DVA Badge"
+                      className="w-10 h-10 object-contain shrink-0"
+                    />
+                    <div>
+                      <div className="text-[#111111] font-semibold">AWS Certified Developer — Associate</div>
+                      <div className="text-[#8a8a8a] text-[11px] pt-0.5">Issued 2026 · Credly Verified</div>
+                    </div>
                   </div>
                   <a
                     href="https://www.credly.com/badges/e3fdcd6b-e0b5-420e-9dde-993c89617e19"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#2563eb] hover:underline font-semibold flex items-center gap-1"
+                    className="text-[#2563eb] hover:underline font-semibold flex items-center gap-1 shrink-0"
                   >
                     Verify ↗
                   </a>
                 </div>
 
-                <div className="border-b border-[#e5e5e5] pb-4 flex items-center justify-between font-mono text-xs">
-                  <div>
-                    <div className="text-[#111111] font-semibold">AWS Certified CloudOps Engineer — Associate</div>
-                    <div className="text-[#8a8a8a] text-[11px] pt-0.5">Issued 2026 · Credly Verified</div>
+                <div className="border-b border-[#e5e5e5] pb-4 flex items-center justify-between font-mono text-xs gap-3">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src="/images/certs/aws-certified-cloudops-engineer-associate.png"
+                      alt="AWS CloudOps Badge"
+                      className="w-10 h-10 object-contain shrink-0"
+                    />
+                    <div>
+                      <div className="text-[#111111] font-semibold">AWS Certified CloudOps Engineer — Associate</div>
+                      <div className="text-[#8a8a8a] text-[11px] pt-0.5">Issued 2026 · Credly Verified</div>
+                    </div>
                   </div>
                   <a
                     href="https://www.credly.com/badges/bd2c6f2c-da53-4fe3-87bb-ec2e22c155ad"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#2563eb] hover:underline font-semibold flex items-center gap-1"
+                    className="text-[#2563eb] hover:underline font-semibold flex items-center gap-1 shrink-0"
                   >
                     Verify ↗
                   </a>
                 </div>
 
-                <div className="border-b border-[#e5e5e5] pb-4 flex items-center justify-between font-mono text-xs">
-                  <div>
-                    <div className="text-[#111111] font-semibold">AWS Certified Cloud Practitioner</div>
-                    <div className="text-[#8a8a8a] text-[11px] pt-0.5">Issued 2026 · Credly Verified</div>
+                <div className="border-b border-[#e5e5e5] pb-4 flex items-center justify-between font-mono text-xs gap-3">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src="/images/certs/aws-certified-cloud-practitioner.png"
+                      alt="AWS CCP Badge"
+                      className="w-10 h-10 object-contain shrink-0"
+                    />
+                    <div>
+                      <div className="text-[#111111] font-semibold">AWS Certified Cloud Practitioner</div>
+                      <div className="text-[#8a8a8a] text-[11px] pt-0.5">Issued 2026 · Credly Verified</div>
+                    </div>
                   </div>
                   <a
                     href="https://www.credly.com/badges/74d3175c-1eda-4ee4-ac65-dfb0cc552706"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#2563eb] hover:underline font-semibold flex items-center gap-1"
-                  >
-                    Verify ↗
-                  </a>
-                </div>
-
-                <div className="border-b border-[#e5e5e5] pb-4 flex items-center justify-between font-mono text-xs">
-                  <div>
-                    <div className="text-[#111111] font-semibold">AWS Certified SysOps Administrator — Associate</div>
-                    <div className="text-[#8a8a8a] text-[11px] pt-0.5">Issued 2026 · Credly Verified</div>
-                  </div>
-                  <a
-                    href="https://www.credly.com/badges/bd2c6f2c-da53-4fe3-87bb-ec2e22c155ad"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[#2563eb] hover:underline font-semibold flex items-center gap-1"
+                    className="text-[#2563eb] hover:underline font-semibold flex items-center gap-1 shrink-0"
                   >
                     Verify ↗
                   </a>
@@ -523,11 +540,31 @@ export default function Home() {
           <div className="border-t border-[#e5e5e5]">
             {displayExperiences.map((exp, idx) => (
               <div key={exp.experienceId || idx} className="border-b border-[#e5e5e5] py-8">
-                <div className="grid md:grid-cols-12 gap-4 items-start">
+                <div className="grid md:grid-cols-12 gap-6 items-start">
                   
-                  {/* Dates */}
-                  <div className="md:col-span-3 font-mono text-xs font-semibold text-[#666666] pt-1">
-                    {exp.startDate} — {exp.endDate || "PRESENT"}
+                  {/* Badge & Dates */}
+                  <div className="md:col-span-3 flex md:flex-col items-center md:items-start gap-4">
+                    {(exp as any).badgeUrl && (
+                      <a
+                        href={(exp as any).credlyUrl || "#"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group block relative shrink-0"
+                        title="View verified credential on Credly"
+                      >
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 bg-[#f8fafc] dark:bg-slate-900/60 rounded-xl p-2 border border-[#e2e8f0] dark:border-slate-800 shadow-xs transition-all duration-300 group-hover:scale-105 group-hover:shadow-md group-hover:border-[#2563eb]/50 flex items-center justify-center">
+                          <img
+                            src={(exp as any).badgeUrl}
+                            alt={exp.position}
+                            className="w-full h-full object-contain filter drop-shadow-xs transition-transform duration-300 group-hover:scale-110"
+                            loading="lazy"
+                          />
+                        </div>
+                      </a>
+                    )}
+                    <div className="font-mono text-xs font-semibold text-[#666666] pt-1">
+                      {exp.startDate} — {exp.endDate || "PRESENT"}
+                    </div>
                   </div>
 
                   {/* Details */}

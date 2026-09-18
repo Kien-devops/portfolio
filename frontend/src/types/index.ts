@@ -40,6 +40,8 @@ export interface Experience {
   endDate: string | null; // YYYY-MM or null
   description: string;
   displayOrder: number;
+  credlyUrl?: string;
+  badgeUrl?: string;
 }
 
 export interface Education {
